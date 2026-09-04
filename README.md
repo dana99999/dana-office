@@ -2,15 +2,12 @@
 
 다나나인 버추얼 오피스 — 픽셀아트 가상 사무실 + 프로젝트 편성·호출제로 일하는 AI 담당자.
 
-- 기획서: [docs/PLAN.md](docs/PLAN.md)
+- 기획서 v3: [docs/PLAN.md](docs/PLAN.md)
 - 동작 프로토타입: [prototype/index.html](prototype/index.html) — 브라우저에서 파일을 열면 바로 실행 (빌드 불필요)
-
-## 프로토타입 조작
-- 방향키: 대표 캐릭터 이동
-- Space: 옆 AI에게 업무 지시(큐 +1)
-- 프로젝트 버튼: 편성 변경 → 필요 없는 AI는 정문으로 퇴근, 필요한 AI는 출근
-- 호출 / 내보내기: 개별 AI 출퇴근
+  - 사무실: 방향키 이동 · Space 업무 지시 · 프로젝트 편성 버튼 · 호출/내보내기
+  - 캐릭터 만들기: 헤어·의상·색·안경 조합 실시간 미리보기 (§08)
+  - 비용·크레딧 화면 목업(예시 데이터), 로그인·관리자 목업
 
 ## 본 구축 (P1~)
-Next.js App Router + TypeScript + SQLite(better-sqlite3). `app/office` 로 시작.
-자세한 구조는 기획서 §9.
+Next.js App Router + TypeScript + SQLite(better-sqlite3). 구조는 기획서 §11.
+서버는 Anthropic **API 키**만 사용한다 (구독 계정 토큰 사용 금지 — 기획서 §7).

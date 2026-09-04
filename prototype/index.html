@@ -11,6 +11,7 @@
   --amber:#B26E15; --amber-soft:#F7EBD6;
   --teal:#15706E; --teal-soft:#DCEFEE;
   --danger:#A6342B; --danger-soft:#F8E3E0;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
   --shadow:0 1px 2px rgba(23,24,38,.06), 0 8px 24px -12px rgba(23,24,38,.18);
   --sans:"IBM Plex Sans KR", system-ui, -apple-system, "Malgun Gothic", sans-serif;
   --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -24,7 +25,8 @@
     --accent:#9089F7; --accent-soft:#221F3A; --accent-ink:#B0AAFF;
     --amber:#E8A33D; --amber-soft:#2C2416;
     --teal:#4FC0BC; --teal-soft:#122A2A;
-    --danger:#E9736A; --danger-soft:#3A1F1c;
+    --danger:#E9736A; --danger-soft:#3A1F1C;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.8);
   }
 }
@@ -35,19 +37,21 @@
   --accent:#9089F7; --accent-soft:#221F3A; --accent-ink:#B0AAFF;
   --amber:#E8A33D; --amber-soft:#2C2416;
   --teal:#4FC0BC; --teal-soft:#122A2A;
-  --danger:#E9736A; --danger-soft:#3A1F1c;
+  --danger:#E9736A; --danger-soft:#3A1F1C;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.8);
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
 .prose{max-width:760px}
-h1,h2,h3{text-wrap:balance;margin:0}
+h1,h2,h3,h4{text-wrap:balance;margin:0}
 a{color:var(--accent-ink)}
 p{margin:0 0 14px}
 ul{margin:0 0 14px;padding-left:20px}
 li{margin-bottom:4px}
 code{font-family:var(--mono);font-size:.9em;background:var(--surface-2);padding:1px 5px;border-radius:2px;color:var(--ink-2)}
+.px{image-rendering:pixelated;image-rendering:crisp-edges}
 
 .masthead{padding:44px 0 18px}
 .kicker{font-family:var(--pixel);font-size:11px;letter-spacing:.14em;color:var(--accent-ink);text-transform:uppercase;display:flex;gap:10px;align-items:center}
@@ -57,14 +61,11 @@ h1{font-size:clamp(2rem,5.2vw,3.15rem);line-height:1.12;font-weight:700;letter-s
 .thesis b{color:var(--ink);font-weight:600}
 .meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:20px;font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
 .meta span b{color:var(--ink-2);font-weight:500}
-
-/* change log strip */
-.delta{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:22px 0 0}
+.delta{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:22px 0 0}
 .delta > div{background:var(--surface);padding:12px 14px;font-size:13px;color:var(--ink-2)}
 .delta b{display:block;color:var(--ink);font-weight:600;margin-bottom:2px}
-.delta .was{text-decoration:line-through;color:var(--ink-3)}
 
-/* office panel */
+/* office */
 .office{margin:26px 0 8px;background:var(--surface);border:1px solid var(--line);border-radius:4px;box-shadow:var(--shadow);overflow:hidden}
 .hud{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;padding:11px 14px;border-bottom:1px solid var(--line);background:var(--surface-2)}
 .hud .clock{font-family:var(--pixel);font-size:17px;color:var(--ink);letter-spacing:.03em}
@@ -76,19 +77,18 @@ h1{font-size:clamp(2rem,5.2vw,3.15rem);line-height:1.12;font-weight:700;letter-s
 .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn.sm{padding:2px 8px;font-size:11px}
-
-.stage{position:relative;background:#0e0f18;display:flex;justify-content:center;padding:10px 0;line-height:0}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.stage{position:relative;background:#0b0c14;display:flex;justify-content:center;padding:10px 0;line-height:0}
 .view{position:relative}
-canvas.px{display:block;image-rendering:pixelated;image-rendering:crisp-edges;touch-action:none}
+canvas.world{display:block;touch-action:none}
 .layer{position:absolute;inset:0;pointer-events:none;line-height:1.4}
 .zlabel{position:absolute;transform:translate(-50%,-50%);font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.85);white-space:nowrap;background:rgba(14,15,24,.55);padding:1px 6px;border-radius:2px}
-.tag{position:absolute;transform:translate(-50%,0);white-space:nowrap;font-size:9.5px;font-weight:500;color:#fff;background:rgba(14,15,24,.74);padding:1px 5px;border-radius:2px}
+.tag{position:absolute;transform:translate(-50%,-100%);white-space:nowrap;font-size:9.5px;font-weight:500;color:#fff;background:rgba(14,15,24,.74);padding:1px 5px;border-radius:2px}
 .tag.human{background:rgba(75,68,196,.92)}
 .tag.you{background:#E8A33D;color:#20170a;font-weight:700}
 .tag em{font-style:normal;opacity:.8;margin-left:3px}
 .bubble{position:absolute;transform:translate(-50%,-100%);max-width:200px;background:#fff;color:#171826;font-size:11.5px;line-height:1.45;padding:5px 8px;border-radius:3px;box-shadow:0 3px 10px rgba(0,0,0,.45);white-space:normal}
 .bubble::after{content:"";position:absolute;left:50%;bottom:-4px;margin-left:-4px;width:0;height:0;border:4px solid transparent;border-top-color:#fff;border-bottom:0}
-
 .deck{display:grid;grid-template-columns:1.1fr 1fr 1fr;border-top:1px solid var(--line)}
 @media (max-width:900px){.deck{grid-template-columns:1fr 1fr}}
 @media (max-width:640px){.deck{grid-template-columns:1fr}}
@@ -96,17 +96,18 @@ canvas.px{display:block;image-rendering:pixelated;image-rendering:crisp-edges;to
 .pad:last-child{border-right:0}
 @media (max-width:900px){.pad{border-bottom:1px solid var(--line)}}
 .lhead{font-family:var(--pixel);font-size:10px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase;margin-bottom:8px}
-#chat{height:190px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;font-size:12.5px;padding-right:4px}
+#chat{height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;font-size:12.5px;padding-right:4px}
 #chat .row{display:grid;grid-template-columns:40px 58px 1fr;gap:7px;align-items:baseline}
 #chat time{font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
 #chat .who{font-weight:600;font-size:11.5px;overflow:hidden;text-overflow:ellipsis}
 #chat .msg{color:var(--ink-2)}
 .projects{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .roster-mini{display:flex;flex-direction:column;gap:4px;font-size:12px}
-.roster-mini .r{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:3px 0;border-bottom:1px dashed var(--line)}
+.roster-mini .r{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:3px 0;border-bottom:1px dashed var(--line)}
 .roster-mini .r:last-child{border-bottom:0}
 .roster-mini .n{font-weight:600}
 .roster-mini .n small{font-weight:400;color:var(--ink-3);margin-left:5px}
+.roster-mini .cost{font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
 .chip{font-family:var(--mono);font-size:10px;padding:1px 6px;border-radius:2px;border:1px solid transparent;white-space:nowrap}
 .chip.work{background:var(--teal-soft);color:var(--teal);border-color:var(--teal)}
 .chip.idle{background:var(--amber-soft);color:var(--amber);border-color:var(--amber)}
@@ -126,7 +127,6 @@ section{padding:52px 0 0}
 h2{font-size:1.42rem;font-weight:700;letter-spacing:-.014em}
 .sdek{color:var(--ink-2);margin:6px 0 22px;max-width:64ch}
 h3{font-size:1.02rem;font-weight:600;margin:26px 0 8px}
-
 .answer{border:1px solid var(--accent);border-left-width:4px;background:var(--surface);padding:18px 22px;margin:0 0 20px}
 .answer .big{font-size:1.15rem;font-weight:600;margin-bottom:6px}
 .answer p:last-child{margin-bottom:0}
@@ -134,6 +134,9 @@ h3{font-size:1.02rem;font-weight:600;margin:26px 0 8px}
 .need .t{font-weight:600;color:var(--amber);font-size:.8rem;letter-spacing:.06em;font-family:var(--mono);margin-bottom:8px}
 .need ol{margin:0;padding-left:20px}
 .need li{margin-bottom:6px}
+.guard{border:1px solid var(--teal);background:var(--teal-soft);padding:16px 20px;margin:14px 0}
+.guard .t{font-family:var(--mono);font-size:.8rem;letter-spacing:.06em;color:var(--teal);font-weight:600;margin-bottom:8px}
+.guard ol{margin:0;padding-left:20px}.guard li{margin-bottom:6px}
 
 .goals{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
 .goals > div{background:var(--surface);padding:16px 16px 18px}
@@ -142,7 +145,6 @@ h3{font-size:1.02rem;font-weight:600;margin:26px 0 8px}
 .goals p{font-size:13px;color:var(--ink-2);margin:0 0 10px}
 .goals .kpi{font-size:12px;color:var(--ink-3);border-top:1px dashed var(--line-strong);padding-top:8px}
 .goals .kpi b{color:var(--teal);font-weight:600}
-
 .states{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin:6px 0 16px}
 .states > div{padding:12px 14px;border-radius:2px}
 .states .a{background:var(--teal-soft);border-left:3px solid var(--teal)}
@@ -152,18 +154,16 @@ h3{font-size:1.02rem;font-weight:600;margin:26px 0 8px}
 .states .p{font-size:12.5px;color:var(--ink-2);line-height:1.55;margin-top:3px}
 .states .cost{font-family:var(--mono);font-size:11.5px;margin-top:6px;color:var(--ink-3)}
 @media (max-width:700px){.states{grid-template-columns:1fr}}
-
 .roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:14px}
 .card{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:12px}
 .card.is-human{border-color:var(--accent);background:var(--accent-soft)}
-.card canvas{width:56px;height:88px;image-rendering:pixelated;flex:none;background:var(--surface-2);border:1px solid var(--line);border-radius:2px}
+.card canvas{width:56px;height:88px;flex:none;background:var(--surface-2);border:1px solid var(--line);border-radius:2px}
 .card .nm{font-weight:600;font-size:.96rem;display:flex;align-items:center;gap:6px}
 .card .rl{font-size:12px;color:var(--ink-2);margin-top:1px}
 .card .out{font-size:11.5px;color:var(--ink-3);margin-top:6px;line-height:1.5}
 .card .mdl{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:6px}
 .pill{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;padding:1px 5px;border-radius:2px;border:1px solid currentColor;font-weight:500}
 .pill.h{color:var(--accent-ink)} .pill.a{color:var(--teal)}
-
 table{width:100%;border-collapse:collapse;font-size:13.5px;margin:4px 0 8px}
 .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface);margin-bottom:12px}
 th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -177,17 +177,14 @@ tr.hi td:first-child{font-weight:600}
 .matrix td{text-align:center;font-family:var(--mono);font-size:13px}
 .matrix td:first-child{text-align:left;font-family:var(--sans);font-weight:500}
 .dot-a{color:var(--teal)} .dot-b{color:var(--amber)} .dot-c{color:var(--ink-3)}
-
 pre{background:var(--surface-2);border:1px solid var(--line);border-radius:3px;padding:14px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.65;color:var(--ink-2);margin:0 0 16px}
 pre b{color:var(--accent-ink);font-weight:600}
-
 .checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
 .check{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:14px 16px}
 .check h4{margin:0 0 8px;font-size:.9rem;font-weight:600;color:var(--accent-ink);font-family:var(--mono);letter-spacing:.04em}
 .check ul{margin:0;padding-left:16px}
 .check li{font-size:13px;color:var(--ink-2);margin-bottom:6px}
 .check li b{color:var(--ink);font-weight:600}
-
 .road .step{display:grid;grid-template-columns:64px 1fr 132px;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);align-items:baseline}
 .road .step:last-child{border-bottom:0}
 .road .p{font-family:var(--pixel);font-size:13px;color:var(--accent-ink)}
@@ -195,30 +192,110 @@ pre b{color:var(--accent-ink);font-weight:600}
 .road .d{font-size:12.5px;color:var(--ink-2);margin-top:3px}
 .road .w{font-family:var(--mono);font-size:12px;color:var(--ink-3);text-align:right}
 @media (max-width:640px){.road .step{grid-template-columns:52px 1fr}.road .w{grid-column:2;text-align:left}}
-
 .ask{background:var(--surface);border:1px solid var(--accent);border-radius:3px;padding:20px 22px}
 .ask ol{margin:0;padding-left:20px}
 .ask li{margin-bottom:9px}
 footer{margin-top:56px;padding:22px 0 60px;border-top:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
+
+/* ---- screen mockups ---- */
+.mock{background:var(--surface);border:1px solid var(--line);border-radius:4px;box-shadow:var(--shadow);overflow:hidden;margin:14px 0 8px}
+.mock .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.mock .bar i{width:9px;height:9px;border-radius:50%;background:var(--line-strong);display:inline-block}
+.mock .bar .url{margin-left:8px;background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:1px 8px;color:var(--ink-2)}
+.mock .bar .tagx{margin-left:auto;color:var(--amber)}
+/* login */
+.login{display:grid;grid-template-columns:1.1fr 1fr;min-height:420px}
+@media (max-width:760px){.login{grid-template-columns:1fr}}
+.login .art{background:#0b0c14;position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:26px 28px;color:#e9e9f2}
+.login .art canvas{display:block}
+.login .art .logo{font-family:var(--pixel);font-size:18px;letter-spacing:.08em;color:#fff}
+.login .art .sub{font-size:12.5px;color:rgba(255,255,255,.6);margin-top:4px}
+.login .art .live{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.55);display:flex;gap:14px;flex-wrap:wrap}
+.login .art .live b{color:#E8A33D;font-weight:600}
+.login .form{padding:30px 34px;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.login .form h4{font-size:1.15rem;font-weight:700}
+.login .form .sub{font-size:12.5px;color:var(--ink-3);margin-top:-6px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11.5px;font-family:var(--mono);color:var(--ink-3);letter-spacing:.04em}
+.field input,.field select,.field textarea{font-family:var(--sans);font-size:14px;padding:9px 11px;border:1px solid var(--line-strong);border-radius:3px;background:var(--surface);color:var(--ink)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.login .form .row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-3)}
+.login .form .alt{border-top:1px dashed var(--line-strong);padding-top:12px;font-size:12.5px;color:var(--ink-2)}
+/* onboarding */
+.maker{display:grid;grid-template-columns:260px 1fr;gap:0}
+@media (max-width:700px){.maker{grid-template-columns:1fr}}
+.maker .stagebox{background:#0b0c14;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px}
+.maker .stagebox canvas{display:block}
+.maker .stagebox .nametag{font-size:11px;background:rgba(75,68,196,.92);color:#fff;padding:1px 6px;border-radius:2px}
+.maker .stagebox .ctl{display:flex;gap:6px}
+.maker .opts{padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:14px 20px}
+@media (max-width:700px){.maker .opts{grid-template-columns:1fr}}
+.opt label{display:block;font-size:11.5px;font-family:var(--mono);color:var(--ink-3);margin-bottom:6px;letter-spacing:.04em}
+.seg{display:flex;flex-wrap:wrap;gap:5px}
+.seg button{font-family:var(--sans);font-size:12px;padding:4px 10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);border-radius:2px;cursor:pointer}
+.seg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.sw{display:flex;flex-wrap:wrap;gap:6px}
+.sw button{width:24px;height:24px;border-radius:3px;border:2px solid transparent;cursor:pointer;padding:0}
+.sw button.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--surface) inset}
+.maker .foot{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:14px;font-size:12.5px;color:var(--ink-3)}
+/* cost dashboard */
+.cost{padding:16px 18px;display:grid;gap:14px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.tile{background:var(--surface);padding:12px 14px}
+.tile .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink-3);text-transform:uppercase}
+.tile .v{font-size:1.5rem;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:2px}
+.tile .v small{font-size:.8rem;font-weight:500;color:var(--ink-3)}
+.tile .sub{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.gauge{height:6px;background:var(--surface-3);border-radius:3px;margin-top:8px;overflow:hidden}
+.gauge i{display:block;height:100%;border-radius:3px;background:var(--accent)}
+.gauge i.warn{background:var(--amber)}
+.charts{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+@media (max-width:760px){.charts{grid-template-columns:1fr}}
+.chart{border:1px solid var(--line);border-radius:3px;padding:12px 14px;background:var(--surface)}
+.chart h5{margin:0 0 2px;font-size:.9rem;font-weight:600}
+.chart .sub{font-size:11.5px;color:var(--ink-3);margin-bottom:8px}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .ax{font-family:var(--mono);font-size:10px;fill:var(--ink-3)}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .lbl{font-family:var(--mono);font-size:10.5px;fill:var(--ink-2)}
+.chart .lbl.b{fill:var(--ink);font-weight:600}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:3px;white-space:nowrap;transform:translate(-50%,-120%);display:none}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:11.5px;color:var(--ink-2);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.limits{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.limit{border:1px solid var(--line);border-radius:3px;padding:10px 12px;font-size:12.5px}
+.limit b{display:block;font-weight:600;margin-bottom:4px}
+.limit .l{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.zero td{color:var(--ink-3)}
+.zero td.num{color:var(--teal);font-weight:600}
+/* admin */
+.admin{display:grid;grid-template-columns:1.2fr 1fr;gap:0}
+@media (max-width:760px){.admin{grid-template-columns:1fr}}
+.admin .formx{padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;border-right:1px solid var(--line)}
+.admin .formx .full{grid-column:1/-1}
+.admin .side{padding:18px 20px;background:var(--surface-2)}
+.admin .side h5{margin:0 0 8px;font-size:.85rem;font-family:var(--mono);color:var(--ink-3);letter-spacing:.06em}
+.tools{display:flex;flex-wrap:wrap;gap:6px}
+.tools label{font-size:12px;border:1px solid var(--line-strong);border-radius:2px;padding:3px 8px;background:var(--surface);color:var(--ink-2);display:flex;gap:5px;align-items:center}
+.ia td:first-child{font-weight:600}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-
 <div class="wrap">
   <header class="masthead">
-    <div class="kicker">DANA OFFICE &nbsp;/&nbsp; PLAN v2</div>
+    <div class="kicker">DANA OFFICE &nbsp;/&nbsp; PLAN v3</div>
     <h1>필요한 사람만 자리에 있고,<br>부르면 걸어 들어오는 픽셀 사무실</h1>
-    <p class="thesis">항상 켜져 있는 다나나인의 가상 사무실. <b>프로젝트에 편성된 AI 담당자만 자기 자리에서 일하고</b>, 나머지는 대기하다가 <b>호출하면 정문으로 걸어 들어옵니다.</b> 일하지 않는 AI는 한 푼도 쓰지 않습니다. 김정기·김성헌은 자기 캐릭터로 접속해 옆자리 AI에게 말을 걸고 업무를 시킵니다.</p>
+    <p class="thesis">항상 켜져 있는 다나나인의 가상 사무실. <b>프로젝트에 편성된 AI 담당자만 자기 자리에서 일하고</b>, 나머지는 대기하다가 <b>호출하면 정문으로 걸어 들어옵니다.</b> 일하지 않는 AI는 코드 수준에서 한 푼도 쓸 수 없게 막혀 있고, 그 사실은 비용 화면에서 <b>$0.00</b>으로 항상 보입니다.</p>
     <div class="meta">
       <span><b>수신</b> 대표이사 김효태</span>
       <span><b>작성일</b> 2026-09-04</span>
       <span><b>저장소</b> dana-office (독립)</span>
-      <span><b>소요</b> 8–9주 · 3주차 시연</span>
+      <span><b>소요</b> 9–10주 · 3주차 시연</span>
     </div>
     <div class="delta">
-      <div><b>운영 모델</b><span class="was">주간·야간·새벽 3교대</span> → 프로젝트 편성 + 호출제. 대기 인원 비용 0</div>
-      <div><b>운영비 (표준)</b><span class="was">월 $700–840</span> → 월 $150–220. 기존 구독으로 무엇이 되고 안 되는지 §06에 답변</div>
-      <div><b>픽셀 아트</b><span class="was">10×14 단색 스프라이트</span> → 12×20 아웃라인·2톤 셰이딩·헤어 4종·의상 4종·그림자·창문 채광</div>
-      <div><b>저장소</b><span class="was">SeedScope 내부 모듈</span> → 독립 저장소 dana-office. SeedScope는 API로 연결</div>
+      <div><b>v3 · 과금 0 보장</b>대기·부재 AI에게 API 호출이 갈 수 있는 코드 경로를 없앴습니다 (§02)</div>
+      <div><b>v3 · 픽셀 120%</b>템플릿 기반 스프라이트 재설계 — 눈 하이라이트·의상 디테일·타이핑/커피/수면 포즈·창문 채광·책상 소품·야간 조명 풀</div>
+      <div><b>v3 · 웹 화면 기획</b>로그인 · 캐릭터 만들기 · 비용/크레딧 대시보드 · 관리자 화면 목업과 화면 목록 (§08)</div>
+      <div><b>v3 · 확장성</b>대표님이 코드 없이 추가할 수 있는 것과 코드가 필요한 것을 나눠 설계 (§09)</div>
     </div>
   </header>
 </div>
@@ -238,7 +315,7 @@ footer{margin-top:56px;padding:22px 0 60px;border-top:1px solid var(--line);font
     </div>
     <div class="stage" id="stage">
       <div class="view" id="view">
-        <canvas id="world" class="px" width="352" height="208" role="img" aria-label="다나 오피스 평면도. 대표실, 디자인 스튜디오, 세일즈, 리셉션, 라운지·갤러리, 그로스, 회의실, 서버룸. 편성된 AI 담당자와 직원이 픽셀 캐릭터로 근무 중."></canvas>
+        <canvas id="world" class="world px" width="352" height="208" role="img" aria-label="다나 오피스 평면도. 대표실, 디자인 스튜디오, 세일즈, 리셉션, 갤러리·라운지, 그로스, 회의실, 서버룸. 편성된 AI 담당자와 직원이 픽셀 캐릭터로 근무 중."></canvas>
         <div class="layer" id="labels"></div>
         <div class="layer" id="actors"></div>
       </div>
@@ -257,7 +334,7 @@ footer{margin-top:56px;padding:22px 0 60px;border-top:1px solid var(--line);font
         <div class="lhead">조작</div>
         <p class="hint" style="margin-top:0">노란 이름표가 <b>대표님</b>입니다.</p>
         <div class="keys"><kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd><span class="hint" style="margin:0">이동</span></div>
-        <div class="keys"><kbd>Space</kbd><span class="hint" style="margin:0">옆 AI에게 업무 지시 (큐 +1, 응답)</span></div>
+        <div class="keys"><kbd>Space</kbd><span class="hint" style="margin:0">옆 AI에게 업무 지시 (큐 +1)</span></div>
         <div class="dpad">
           <button type="button" data-d="" aria-hidden="true" style="visibility:hidden"></button>
           <button type="button" data-d="up" aria-label="위로">▲</button>
@@ -266,11 +343,11 @@ footer{margin-top:56px;padding:22px 0 60px;border-top:1px solid var(--line);font
           <button type="button" data-d="down" aria-label="아래로">▼</button>
           <button type="button" data-d="right" aria-label="오른쪽">▶</button>
         </div>
-        <p class="hint">시연용 가속 — 실시간 4분이 하루입니다. 큐가 빈 AI는 라운지로 가서 쉬고(비용 0), 편성에서 빠진 AI는 정문으로 퇴근합니다. 밤에도 큐에 일이 남은 자리는 스탠드가 켜져 있습니다.</p>
+        <p class="hint">실시간 4분 = 하루. 근무 중인 캐릭터는 타이핑하고, 큐가 빈 AI는 라운지에서 커피를 마시며 쉬고(비용 0), 편성에서 빠진 AI는 정문으로 퇴근합니다. 밤에는 근무 중인 책상에만 스탠드와 모니터가 켜집니다.</p>
       </div>
     </div>
   </div>
-  <p class="caption">실제로 동작하는 프로토타입입니다. 사무실 자체(공간·이동·채팅·프레즌스)는 LLM 호출 없이 돌아가고, 비용은 AI가 실제 작업을 할 때만 발생합니다.</p>
+  <p class="caption">실제로 동작하는 프로토타입입니다. 사무실 자체(공간·이동·채팅·프레즌스)는 LLM 호출 없이 돌아가고, 비용은 AI가 실제 작업을 할 때만 발생합니다. 오른쪽 명단의 $는 에이전트별 오늘 비용입니다.</p>
 </div>
 
 <div class="wrap">
@@ -290,22 +367,31 @@ footer{margin-top:56px;padding:22px 0 60px;border-top:1px solid var(--line);font
 
 <section>
   <div class="prose">
-    <div class="shead"><span class="snum">02</span><h2>운영 모델 — 편성 · 호출 · 대기</h2></div>
-    <p class="sdek">교대제를 없앴습니다. 대신 AI는 세 가지 상태만 가지며, 돈이 드는 상태는 하나뿐입니다.</p>
+    <div class="shead"><span class="snum">02</span><h2>운영 모델 — 편성 · 호출 · 대기, 그리고 과금 0의 보장</h2></div>
+    <p class="sdek">AI는 세 가지 상태만 가지며 돈이 드는 상태는 하나뿐입니다. "필요 없는 AI에게 과금이 안 되게"는 정책이 아니라 코드 구조로 보장합니다.</p>
   </div>
   <div class="states">
     <div class="a"><div class="n">근무</div><div class="p">프로젝트에 편성되어 자리에 있고 큐에 일이 있음. 작업하고, 필요하면 회의실·동료 자리로 이동.</div><div class="cost">비용 발생 — 작업 단위로 과금</div></div>
-    <div class="b"><div class="n">대기 (사내)</div><div class="p">편성은 되어 있으나 큐가 빔. 라운지에서 쉬며 💤 표시. 새 작업이 배정되면 즉시 복귀.</div><div class="cost">비용 0 — LLM 호출 없음</div></div>
+    <div class="b"><div class="n">대기 (사내)</div><div class="p">편성은 되어 있으나 큐가 빔. 라운지에서 커피를 마시며 💤. 새 작업이 배정되면 즉시 복귀.</div><div class="cost">비용 0 — LLM 호출 없음</div></div>
     <div class="c"><div class="n">부재 (퇴근)</div><div class="p">어떤 프로젝트에도 편성되지 않음. 화면에 없고 책상 모니터가 꺼져 있음. 호출하면 정문으로 걸어 들어와 자리로 감.</div><div class="cost">비용 0</div></div>
+  </div>
+  <div class="guard">
+    <div class="t">과금 0 보장 — 네 겹의 잠금</div>
+    <ol>
+      <li><b>단일 진입점.</b> Anthropic SDK를 호출하는 함수는 서버 전체에 <code>invoke(agent, task)</code> 하나뿐입니다. 이 함수는 ① 에이전트 상태가 <code>근무</code>이고 ② 배정된 작업이 있고 ③ 프로젝트가 <code>ai_allowed</code>이고 ④ 일일·프로젝트·월 한도 미달일 때만 실행됩니다. 하나라도 아니면 호출 자체가 일어나지 않습니다.</li>
+      <li><b>월드 엔진은 LLM을 모릅니다.</b> 이동·표정·대기·라운지 잡담 애니메이션은 순수 스크립트입니다. 걸어다니는 것만으로는 토큰이 1개도 소모되지 않습니다.</li>
+      <li><b>대기 중 대화는 정해진 문장.</b> 대기 AI에게 말을 걸면 LLM이 아니라 저장된 응답("지금 배정된 일이 없어요. 업무를 주시면 시작할게요")으로 답합니다. 업무를 주는 순간부터만 과금됩니다.</li>
+      <li><b>보이는 증거.</b> 비용 화면(§08)에 에이전트별 오늘 호출 수·토큰·비용이 뜹니다. 부재·대기 AI는 항상 <b>0회 · $0.00</b>이며, 이 행이 0이 아니면 버그로 간주합니다.</li>
+    </ol>
   </div>
   <div class="prose">
     <h3>호출되는 경로</h3>
     <ul>
-      <li><b>프로젝트 편성</b> — 프로젝트를 만들면 유형별 기본 편성표(§10)대로 자동 호출. 편성표는 수정 가능</li>
-      <li><b>@멘션</b> — 채팅에서 <code>@소라</code>를 부르면 부재 중이라도 출근해 내 자리로 옴</li>
+      <li><b>프로젝트 편성</b> — 프로젝트를 만들면 유형별 기본 편성표(§12)대로 자동 호출. 편성표는 수정 가능</li>
+      <li><b>@멘션</b> — <code>@소라</code>를 부르면 부재 중이라도 출근해 내 자리로 옴</li>
       <li><b>직접 배정</b> — 작업 보드에서 담당자를 지정하면 그 AI가 호출됨</li>
-      <li><b>연쇄 호출</b> — AI가 다른 AI의 도움이 필요하면 무결(PM)에게 요청 → 무결이 호출. AI가 직접 동료를 부르진 못함(비용 통제)</li>
-      <li><b>외부 채널 (P4)</b> — 슬랙/카카오 워크에서 <code>@소라</code> → 사무실에 반영</li>
+      <li><b>연쇄 호출</b> — AI가 동료가 필요하면 무결(PM)에게 요청 → 무결이 호출. AI가 직접 동료를 부르진 못함(비용 통제)</li>
+      <li><b>외부 채널 (P4)</b> — 슬랙/카카오워크 <code>@소라</code></li>
     </ul>
     <h3>퇴근하는 규칙</h3>
     <ul>
@@ -313,52 +399,51 @@ footer{margin-top:56px;padding:22px 0 60px;border-top:1px solid var(--line);font
       <li>대기 상태가 48시간 지속되면 무결이 대표에게 "퇴근시킬까요?" 확인</li>
       <li>대표·직원은 언제든 [내보내기] 가능. 진행 중 작업은 저장 후 중단</li>
     </ul>
-    <h3>"24시간"의 의미</h3>
-    <p>사무실은 항상 존재하고 항상 렌더링됩니다. 밤에는 조명만 바뀝니다. 큐에 일이 남은 AI는 밤에도 자리에서 처리하고, 큐가 비면 쉽니다. 퇴근 전 "내일 아침까지 후보 리스트 30개"를 배정해 두면 아침에 승인 큐에 올라와 있는 구조입니다.</p>
   </div>
 </section>
 
 <section>
   <div class="prose">
     <div class="shead"><span class="snum">03</span><h2>근무자 12명</h2></div>
-    <p class="sdek">사람 3명 + AI 9명. AI 한 명은 DB 레코드 하나입니다(이름·직무·페르소나·좌석·팔레트·툴·모델·일일 한도). 대표가 관리 화면에서 고칩니다. 추가 직무(영상 편집, 개발 등)는 레코드를 하나 더 넣는 일입니다.</p>
+    <p class="sdek">사람 3명 + AI 9명. AI 한 명은 DB 레코드 하나입니다. 대표가 관리 화면(§08)에서 고치고, 새 직무는 폼 하나로 추가합니다.</p>
   </div>
   <div class="roster" id="roster"></div>
 </section>
 
 <section>
   <div class="prose">
-    <div class="shead"><span class="snum">04</span><h2>공간과 픽셀아트</h2></div>
-    <p class="sdek">좌석은 조직도이고, 존은 권한 경계이며, 벽면은 대시보드입니다. 정문이 생겼습니다 — 호출과 퇴근이 눈에 보여야 하기 때문입니다.</p>
+    <div class="shead"><span class="snum">04</span><h2>공간과 픽셀아트 v3</h2></div>
+    <p class="sdek">좌석은 조직도이고, 존은 권한 경계이며, 벽면은 대시보드입니다. v3는 캐릭터와 가구를 템플릿 기반으로 다시 그려 "무엇을 하는 중인지"가 동작으로 보이게 했습니다.</p>
   </div>
   <div class="scroll">
     <table>
       <thead><tr><th>존</th><th>상주</th><th>공간이 하는 일</th></tr></thead>
       <tbody>
-        <tr><td><b>정문 · 리셉션</b></td><td>무결</td><td>호출된 AI가 정문으로 들어와 리셉션을 지나 자리로 감. 무결의 카운터에 승인 대기 수가 표시</td></tr>
-        <tr><td><b>대표실</b></td><td>김효태</td><td>승인 큐 보드, 일일 리포트, 2인 미팅 테이블. 책장에 프로젝트 파일이 쌓임</td></tr>
-        <tr><td><b>디자인 스튜디오</b></td><td>소라 · 도담 · 여울 · 김정기</td><td>창가 무드보드에 최신 시안 썸네일이 자동 갱신</td></tr>
-        <tr><td><b>세일즈</b></td><td>한결 · 온유</td><td>콜 부스 입장 = 통화 중. 리드 팔로업 진행을 공간으로 표현</td></tr>
-        <tr><td><b>그로스</b></td><td>하람 · 시아 · 나루 · 김성헌</td><td>벽면 모니터에 SeedScope 실지표(캠페인·CPE·후보 풀)</td></tr>
-        <tr><td><b>회의실</b></td><td>수시 3–5명</td><td>멀티 에이전트 회의 → 회의록 자동 생성</td></tr>
-        <tr><td><b>갤러리 · 라운지</b></td><td>대기 인원</td><td>갤러리 벽에 승인 산출물 액자. 라운지는 대기 상태 AI가 쉬는 곳(비용 0)</td></tr>
-        <tr><td><b>서버룸</b></td><td>—</td><td>API 상태·배치 상태 램프. 장애 시 빨간 램프 + 무결이 알림</td></tr>
+        <tr><td><b>정문 · 리셉션</b></td><td>무결</td><td>호출된 AI가 정문(문이 열리는 연출) → 리셉션 → 자리. 카운터 전광판에 승인 대기 수</td></tr>
+        <tr><td><b>대표실</b></td><td>김효태</td><td>승인 큐 보드, 화이트보드, 2인 미팅 테이블, 프로젝트 파일이 쌓이는 책장</td></tr>
+        <tr><td><b>디자인 스튜디오</b></td><td>소라 · 도담 · 여울 · 김정기</td><td>창가 무드보드에 최신 시안 썸네일 자동 갱신. 모니터에 색상 견본이 뜸</td></tr>
+        <tr><td><b>세일즈</b></td><td>한결 · 온유</td><td>콜 부스 입장 = 통화 중(ON AIR 등). 벽 보드에 리드 수</td></tr>
+        <tr><td><b>그로스</b></td><td>하람 · 시아 · 나루 · 김성헌</td><td>벽면 모니터에 SeedScope 실지표가 움직이는 막대로 표시</td></tr>
+        <tr><td><b>회의실</b></td><td>수시 3–5명</td><td>러그 위 원탁, 노트북·서류. 멀티 에이전트 회의 → 회의록</td></tr>
+        <tr><td><b>갤러리 · 라운지</b></td><td>대기 인원</td><td>갤러리 벽 액자 = 승인 산출물. 라운지 소파·커피머신·정수기 = 대기(비용 0)</td></tr>
+        <tr><td><b>서버룸</b></td><td>—</td><td>API·배치 상태 LED. 장애 시 빨간 램프 + 무결 알림</td></tr>
       </tbody>
     </table>
   </div>
-  <div class="prose"><h3>픽셀아트 스펙 v2</h3></div>
+  <div class="prose"><h3>픽셀아트 스펙 v3 — v2에서 달라진 것</h3></div>
   <div class="scroll">
     <table>
-      <thead><tr><th>항목</th><th>사양</th></tr></thead>
+      <thead><tr><th>항목</th><th>v3 사양</th></tr></thead>
       <tbody>
-        <tr><td>타일</td><td>16px 논리 해상도, 정수 배율(1×·2×·3×)만 허용 — 소수 배율은 픽셀이 뭉개져 금지</td></tr>
-        <tr><td>맵</td><td>프로토타입 22×13 → 본 구축 40×24. 바닥 3종(카펫·복도 타일·라운지 원목), 벽은 상단면·전면·걸레받이 3톤</td></tr>
-        <tr><td>캐릭터</td><td>12×20px, 1px 아웃라인, 색마다 밝은톤·그림자톤 2단. 헤어 4종(숏·롱·번·캡) × 의상 4종(티·후디·블레이저·베스트) × 안경 옵션</td></tr>
-        <tr><td>애니메이션</td><td>4방향 × 걷기 4프레임(다리 교차 + 팔 스윙 + 1px 바운스), 대기 호흡 1px, 발밑 그림자 타원</td></tr>
-        <tr><td>가구</td><td>모니터(근무 중이면 화면 켜짐·부재면 꺼짐), 의자, 키보드, 책장(색 책등), 소파, 커피머신, 화분 2종, 회의 테이블, 콜 부스, 리셉션 카운터, 서버랙(램프 점멸)</td></tr>
-        <tr><td>채광</td><td>상단 벽 창문에 시각별 하늘색(새벽·낮·노을·밤+별). 밤에는 근무 중 책상 스탠드·모니터 글로우만 켜짐</td></tr>
-        <tr><td>상태</td><td>이름표 아래 이모지 — ✏️작업 · 💬대화 · 💤대기 · 📞통화 · ⚙️툴 실행 · ❗승인 요청</td></tr>
-        <tr><td>에셋 조달</td><td><b>자체 제작</b>(코드 내 픽셀 데이터, 김정기 감수). 라이선스 리스크 0, 다나나인 스타일 자체가 포트폴리오</td></tr>
+        <tr><td>캐릭터 구조</td><td>12×20 <b>문자 템플릿</b>(정면·측면·후면) 위에 헤어·의상·안경 레이어를 합성 → 조합이 늘어도 스프라이트를 손으로 안 그림. 1px 아웃라인, 색마다 밝은톤·그림자톤</td></tr>
+        <tr><td>얼굴</td><td>눈 하이라이트 1px + 동공 1px(2단 눈), 턱 그림자, 입. 3–5초마다 깜빡임. 대기 시 눈 감음 + 머리 위 픽셀 Z</td></tr>
+        <tr><td>의상 디테일</td><td>블레이저(라펠·셔츠·넥타이) · 후디(후드·끈·주머니) · 베스트(셔츠·단추) · 티(프린트). 신발 2톤</td></tr>
+        <tr><td>포즈</td><td>걷기 4프레임(다리 교차·팔 스윙·바운스) · <b>타이핑</b>(손 교차) · <b>커피</b>(컵 들고 2초마다 한 모금) · <b>수면</b> · 통화</td></tr>
+        <tr><td>책상</td><td>모니터(직무별 화면: 디자인=색견본, 그로스=막대, 세일즈=리스트, 대표=문서), 키보드·마우스·머그(근무 중 김이 남)·서류·포스트잇·스탠드(밤에 켜짐)</td></tr>
+        <tr><td>환경</td><td>창문(창틀·커튼·시각별 하늘·밤의 별) + 낮에는 바닥에 빛 줄기 / 벽 패널 라인·걸레받이 / 카펫 스티치·복도 줄눈·원목 옹이 / 벽시계(실제 시각) / 회사 픽셀 사인</td></tr>
+        <tr><td>조명</td><td>밤: 남색 오버레이 + 근무 중 책상의 스탠드·모니터 글로우 + 천장등 빛 풀(근무 존만) + 창가 달빛</td></tr>
+        <tr><td>렌더 규칙</td><td>정수 배율만(1×·2×·3×). 소수 배율 금지. 본 구축은 32px 타일·40×24 맵</td></tr>
+        <tr><td>에셋</td><td><b>자체 제작</b>(코드 내 픽셀 템플릿, 김정기 감수). 라이선스 리스크 0 · 다나나인 스타일 자체가 포트폴리오</td></tr>
       </tbody>
     </table>
   </div>
@@ -370,60 +455,56 @@ footer{margin-top:56px;padding:22px 0 60px;border-top:1px solid var(--line);font
   </div>
   <div class="scroll">
     <table>
-      <thead><tr><th>채널</th><th>동작</th></tr></thead>
+      <thead><tr><th>채널</th><th>동작</th><th>과금</th></tr></thead>
       <tbody>
-        <tr><td><b>근접 채팅</b></td><td>반경 3타일 내 전원에게 전달. 말풍선 + 하단 로그</td></tr>
-        <tr><td><b>존 채널</b></td><td><code>#디자인</code> <code>#그로스</code> <code>#세일즈</code> <code>#전체</code></td></tr>
-        <tr><td><b>@멘션</b></td><td><code>@소라 시안 다시</code> → 소라가 (부재 중이면 출근해서) 내 자리로 와 응답</td></tr>
-        <tr><td><b>DM</b></td><td>1:1. 대표–AI 지시, AI 간 핸드오프 요청(무결 경유)</td></tr>
-        <tr><td><b>회의실</b></td><td>소집 → 이동 → 라운드로빈 발언(최대 12턴) → 회의록</td></tr>
+        <tr><td><b>근접 채팅</b></td><td>반경 3타일. 말풍선 + 로그</td><td>근무 AI만 LLM 응답. 대기 AI는 저장 문장</td></tr>
+        <tr><td><b>존 채널</b></td><td><code>#디자인</code> <code>#그로스</code> <code>#세일즈</code> <code>#전체</code></td><td>@멘션된 근무 AI만</td></tr>
+        <tr><td><b>@멘션</b></td><td><code>@소라 시안 다시</code> → (부재 시 출근 후) 내 자리로 와 응답</td><td>호출 시점부터</td></tr>
+        <tr><td><b>DM</b></td><td>1:1. AI 간 핸드오프는 무결 경유</td><td>근무 AI만</td></tr>
+        <tr><td><b>회의실</b></td><td>소집 → 이동 → 라운드로빈 최대 12턴 → 회의록</td><td>참가자 × 턴</td></tr>
       </tbody>
     </table>
   </div>
-  <div class="prose"><p>발언은 모두 저장되지만 AI가 읽는 컨텍스트는 <b>최근 20건 + 프로젝트 요약</b>으로 제한합니다. 대화가 길어져도 비용이 선형으로 늘지 않게 하는 장치입니다.</p></div>
+  <div class="prose"><p>AI가 읽는 컨텍스트는 <b>최근 20건 + 프로젝트 요약</b>으로 제한합니다. 대화가 길어져도 비용이 선형으로 늘지 않게 하는 장치입니다.</p></div>
 </section>
 
 <section>
   <div class="prose">
-    <div class="shead"><span class="snum">06</span><h2>지금 구독(Claude Max · ChatGPT Plus · Genspark)만으로 굴러가는가</h2></div>
+    <div class="shead"><span class="snum">06</span><h2>구독으로 되는 것, 안 되는 것</h2></div>
   </div>
   <div class="answer">
-    <div class="big">짧은 답 — 사무실은 굴러가지만, AI 담당자의 두뇌는 구독으로 돌릴 수 없습니다. Anthropic API 크레딧이 별도로 필요합니다.</div>
-    <p>구독은 <b>사람이 화면 앞에서 쓰는 권리</b>이고, 우리가 만드는 건 <b>서버가 사람 없이 호출하는 시스템</b>입니다. Claude Max 로그인 토큰을 우리 서버에 심어 자동 호출하는 것은 약관 위반이라 설계에 넣지 않습니다. 대신 좋은 소식은 두 가지입니다. ① 호출제로 바꾸면서 API 비용이 교대제의 1/4로 떨어져 <b>표준 운영이 월 $150–220</b>이고, ② <b>개발 자체는 Claude Max(Claude Code)로 전부 가능</b>해 개발비가 사실상 0입니다.</p>
+    <div class="big">네, 약관 위반입니다. Claude Max 계정을 우리 서버에 심어 자동 호출하는 건 Anthropic 소비자 약관이 금지하는 "자동화·비공식 앱을 통한 접근"에 해당하고, 적발 시 계정 정지 사유입니다.</div>
+    <p>구독은 사람이 Claude 앱과 Claude Code 안에서 쓰는 권리이고, 우리 사무실 서버가 필요로 하는 것은 <b>API 키</b>입니다. API 키는 Anthropic Console에서 별도로 만들며 선불 크레딧으로 결제합니다. 그래서 설계는 처음부터 API 키 기준이고, 구독은 ① 8주 개발 전체(Claude Code)와 ② 대표님·직원의 개인 작업, ③ 검증 기간의 옵션 B에만 씁니다.</p>
   </div>
   <div class="scroll">
     <table>
       <thead><tr><th>보유 구독</th><th>이 시스템에서 쓰는 곳</th><th>못 쓰는 곳</th><th>판단</th></tr></thead>
       <tbody>
-        <tr><td><b>Claude Max</b></td><td>① 8주 개발 전체(Claude Code) ② 대표·직원의 개인 작업 ③ <b>옵션 B</b>: Claude Code 루틴(예약 세션)으로 AI 담당자 세션을 사람이 띄우는 검증 단계 운영</td><td>서버가 24시간 자동 호출하는 용도. Max 토큰을 서버에 심는 것</td><td class="ok">유지 · 핵심</td></tr>
-        <tr><td><b>ChatGPT Plus</b></td><td>이 시스템과 무관. 개인 용도</td><td>API가 아님. 이미지 생성도 API는 별도 결제</td><td class="mid">개인 판단</td></tr>
-        <tr><td><b>Genspark</b></td><td>사람이 리서치 보조로 쓰는 용도</td><td>연동 불가</td><td class="mid">개인 판단</td></tr>
+        <tr><td><b>Claude Max</b></td><td>① 개발 전체(Claude Code) ② 개인 작업 ③ 옵션 B: Claude Code 루틴(예약 세션)으로 검증 단계 운영 — 사람이 띄우는 세션이라 허용 범위</td><td>서버가 24시간 자동 호출하는 용도. 로그인 토큰을 서버에 심는 것</td><td class="ok">유지 · 핵심</td></tr>
+        <tr><td><b>ChatGPT Plus</b></td><td>이 시스템과 무관. 개인 용도</td><td>API 아님. 이미지 API도 별도 결제</td><td class="mid">개인 판단</td></tr>
+        <tr><td><b>Genspark</b></td><td>사람이 리서치 보조로</td><td>연동 불가</td><td class="mid">개인 판단</td></tr>
       </tbody>
     </table>
   </div>
   <div class="need">
     <div class="t">추가로 필요한 것 — 별도 결제</div>
     <ol>
-      <li><b>Anthropic API 크레딧 (필수)</b> — Console에서 선불 충전. 시작 $50–100, 월 지출 한도 설정. 구독과 별개 계정·별개 청구. 표준 운영 시 월 $150–220 (§07)</li>
-      <li><b>이미지 생성 API (선택)</b> — Claude는 이미지를 만들지 못합니다. AI 디자이너가 '보이는 시안'까지 내려면 이미지 모델(OpenAI 이미지 API, Google Imagen, Flux 등) 연결. 장당 수십 원~수백 원, 하루 20장 기준 월 $20–120. 없으면 AI는 레이아웃·카피·HTML/SVG 시안까지, 아트웍은 김정기</li>
-      <li><b>호스팅 (필수, 소액)</b> — 월드 상태가 살아 있어야 해 상시 프로세스 필요. Railway/Render 볼륨 $5–20/월, 또는 사무실 맥 상시 + Tailscale $0</li>
-      <li><b>도메인</b> — <code>office.dananine.com</code> 서브도메인이면 추가 비용 0</li>
+      <li><b>Anthropic API 크레딧 (필수)</b> — Console 선불 충전, 월 지출 한도 설정. 시작 $50–100. 표준 운영 월 $150–220. 잔액·사용량은 우리 웹의 비용 화면(§08)에서 봅니다</li>
+      <li><b>이미지 생성 API (선택)</b> — Claude는 이미지를 만들지 못합니다. AI 디자이너가 '보이는 시안'까지 내려면 이미지 모델 연결. 하루 20장 기준 월 $20–120. 없으면 AI는 레이아웃·카피·HTML/SVG 시안까지, 아트웍은 김정기</li>
+      <li><b>호스팅 (필수, 소액)</b> — 상시 프로세스. Railway/Render 볼륨 $5–20/월 또는 사무실 맥 상시 + Tailscale $0</li>
+      <li><b>도메인</b> — <code>office.dananine.com</code> 서브도메인이면 0</li>
     </ol>
-  </div>
-  <div class="prose">
-    <h3>운영 방식 세 가지</h3>
   </div>
   <div class="scroll">
     <table>
-      <thead><tr><th>방식</th><th>AI 두뇌 실행 주체</th><th>24시간</th><th>비용</th><th>권장 시점</th></tr></thead>
+      <thead><tr><th>운영 방식</th><th>AI 실행 주체</th><th>24시간</th><th>비용</th><th>권장 시점</th></tr></thead>
       <tbody>
-        <tr class="hi"><td>A · API 상시</td><td>우리 서버가 Anthropic API 호출</td><td class="ok">완전</td><td class="num">월 $150–220 (표준)</td><td>P3 이후 본 운영</td></tr>
-        <tr><td>B · Claude Code 루틴</td><td>Max 플랜의 예약 세션이 정해진 시각에 사무실 큐를 가져가 처리 후 결과 업로드</td><td class="mid">예약 시각만</td><td class="num">추가 $0 (Max 한도 공유)</td><td>P1–P2 검증 기간</td></tr>
-        <tr><td>C · 하이브리드</td><td>대화·상태는 API(소액), 무거운 산출물은 루틴</td><td class="mid">부분</td><td class="num">월 $30–60</td><td>예산이 빠듯할 때</td></tr>
+        <tr class="hi"><td>A · API 상시</td><td>우리 서버가 API 키로 호출</td><td class="ok">완전</td><td class="num">월 $150–220 (표준)</td><td>P3 이후 본 운영</td></tr>
+        <tr><td>B · Claude Code 루틴</td><td>Max의 예약 세션이 정해진 시각에 큐를 가져가 처리 후 업로드</td><td class="mid">예약 시각만</td><td class="num">추가 $0 (Max 한도 공유)</td><td>P1–P2 검증</td></tr>
+        <tr><td>C · 하이브리드</td><td>대화·상태는 API(소액), 무거운 산출물은 루틴</td><td class="mid">부분</td><td class="num">월 $30–60</td><td>예산 빠듯할 때</td></tr>
       </tbody>
     </table>
   </div>
-  <div class="prose"><p>옵션 B의 한계는 분명합니다. 대표님 개인 사용량과 한도를 나눠 쓰고, 세션마다 기억이 초기화되며, 예약 시각 사이에는 AI가 멈춰 있습니다. 검증용으로는 충분하지만 "부르면 온다"를 실제로 체감하려면 A로 가야 합니다.</p></div>
 </section>
 
 <section>
@@ -435,18 +516,18 @@ footer{margin-top:56px;padding:22px 0 60px;border-top:1px solid var(--line);font
     <table>
       <thead><tr><th>작업 단위</th><th>모델 · effort</th><th>1건 원가</th></tr></thead>
       <tbody>
-        <tr><td>대화 · 상태 판단 · 이동 결정</td><td>Claude Haiku 4.5</td><td class="num">≈ $0.003</td></tr>
-        <tr><td>대화 (맥락이 필요한 응답)</td><td>Claude Sonnet 5 · low</td><td class="num">≈ $0.006</td></tr>
+        <tr><td>대화 · 상태 판단</td><td>Claude Haiku 4.5</td><td class="num">≈ $0.003</td></tr>
+        <tr><td>대화 (맥락 응답)</td><td>Claude Sonnet 5 · low</td><td class="num">≈ $0.006</td></tr>
         <tr><td>산출물 — 카피 · 브리프 · 후보 리스트 · 응대 초안</td><td>Claude Sonnet 5 · high</td><td class="num">≈ $0.09</td></tr>
         <tr><td>산출물 — 컨셉 · 제안서 · 시안 레이아웃 · 네이밍</td><td>Claude Opus 5 · high (툴 4턴)</td><td class="num">≈ $0.25</td></tr>
         <tr><td>회의 1회 (5명 × 3라운드)</td><td>Claude Sonnet 5</td><td class="num">≈ $0.15</td></tr>
-        <tr><td>이미지 시안 1장 (선택)</td><td>외부 이미지 모델</td><td class="num">$0.03–0.20 (공급자 가격표 기준)</td></tr>
+        <tr><td>이미지 시안 1장 (선택)</td><td>외부 이미지 모델</td><td class="num">$0.03–0.20</td></tr>
       </tbody>
     </table>
   </div>
   <div class="scroll">
     <table>
-      <thead><tr><th>규모</th><th>동시 프로젝트</th><th>산출물/일</th><th>대화/일</th><th>회의/일</th><th>월 API 비용</th><th>+ 이미지 옵션</th></tr></thead>
+      <thead><tr><th>규모</th><th>동시 프로젝트</th><th>산출물/일</th><th>대화/일</th><th>회의/일</th><th>월 API</th><th>+ 이미지</th></tr></thead>
       <tbody>
         <tr><td><b>최소</b></td><td class="c">1</td><td class="c">5</td><td class="c">100</td><td class="c">1</td><td class="num">$50–80</td><td class="num">+$20</td></tr>
         <tr class="hi"><td>표준 <span class="pill a">권장</span></td><td class="c">2–3</td><td class="c">15</td><td class="c">300</td><td class="c">2</td><td class="num">$150–220</td><td class="num">+$50</td></tr>
@@ -456,91 +537,265 @@ footer{margin-top:56px;padding:22px 0 60px;border-top:1px solid var(--line);font
     </table>
   </div>
   <div class="prose">
-    <p>v1 교대제 표준안(월 $700–840)과 비교하면 같은 산출물 규모에서 <b>약 75% 절감</b>입니다. 차이는 전부 "결정하려고 깨어 있는 시간"을 없앤 데서 나옵니다.</p>
-    <h3>비용 통제 장치 (v1에 포함)</h3>
+    <p>v1 교대제 표준(월 $700–840) 대비 약 75% 절감. 비용 통제 장치: 프롬프트 캐싱 / 모델 계층화(판단 Haiku · 텍스트 Sonnet · 컨셉 Opus) / 야간 대량 생성 Batch API 50% / 한도 3중(에이전트 일일 → 프로젝트 예산 → 월 한도) / 비용 화면 상시 노출.</p>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <div class="shead"><span class="snum">08</span><h2>웹 화면 기획</h2></div>
+    <p class="sdek">직원이 로그인해서 캐릭터를 만들고, 사무실에 들어가고, 대표가 비용을 확인하고 AI를 추가하는 흐름입니다. 목업은 실제 데이터 구조로 그렸고, 캐릭터 만들기는 동작합니다.</p>
+  </div>
+  <div class="scroll">
+    <table class="ia">
+      <thead><tr><th>화면</th><th>경로</th><th>권한</th><th>핵심 기능</th><th>단계</th></tr></thead>
+      <tbody>
+        <tr><td>로그인</td><td><code>/login</code></td><td>전원</td><td>아이디·비밀번호, 초대 코드로 첫 출근, 관람 링크 안내</td><td>P1</td></tr>
+        <tr><td>캐릭터 만들기</td><td><code>/onboarding</code></td><td>첫 로그인</td><td>헤어·의상·색·안경 조합, 실시간 미리보기, 좌석 배정</td><td>P1</td></tr>
+        <tr><td>오피스</td><td><code>/office</code></td><td>ceo · staff</td><td>캔버스, 이동, 채팅, 편성·호출 패널, HUD(비용 포함)</td><td>P1</td></tr>
+        <tr><td>캐릭터 프로필</td><td>모달</td><td>ceo · staff</td><td>직무·현재 작업·오늘 산출물·오늘 비용 · [업무 지시] [호출/내보내기]</td><td>P2</td></tr>
+        <tr><td>프로젝트</td><td><code>/projects</code></td><td>ceo · staff</td><td>생성(유형 → 기본 편성), 예산 상한, <code>ai_allowed</code>, 종료 시 자동 퇴근</td><td>P2</td></tr>
+        <tr><td>작업 보드</td><td><code>/tasks</code></td><td>ceo · staff</td><td>큐/진행/검토/승인 칸반, 담당자 지정 = 호출</td><td>P2</td></tr>
+        <tr><td>승인 큐</td><td><code>/approvals</code></td><td>ceo · staff(존별)</td><td>승인·반려(사유 필수 → 다음 프롬프트 주입), 모바일 전용 뷰</td><td>P2</td></tr>
+        <tr><td><b>비용 · 크레딧</b></td><td><code>/billing</code></td><td>ceo</td><td>잔여 크레딧, 오늘/이번 달, 에이전트·프로젝트별, 한도 설정, 알림</td><td>P2</td></tr>
+        <tr><td>갤러리</td><td><code>/gallery</code></td><td>ceo · staff · viewer</td><td>승인 산출물 그리드, 원본 열람, 광고주 공유</td><td>P3</td></tr>
+        <tr><td><b>관리자 — AI 담당자</b></td><td><code>/admin/agents</code></td><td>ceo</td><td>AI 추가·편집(페르소나·모델·툴·한도·스프라이트), 활성/비활성</td><td>P3</td></tr>
+        <tr><td>관리자 — 사용자</td><td><code>/admin/users</code></td><td>ceo</td><td>직원 초대 코드 발급, 권한, 존별 승인자 지정</td><td>P2</td></tr>
+        <tr><td>관리자 — 기능</td><td><code>/admin/features</code></td><td>ceo</td><td>기능 플래그, 프로젝트 유형·편성표, 채널, 툴 on/off, 외부 연동 키</td><td>P3</td></tr>
+        <tr><td>맵 에디터</td><td><code>/admin/map</code></td><td>ceo</td><td>가구 배치·좌석 지정·존 경계 편집(코드 없이)</td><td>P4</td></tr>
+        <tr><td>관람 모드</td><td><code>/view/[token]</code></td><td>viewer</td><td>읽기 전용 순회 카메라, 타 프로젝트 마스킹</td><td>P4</td></tr>
+        <tr><td>일일 리포트</td><td><code>/reports/daily</code></td><td>ceo · staff</td><td>08:50 자동 생성 — 산출물·비용·병목·오늘 계획</td><td>P3</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="prose"><h3>화면 1 · 로그인</h3><p>왼쪽은 실제 사무실의 축소 실황(지금 근무 중인 인원과 비용)이라 "들어가면 회사가 있다"는 느낌을 로그인 전에 줍니다. 직원은 초대 코드로 첫 출근하며, 비밀번호는 8자 이상, 세션 30일, 기기별 로그아웃을 지원합니다. 광고주는 이 화면을 쓰지 않고 관람 링크로만 들어옵니다.</p></div>
+  <div class="mock">
+    <div class="bar"><i></i><i></i><i></i><span class="url">office.dananine.com/login</span><span class="tagx">목업 · 동작하지 않음</span></div>
+    <div class="login">
+      <div class="art">
+        <div><div class="logo">DANA OFFICE</div><div class="sub">다나나인 버추얼 오피스</div></div>
+        <canvas id="loginStrip" class="px" width="160" height="44" aria-hidden="true"></canvas>
+        <div class="live"><span>지금 근무 <b>5</b>명</span><span>대기 <b>4</b>명</span><span>오늘 비용 <b>$4.82</b></span><span>승인 대기 <b>7</b>건</span></div>
+      </div>
+      <div class="form">
+        <h4>출근하기</h4>
+        <div class="sub">회사 계정으로 로그인하세요.</div>
+        <div class="field"><label>아이디</label><input type="text" value="jungki.kim" readonly></div>
+        <div class="field"><label>비밀번호</label><input type="password" value="••••••••••" readonly></div>
+        <div class="row"><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" checked disabled> 30일 동안 로그인 유지</label><span>비밀번호 재설정</span></div>
+        <button class="btn primary" type="button" style="padding:10px">출근하기</button>
+        <div class="alt">처음이신가요? <b>초대 코드로 첫 출근</b> — 대표가 발급한 6자리 코드를 입력하면 캐릭터 만들기로 이동합니다.</div>
+        <div class="hint" style="margin:0">광고주 관람 링크로 오셨다면 별도 로그인 없이 열립니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="prose"><h3>화면 2 · 캐릭터 만들기 (동작함)</h3><p>첫 로그인 때 한 번, 이후 프로필에서 언제든. 조합은 헤어 4 × 헤어색 6 × 피부 3 × 의상 4 × 상의색 8 × 하의색 4 × 안경 2 = 9,216가지이고, 같은 템플릿을 AI 담당자에게도 쓰므로 대표가 새 AI를 추가할 때도 이 화면을 그대로 씁니다.</p></div>
+  <div class="mock">
+    <div class="bar"><i></i><i></i><i></i><span class="url">office.dananine.com/onboarding</span><span class="tagx">동작하는 목업</span></div>
+    <div class="maker">
+      <div class="stagebox">
+        <canvas id="makerCv" class="px" width="14" height="22" style="width:112px;height:176px"></canvas>
+        <div class="nametag" id="makerName">김정기</div>
+        <div class="ctl">
+          <button class="btn sm" type="button" data-rot="-1">◀ 회전</button>
+          <button class="btn sm" type="button" data-rot="1">회전 ▶</button>
+          <button class="btn sm" type="button" id="makerWalk">걷기</button>
+        </div>
+      </div>
+      <div class="opts" id="makerOpts"></div>
+    </div>
+  </div>
+
+  <div class="prose"><h3>화면 3 · 비용 · 크레딧</h3><p>대표 전용입니다. 비용은 매 API 응답의 <code>usage</code> 필드(정확한 토큰 수)에 가격표를 곱해 우리 DB에 원장으로 쌓고, 잔여 크레딧은 충전 기록에서 누적 비용을 뺀 값입니다. Console의 실제 잔액과는 월 1회 대조하며, 차이가 나면 화면에 경고가 뜹니다. 에이전트별 표에서 부재·대기 AI가 <b>0회 · $0.00</b>인 것이 과금 0 보장의 증거입니다.</p></div>
+  <div class="mock">
+    <div class="bar"><i></i><i></i><i></i><span class="url">office.dananine.com/billing</span><span class="tagx">목업 · 예시 데이터</span></div>
+    <div class="cost">
+      <div class="tiles">
+        <div class="tile"><div class="l">잔여 크레딧</div><div class="v">$61.40 <small>/ $100 충전</small></div><div class="gauge"><i style="width:61%"></i></div><div class="sub">이 속도면 약 13일 남음</div></div>
+        <div class="tile"><div class="l">오늘</div><div class="v">$4.82</div><div class="sub">호출 214회 · 산출물 11건</div></div>
+        <div class="tile"><div class="l">이번 달 (9월 1–4일)</div><div class="v">$38.60 <small>/ 한도 $200</small></div><div class="gauge"><i style="width:19%"></i></div><div class="sub">월말 예상 $142 · 한도 이내</div></div>
+        <div class="tile"><div class="l">산출물 1건당</div><div class="v">$0.21</div><div class="sub">지난주 $0.27 → 캐시 적중률 개선</div></div>
+      </div>
+      <div class="charts">
+        <div class="chart" id="chartDaily" style="position:relative">
+          <h5>일별 비용 — 최근 30일</h5>
+          <div class="sub">예시 데이터. 막대에 마우스를 올리면 값이 보입니다.</div>
+          <div class="tip" id="tipDaily"></div>
+        </div>
+        <div class="chart" id="chartZone">
+          <h5>이번 달 존별 비용</h5>
+          <div class="sub">예시 데이터. 이미지 생성은 도입 전(0).</div>
+        </div>
+      </div>
+      <div class="scroll" style="margin:0">
+        <table>
+          <thead><tr><th>담당자</th><th>상태</th><th>오늘 호출</th><th>입력 토큰</th><th>출력 토큰</th><th>오늘 비용</th><th>일일 한도</th></tr></thead>
+          <tbody>
+            <tr><td>소라</td><td><span class="chip work">근무</span></td><td class="num">38</td><td class="num">184,200</td><td class="num">11,400</td><td class="num">$1.31</td><td class="num">$8</td></tr>
+            <tr><td>도담</td><td><span class="chip work">근무</span></td><td class="num">41</td><td class="num">160,900</td><td class="num">14,800</td><td class="num">$1.22</td><td class="num">$8</td></tr>
+            <tr><td>여울</td><td><span class="chip work">근무</span></td><td class="num">52</td><td class="num">121,500</td><td class="num">9,900</td><td class="num">$0.94</td><td class="num">$8</td></tr>
+            <tr><td>나루</td><td><span class="chip idle">대기</span></td><td class="num">27</td><td class="num">96,000</td><td class="num">6,100</td><td class="num">$0.48</td><td class="num">$5</td></tr>
+            <tr><td>무결</td><td><span class="chip work">근무</span></td><td class="num">56</td><td class="num">142,300</td><td class="num">7,700</td><td class="num">$0.87</td><td class="num">$8</td></tr>
+            <tr class="zero"><td>하람</td><td><span class="chip away">부재</span></td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">$0.00</td><td class="num">$5</td></tr>
+            <tr class="zero"><td>시아</td><td><span class="chip away">부재</span></td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">$0.00</td><td class="num">$5</td></tr>
+            <tr class="zero"><td>한결</td><td><span class="chip away">부재</span></td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">$0.00</td><td class="num">$8</td></tr>
+            <tr class="zero"><td>온유</td><td><span class="chip away">부재</span></td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">$0.00</td><td class="num">$5</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="limits">
+        <div class="limit"><b>월 지출 한도 $200</b><span class="l">80%에서 알림 · 100%에서 AI 전원 대기 전환</span></div>
+        <div class="limit"><b>프로젝트 예산</b><span class="l">A사 리브랜딩 $60 (사용 $23.10) · 초과 시 그 프로젝트만 정지</span></div>
+        <div class="limit"><b>크레딧 부족 알림</b><span class="l">잔여 $20 이하 → 대표에게 메일 + 서버룸 노란 램프</span></div>
+        <div class="limit"><b>충전 기록</b><span class="l">09-01 $100 (Console 영수증 번호 입력) · 월 1회 잔액 대조</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="prose"><h3>화면 4 · 관리자 — AI 담당자 추가</h3><p>새 직무는 코드 없이 이 폼으로 추가합니다. 저장하면 다음 tick에 정문으로 걸어 들어와 지정 좌석에 앉습니다. 페르소나는 자유 서술이지만 "무엇을 만들고, 무엇을 만들면 안 되며, 누구에게 승인받는가" 세 항목이 비어 있으면 저장되지 않습니다.</p></div>
+  <div class="mock">
+    <div class="bar"><i></i><i></i><i></i><span class="url">office.dananine.com/admin/agents/new</span><span class="tagx">목업 · 동작하지 않음</span></div>
+    <div class="admin">
+      <div class="formx">
+        <div class="field"><label>이름</label><input type="text" value="누리" readonly></div>
+        <div class="field"><label>직무</label><input type="text" value="영상 편집" readonly></div>
+        <div class="field"><label>존 · 좌석</label><select disabled><option>디자인 스튜디오 · 프리 데스크 D-5</option></select></div>
+        <div class="field"><label>모델</label><select disabled><option>claude-sonnet-5 (텍스트 산출물)</option></select></div>
+        <div class="field full"><label>페르소나 — 무엇을 만들고 / 만들면 안 되고 / 누구에게 승인받는가</label><textarea rows="4" readonly>숏폼 영상 편집 계획서와 컷 리스트, 자막 초안을 만든다. 완성 영상 파일은 만들지 않는다(도구 없음). 모든 산출물은 김정기에게 1차 승인을 받는다. 다나나인 톤: 간결, 과장 금지.</textarea></div>
+        <div class="field"><label>일일 비용 한도</label><input type="text" value="$5" readonly></div>
+        <div class="field"><label>1차 승인자</label><select disabled><option>김정기</option></select></div>
+        <div class="field full"><label>사용 가능 툴</label><div class="tools"><label><input type="checkbox" checked disabled>create_artifact</label><label><input type="checkbox" checked disabled>search_web</label><label><input type="checkbox" checked disabled>post_message</label><label><input type="checkbox" disabled>seedscope.discover</label><label><input type="checkbox" disabled>draft_outreach</label><label><input type="checkbox" disabled>generate_image (미도입)</label></div></div>
+        <div class="field full" style="flex-direction:row;gap:8px;justify-content:flex-end"><button class="btn" type="button">캐릭터 꾸미기</button><button class="btn primary" type="button">저장하고 출근시키기</button></div>
+      </div>
+      <div class="side">
+        <h5>저장 시 일어나는 일</h5>
+        <ul style="font-size:12.5px;color:var(--ink-2)">
+          <li><code>agents</code>에 레코드 1건 추가</li>
+          <li>스프라이트는 캐릭터 만들기 조합값으로 생성 — 그림 파일 없음</li>
+          <li>프로젝트 유형별 편성표에 "필요 시 호출(○)"로 등록</li>
+          <li>다음 tick에 정문 등장 → D-5 착석 → 큐가 비어 있으므로 라운지 대기(비용 0)</li>
+        </ul>
+        <h5 style="margin-top:14px">편집 가능한 것</h5>
+        <ul style="font-size:12.5px;color:var(--ink-2)">
+          <li>페르소나 · 모델 · effort · 한도 · 툴 · 승인자 · 좌석 · 외형</li>
+          <li>비활성화(퇴사): 레코드 보존, 산출물 이력 유지</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <div class="shead"><span class="snum">09</span><h2>나중에 대표님이 추가할 것들 — 확장 설계</h2></div>
+    <p class="sdek">"기능 추가"를 두 부류로 나눴습니다. 코드 없이 관리자 화면에서 끝나는 것과, 코드가 필요하지만 파일 하나로 끝나게 만든 것.</p>
+  </div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>추가하고 싶은 것</th><th>방법</th><th>소요</th></tr></thead>
+      <tbody>
+        <tr><td>새 AI 담당자 (영상 편집, 개발자, 회계…)</td><td class="ok">코드 없음 — 관리자 폼</td><td>5분</td></tr>
+        <tr><td>새 프로젝트 유형과 기본 편성표</td><td class="ok">코드 없음 — 관리자 &gt; 기능</td><td>5분</td></tr>
+        <tr><td>AI의 말투·금지어·승인자 변경</td><td class="ok">코드 없음 — 페르소나 편집</td><td>즉시</td></tr>
+        <tr><td>모델·한도·툴 권한 변경</td><td class="ok">코드 없음</td><td>즉시</td></tr>
+        <tr><td>채널 추가 (<code>#영상</code>)</td><td class="ok">코드 없음</td><td>즉시</td></tr>
+        <tr><td>가구·좌석·존 재배치, 2층 추가</td><td class="ok">코드 없음 — 맵 에디터 (P4)</td><td>30분</td></tr>
+        <tr><td>직원 추가·권한·승인자 지정</td><td class="ok">코드 없음 — 초대 코드</td><td>즉시</td></tr>
+        <tr><td>새 툴 (예: 노션 읽기, 구글 드라이브 저장)</td><td class="mid">코드 — <code>tools/notion.ts</code> 파일 하나</td><td>반나절</td></tr>
+        <tr><td>새 외부 채널 (슬랙·카카오워크 호출)</td><td class="mid">코드 — <code>channels/slack.ts</code> 파일 하나</td><td>1일</td></tr>
+        <tr><td>이미지 생성 도입</td><td class="mid">코드 — 툴 파일 + API 키 + 갤러리 썸네일</td><td>2일</td></tr>
+        <tr><td>새 화면 (예: 클라이언트 포털)</td><td class="no">코드 — 페이지 + 권한</td><td>3–5일</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="prose">
+    <h3>이걸 가능하게 하는 구조</h3>
     <ul>
-      <li><b>프롬프트 캐싱</b> — 페르소나·툴 정의·브랜드 바이블을 캐시 프리픽스로 고정</li>
-      <li><b>모델 계층화</b> — 판단은 Haiku, 텍스트 산출물은 Sonnet, 컨셉·제안서만 Opus</li>
-      <li><b>배치 처리</b> — 야간 대량 생성은 Batch API로 50% 할인</li>
-      <li><b>한도 3중</b> — 에이전트별 일일 한도 → 프로젝트별 예산 → Console 월 지출 한도</li>
-      <li><b>비용 위젯</b> — 사무실 HUD에 오늘 비용이 항상 보임(프로토타입과 동일)</li>
+      <li><b>모든 설정은 DB</b> — 에이전트·프로젝트 유형·편성표·채널·한도·기능 플래그가 전부 테이블. 배포 없이 바뀝니다</li>
+      <li><b>툴 = 파일 하나</b> — <code>tools/</code> 폴더에 파일을 넣으면 자동 등록되고 관리자 화면에 체크박스로 나타납니다. Claude Code(Max)로 반나절이면 씁니다</li>
+      <li><b>기능 플래그</b> — <code>features</code> 테이블로 회의실·이미지 생성·관람 링크·슬랙을 켜고 끕니다. 위험한 기능은 꺼진 채로 배포</li>
+      <li><b>스프라이트는 조합값</b> — 그림 파일이 없으니 캐릭터 추가에 디자이너가 필요 없습니다. 특별한 외형은 김정기가 템플릿에 헤어·의상 1종을 추가</li>
+      <li><b>API가 먼저</b> — 모든 화면은 내부 API 위에 있습니다. 나중에 슬랙·모바일·자동화가 같은 API를 씁니다</li>
     </ul>
   </div>
 </section>
 
 <section>
   <div class="prose">
-    <div class="shead"><span class="snum">08</span><h2>기술 구성 — 독립 저장소</h2></div>
-    <p class="sdek">SeedScope와 같은 스택(Next.js · TypeScript · SQLite)을 쓰되 별도 앱으로 둡니다. 팀이 이미 아는 구조라 개발 속도가 빠르고, SeedScope 데이터는 API로 가져옵니다.</p>
+    <div class="shead"><span class="snum">10</span><h2>기술 구성 — 독립 저장소</h2></div>
+    <p class="sdek">SeedScope와 같은 스택(Next.js · TypeScript · SQLite)을 별도 앱으로. 팀이 이미 아는 구조라 개발이 빠르고, SeedScope 데이터는 API로 가져옵니다.</p>
   </div>
-  <pre>[브라우저]  Canvas 렌더러(정수 배율 · 20fps 보간) ─ 입력 ─ 채팅 ─ 작업 보드
-     │   SSE  /api/office/stream          POST /api/office/{move,say,call,dismiss,task,approve}
+  <pre>[브라우저]  Canvas 렌더러(정수 배율 · 20fps 보간) ─ 입력 ─ 채팅 ─ 작업 보드 ─ 비용 화면
+     │   SSE  /api/office/stream      POST /api/office/{move,say,call,dismiss,task,approve}
      ▼
 [dana-office · Next.js App Router · 단일 Node 프로세스]
-     ├ <b>World Engine</b>   인메모리 권위 상태 · 250ms tick · 5초마다 SQLite 스냅샷 · <b>LLM 호출 없음</b>
-     ├ <b>Presence</b>       편성표 → 호출/퇴근 큐 · 정문 경로 · 상태 전이
-     ├ <b>Agent Runtime</b>  @anthropic-ai/sdk · tool_runner · structured output · 캐싱 · 한도 계량
-     ├ <b>Tools</b>          seedscope.discover / seedscope.campaign / draft_outreach / create_artifact /
-     │                assign_task / post_message / search_web / (선택) generate_image
-     ├ <b>Memory</b>         프로젝트별 요약 + 승인/반려 사유 → 다음 컨텍스트에 주입
-     └ <b>SQLite</b>         better-sqlite3(WAL) · 야간 자동 백업 → 오브젝트 스토리지</pre>
-  <div class="prose">
-    <h3>테이블</h3>
-  </div>
+     ├ <b>World Engine</b>    인메모리 권위 상태 · 250ms tick · 5초 SQLite 스냅샷 · <b>LLM 호출 없음</b>
+     ├ <b>Presence</b>        편성표 → 호출/퇴근 큐 · 정문 경로 · 상태 전이
+     ├ <b>Agent Runtime</b>   <b>invoke(agent, task) 단일 진입점</b> · @anthropic-ai/sdk · tool_runner
+     │                  structured output · 캐싱 · 응답 usage → 비용 원장
+     ├ <b>Tools/</b>          파일 = 툴. seedscope.discover · draft_outreach · create_artifact ·
+     │                  assign_task · post_message · search_web · (선택) generate_image
+     ├ <b>Billing</b>         원장 · 충전 기록 · 한도 3중 · 알림 · Console 대조
+     ├ <b>Memory</b>          프로젝트 요약 + 승인/반려 사유 → 다음 컨텍스트
+     └ <b>SQLite</b>          better-sqlite3(WAL) · 야간 백업</pre>
   <pre>agents(id, name, role_title, zone, desk_x, desk_y, persona, sprite_json, model, effort,
-       tools_json, daily_cost_cap, active)
-projects(id, client, name, type, status, ai_allowed /*클라이언트 AI 금지 플래그*/, budget_usd, created_at)
-assignments(project_id, agent_id, role_in_project)          -- 편성표 = 호출 근거
+       tools_json, daily_cost_cap, approver_user_id, active)
+users(id, username, password_hash, role /*ceo|staff|viewer*/, display_name, sprite_json, invite_code)
+projects(id, client, name, type, status, ai_allowed, budget_usd, created_at)
+project_types(id, name, default_team_json)                 -- 편성표 (관리자 편집)
+assignments(project_id, agent_id, role_in_project)
 presence(agent_id, state /*work|idle|away|arriving|leaving*/, x, y, dir, since)
-tasks(id, project_id, title, brief, requester_id, assignee_agent_id,
-      status /*queued|doing|review|approved|rejected*/, priority, due, cost_usd)
+tasks(id, project_id, title, brief, requester_id, assignee_agent_id, status, priority, due, cost_usd)
 artifacts(id, task_id, agent_id, kind, title, body_md, image_url, status, approved_by, reason)
 messages(id, ts, channel, channel_key, sender_kind, sender_id, body, mentions)
 meetings(id, project_id, room, participants_json, minutes_md, started_at, ended_at)
-office_events(id, ts, actor_kind, actor_id, type, payload_json)
-agent_usage(agent_id, date, calls, input_tokens, output_tokens, cost_usd)
-users(id, username, password_hash, role /*ceo|staff|viewer*/, display_name, sprite_json)</pre>
+usage_ledger(id, ts, agent_id, project_id, task_id, model, input_tokens, cached_tokens,
+             output_tokens, cost_usd)                         -- 응답 usage 그대로
+credits(id, ts, amount_usd, receipt_ref, note)                -- 충전 기록
+limits(scope /*global|agent|project*/, ref_id, monthly_usd, daily_usd, alert_pct)
+features(key, enabled, config_json)                           -- 기능 플래그
+office_events(id, ts, actor_kind, actor_id, type, payload_json)</pre>
 </section>
 
 <section>
   <div class="prose">
-    <div class="shead"><span class="snum">09</span><h2>미처 챙기지 못했을 것들</h2></div>
-    <p class="sdek">대표님이 지시하지 않았지만 구축 중에 반드시 부딪히는 것들입니다. 각 항목에 설계상 답을 미리 넣었습니다.</p>
+    <div class="shead"><span class="snum">11</span><h2>미처 챙기지 못했을 것들</h2></div>
   </div>
   <div class="checks">
     <div class="check"><h4>산출물의 현실</h4><ul>
-      <li><b>AI 디자이너는 그림을 못 그립니다.</b> Claude는 텍스트·코드·SVG·HTML까지. 이미지 시안은 별도 이미지 API(§06) 또는 "AI 레이아웃 → 김정기 아트웍" 분업으로 갑니다</li>
-      <li><b>네이밍은 상표 검색이 필수.</b> 여울의 네이밍 산출물은 KIPRIS 검색 단계를 거쳐야 승인 큐에 오르도록 워크플로에 박습니다</li>
-      <li><b>카피 표절 검사.</b> 슬로건은 유사도 검색 후 제출</li>
-      <li><b>AI 산출물의 저작권 귀속</b>은 국가별로 다릅니다. 클라이언트 계약서에 "AI 보조 제작물" 조항 추가</li>
+      <li><b>AI 디자이너는 그림을 못 그립니다.</b> Claude는 텍스트·코드·SVG·HTML까지. 이미지 시안은 이미지 API 또는 "AI 레이아웃 → 김정기 아트웍" 분업</li>
+      <li><b>네이밍은 상표 검색 필수.</b> KIPRIS 검색 단계를 거쳐야 승인 큐에 오름</li>
+      <li><b>카피 표절 검사</b> — 슬로건은 유사도 검색 후 제출</li>
+      <li><b>AI 산출물 저작권</b>은 국가별로 다름 — 계약서에 "AI 보조 제작물" 조항</li>
     </ul></div>
     <div class="check"><h4>데이터 · 기밀</h4><ul>
-      <li><b>클라이언트 자료가 API로 나갑니다.</b> Anthropic 상용 API는 학습에 쓰지 않지만, NDA에 "제3자 처리자" 고지가 필요한 클라이언트가 있습니다. 프로젝트마다 <code>ai_allowed</code> 플래그 — 꺼지면 그 프로젝트 자료는 어떤 AI에게도 안 들어감</li>
-      <li><b>브랜드 바이블이 먼저.</b> AI가 우리 톤·과거 작업·클라이언트를 알아야 합니다. P0에 대표·직원이 2–3일 들여 정리하는 게 가장 큰 숨은 비용입니다</li>
-      <li><b>백업.</b> SQLite 파일 야간 자동 백업, 30일 보관</li>
-      <li><b>관람 링크 마스킹.</b> 광고주 관람 모드에서는 다른 클라이언트 프로젝트명·채팅이 가려집니다</li>
+      <li><b>클라이언트 자료가 API로 나갑니다.</b> 상용 API는 학습에 쓰지 않지만 NDA 고지가 필요한 경우가 있음. 프로젝트별 <code>ai_allowed</code></li>
+      <li><b>브랜드 바이블이 먼저.</b> P0에 대표·직원 2–3일 — 가장 큰 숨은 비용</li>
+      <li><b>API 키는 서버 환경변수에만.</b> 화면·DB·로그에 절대 노출 안 됨</li>
+      <li><b>백업</b> — SQLite 야간 자동 백업 30일 / <b>관람 링크 마스킹</b></li>
     </ul></div>
     <div class="check"><h4>사람</h4><ul>
-      <li><b>감시 도구로 보이면 실패합니다.</b> 직원 캐릭터의 위치·접속은 기록하지 않고 프레즌스만 표시. 인사 평가에 쓰지 않음을 명문화</li>
-      <li><b>대표가 병목이 됩니다.</b> 승인 권한 위임 규칙 — 디자인 산출물은 김정기, 그로스는 김성헌이 1차 승인, 대표는 대외 발송·비용 승인만</li>
-      <li><b>직원 부재 시</b> 담당 존의 AI는 자동으로 대표 직속으로 전환</li>
-      <li><b>모바일에서는 승인만.</b> 대표는 폰으로 승인·반려·한 줄 지시만 하고 싶어할 것 — 승인 전용 모바일 뷰</li>
+      <li><b>감시 도구로 보이면 실패합니다.</b> 직원 위치·접속 로그 없음. 인사 평가 미사용 명문화</li>
+      <li><b>대표가 병목이 됩니다.</b> 디자인은 김정기, 그로스는 김성헌 1차 승인. 대표는 대외 발송·비용만</li>
+      <li><b>직원 부재 시</b> 담당 존 AI는 대표 직속 자동 전환</li>
+      <li><b>모바일은 승인 전용 뷰</b></li>
     </ul></div>
     <div class="check"><h4>운영 · 장애</h4><ul>
-      <li><b>API 장애</b> — AI 전원 💤, 서버룸 램프 빨강. 사람 업무 무영향, 복구 시 큐 자동 재개</li>
-      <li><b>한도 도달</b> — 자동 정지 + 대표 알림. 열람·승인은 계속 가능</li>
-      <li><b>승인 48시간 방치</b> — 무결이 리마인드, 7일이면 해당 작업 보류 처리</li>
-      <li><b>AI 기억</b> — 회의록·승인 사유·프로젝트 요약이 다음 호출 컨텍스트에 들어감. 없으면 매번 처음부터 설명하게 됨</li>
-      <li><b>호스팅 재시작</b> — 5초 스냅샷 덕에 위치·큐가 보존, 재시작 후 자리 복귀</li>
+      <li><b>API 장애</b> → AI 전원 💤, 서버룸 램프 빨강, 사람 업무 무영향, 복구 시 큐 재개</li>
+      <li><b>한도 도달</b> → 자동 정지 + 알림. 열람·승인은 계속</li>
+      <li><b>크레딧 소진</b> → 잔여 $20에서 경고, $0이면 전원 대기. 충전 후 자동 재개</li>
+      <li><b>승인 48시간 방치</b> → 리마인드, 7일이면 보류</li>
+      <li><b>AI 기억</b> — 회의록·승인 사유·프로젝트 요약이 다음 호출에 들어감</li>
     </ul></div>
   </div>
 </section>
 
 <section>
   <div class="prose">
-    <div class="shead"><span class="snum">10</span><h2>경우의 수</h2></div>
-    <p class="sdek">프로젝트 유형별로 누가 불려오는지, 회사가 커지면 무엇이 바뀌는지, 무엇이 잘못될 수 있는지.</p>
-    <h3>프로젝트 유형 × 편성 기본값</h3>
+    <div class="shead"><span class="snum">12</span><h2>경우의 수</h2></div>
+    <h3 style="margin-top:0">프로젝트 유형 × 편성 기본값</h3>
   </div>
   <div class="scroll">
     <table class="matrix">
@@ -556,34 +811,32 @@ users(id, username, password_hash, role /*ceo|staff|viewer*/, display_name, spri
     </table>
   </div>
   <p class="caption" style="margin:0 0 20px"><span class="dot-a">●</span> 기본 편성 &nbsp; <span class="dot-b">○</span> 필요 시 호출 &nbsp; <span class="dot-c">–</span> 대기 · 비용 0</p>
-
   <div class="prose"><h3>규모가 바뀌면</h3></div>
   <div class="scroll">
     <table>
       <thead><tr><th>상황</th><th>바뀌는 것</th><th>바뀌지 않는 것</th></tr></thead>
       <tbody>
-        <tr><td>직원 3명 → 8명</td><td>프리 데스크 추가(맵 확장), 존별 승인자 지정, 동시 접속 20명까지는 SQLite로 충분</td><td>AI 편성·호출 구조</td></tr>
-        <tr><td>AI 9명 → 20명</td><td>2층 맵(계단 타일), 무결 아래 존별 서브 PM, 프로젝트 예산 상한 필수</td><td>레코드 추가로 끝 — 코드 변경 없음</td></tr>
-        <tr><td>동시 프로젝트 8개 이상</td><td>Postgres 전환, 월 비용 풀가동 구간, 회의 라운드 상한 축소</td><td>사무실 UX</td></tr>
-        <tr><td>클라이언트에게 사무실 공개</td><td>관람 링크 + 마스킹, 브랜드 톤 연출(사운드·인트로)</td><td>내부 데이터 경계</td></tr>
-        <tr><td>AI 디자이너에 이미지 생성 도입</td><td>이미지 API 키 · 갤러리 액자에 실제 썸네일 · 월 +$20–200</td><td>승인 큐 경유 원칙</td></tr>
+        <tr><td>직원 3명 → 8명</td><td>프리 데스크(맵 에디터), 존별 승인자, 동시 20명까지 SQLite</td><td>AI 편성·호출 구조</td></tr>
+        <tr><td>AI 9명 → 20명</td><td>2층 맵, 존별 서브 PM, 프로젝트 예산 상한 필수</td><td>관리자 폼으로 추가 — 코드 변경 없음</td></tr>
+        <tr><td>동시 프로젝트 8개 이상</td><td>Postgres 전환, 풀가동 비용 구간, 회의 상한 축소</td><td>사무실 UX</td></tr>
+        <tr><td>클라이언트에게 공개</td><td>관람 링크 + 마스킹, 브랜드 연출</td><td>내부 데이터 경계</td></tr>
+        <tr><td>이미지 생성 도입</td><td>툴 파일 + API 키 · 갤러리 실제 썸네일 · 월 +$20–200</td><td>승인 큐 원칙</td></tr>
       </tbody>
     </table>
   </div>
-
   <div class="prose"><h3>잘못될 수 있는 것</h3></div>
   <div class="scroll">
     <table>
       <thead><tr><th>리스크</th><th>영향</th><th>설계상 대응</th></tr></thead>
       <tbody>
-        <tr><td>비용 폭주</td><td>높음</td><td>한도 3중(에이전트·프로젝트·월) + 대기 상태 비용 0 구조 자체가 방어</td></tr>
-        <tr><td>AI끼리 무한 대화</td><td>중간</td><td>AI는 동료를 직접 못 부름(무결 경유), 회의 12턴 상한, 잡담 예산</td></tr>
-        <tr><td>품질 편차</td><td>높음</td><td>전 산출물 승인 큐, 반려 사유가 다음 프롬프트에 주입</td></tr>
-        <tr><td>외부 발송 사고</td><td>높음</td><td>메일·게시 툴은 사람 승인 없이는 실행 불가</td></tr>
-        <tr><td>클라이언트 AI 거부</td><td>중간</td><td>프로젝트 <code>ai_allowed=false</code> → 자료 차단·AI 호출 차단</td></tr>
-        <tr><td>구독 약관 위반</td><td>높음</td><td>Max 토큰을 서버에 넣지 않음. 옵션 B도 사람이 띄우는 세션만</td></tr>
-        <tr><td>직원 반감</td><td>높음</td><td>위치 로그 없음, 평가 미사용 명문화, 직원이 AI를 "부리는" 구조</td></tr>
-        <tr><td>"보여주기용" 전락</td><td>높음</td><td>KPI = 채택 산출물 수. 3개월 후 미달이면 축소 판단</td></tr>
+        <tr><td>비용 폭주</td><td>높음</td><td>한도 3중 + 단일 진입점 + 대기 비용 0 구조</td></tr>
+        <tr><td>AI끼리 무한 대화</td><td>중간</td><td>동료 직접 호출 불가(무결 경유), 회의 12턴, 잡담 예산</td></tr>
+        <tr><td>품질 편차</td><td>높음</td><td>전 산출물 승인 큐, 반려 사유 주입</td></tr>
+        <tr><td>외부 발송 사고</td><td>높음</td><td>발송 툴은 사람 승인 필수</td></tr>
+        <tr><td>클라이언트 AI 거부</td><td>중간</td><td><code>ai_allowed=false</code> → 자료·호출 차단</td></tr>
+        <tr><td>구독 약관 위반</td><td>높음</td><td>서버는 API 키만. Max는 사람이 쓰는 Claude Code에서만</td></tr>
+        <tr><td>직원 반감</td><td>높음</td><td>위치 로그 없음, 평가 미사용, 직원이 AI를 부리는 구조</td></tr>
+        <tr><td>"보여주기용" 전락</td><td>높음</td><td>KPI = 채택 산출물. 3개월 미달 시 축소</td></tr>
       </tbody>
     </table>
   </div>
@@ -591,44 +844,43 @@ users(id, username, password_hash, role /*ceo|staff|viewer*/, display_name, spri
 
 <section>
   <div class="prose">
-    <div class="shead"><span class="snum">11</span><h2>구축 순서</h2></div>
-    <p class="sdek">개발은 Claude Code(Max)로 진행하므로 외주비가 없고, 대표님 시간은 P0 브랜드 바이블 정리와 각 단계 검수에만 들어갑니다.</p>
+    <div class="shead"><span class="snum">13</span><h2>구축 순서</h2></div>
+    <p class="sdek">개발은 Claude Code(Max)로 진행하므로 외주비가 없고, 대표님 시간은 P0 브랜드 바이블과 단계별 검수에만 들어갑니다.</p>
   </div>
   <div class="road">
-    <div class="step"><div class="p">P0</div><div><div class="t">준비 — 저장소 · 브랜드 바이블 · 픽셀 에셋 1차 · 맵 확정</div><div class="d">캐릭터 12종(헤어·의상 조합), 타일 40종. <b>브랜드 바이블 초안</b>(톤, 금지어, 과거 작업 10건 요약, 클라이언트 목록). 김정기 디자인 승인.</div></div><div class="w">1주</div></div>
-    <div class="step"><div class="p">P1</div><div><div class="t">공간 — 렌더러 · 이동 · 정문 호출/퇴근 연출 · 채팅 · SSE · 로그인</div><div class="d">AI는 스크립트(더미). <b>3명 동시 접속, 편성 바꾸면 AI가 정문으로 드나들면 통과.</b></div></div><div class="w">2주 · 시연</div></div>
-    <div class="step"><div class="p">P2</div><div><div class="t">두뇌 — 에이전트 런타임 · 툴 · 작업 큐 · 승인 · 메모리 · 비용 계량</div><div class="d">옵션 B(루틴)로 먼저 검증, API 크레딧 $50 충전 후 A로 전환. 지시 없이 큐를 소진하면 통과.</div></div><div class="w">2주</div></div>
-    <div class="step"><div class="p">P3</div><div><div class="t">업무 — 회의실 · 갤러리 · 일일 리포트 · SeedScope 연동 · 상표 검색 단계</div><div class="d">실제 프로젝트 1건을 AI 편성으로 끝까지 진행하면 통과.</div></div><div class="w">2주</div></div>
-    <div class="step"><div class="p">P4</div><div><div class="t">대외 — 관람 링크 · 모바일 승인 뷰 · 슬랙 호출 · (선택) 이미지 생성</div><div class="d">제안서에 링크를 첨부할 수 있는 완성도.</div></div><div class="w">1–2주</div></div>
+    <div class="step"><div class="p">P0</div><div><div class="t">준비 — 저장소 · 브랜드 바이블 · 픽셀 템플릿 확정 · 맵 40×24</div><div class="d">헤어·의상 템플릿과 가구 세트를 김정기가 감수. 브랜드 바이블 초안.</div></div><div class="w">1주</div></div>
+    <div class="step"><div class="p">P1</div><div><div class="t">공간 — 로그인 · 캐릭터 만들기 · 렌더러 · 이동 · 정문 연출 · 채팅 · SSE</div><div class="d">AI는 스크립트. <b>3명이 각자 만든 캐릭터로 동시 접속하고, 편성 바꾸면 AI가 드나들면 통과.</b></div></div><div class="w">2주 · 시연</div></div>
+    <div class="step"><div class="p">P2</div><div><div class="t">두뇌와 지갑 — 에이전트 런타임(단일 진입점) · 작업 큐 · 승인 · 비용 원장 · 비용 화면 · 한도</div><div class="d">옵션 B로 검증 → API $50 충전 후 A. 대기 AI 비용이 0으로 찍히는 것을 확인하면 통과.</div></div><div class="w">2–3주</div></div>
+    <div class="step"><div class="p">P3</div><div><div class="t">업무와 관리 — 회의실 · 갤러리 · 일일 리포트 · SeedScope 연동 · 관리자(AI 추가·기능 플래그)</div><div class="d">실제 프로젝트 1건 완료 + 대표가 AI 1명을 직접 추가해 출근시키면 통과.</div></div><div class="w">2주</div></div>
+    <div class="step"><div class="p">P4</div><div><div class="t">대외와 확장 — 관람 링크 · 모바일 승인 뷰 · 맵 에디터 · 슬랙 호출 · (선택) 이미지 생성</div><div class="d">제안서에 링크를 첨부할 수 있는 완성도.</div></div><div class="w">2주</div></div>
   </div>
 </section>
 
 <section>
   <div class="prose">
-    <div class="shead"><span class="snum">12</span><h2>결재 요청</h2></div>
+    <div class="shead"><span class="snum">14</span><h2>결재 요청</h2></div>
   </div>
   <div class="ask">
     <ol>
-      <li><b>운영 방식</b> — P1–P2는 옵션 B(추가 비용 0), P3부터 옵션 A(API). 시작 크레딧 <b>$100 충전</b> 승인</li>
-      <li><b>규모</b> — 표준(월 $150–220) 기준으로 한도 설정</li>
-      <li><b>이미지 생성 도입 여부</b> — 도입 시 월 +$20–120. 미도입 시 아트웍은 김정기 전담</li>
-      <li><b>브랜드 바이블 작성 시간</b> — P0에 대표 1일 + 직원 각 1일 확보</li>
-      <li><b>P1 착수</b> — 3주차 시연 목표</li>
+      <li><b>운영 방식</b> — P1–P2 옵션 B(추가 비용 0), P3부터 API. Console 계정 개설과 시작 크레딧 <b>$100</b> 승인</li>
+      <li><b>규모</b> — 표준(월 $150–220) 기준 한도 설정. 80% 알림, 100% 자동 대기</li>
+      <li><b>이미지 생성 도입 여부</b> — 도입 시 월 +$20–120</li>
+      <li><b>1차 승인자</b> — 디자인 김정기 · 그로스 김성헌 위임 승인</li>
+      <li><b>브랜드 바이블 작성 시간</b> — P0에 대표 1일 + 직원 각 1일</li>
+      <li><b>P1 착수</b> — 3주차 시연</li>
     </ol>
   </div>
 </section>
 
 <footer>
-  <span>다나나인 · 다나 오피스 기획서 v2 · 2026-09-04</span>
+  <span>다나나인 · 다나 오피스 기획서 v3 · 2026-09-04</span>
   <span>원본 · dana-office/docs/PLAN.md · prototype/index.html</span>
 </footer>
 </div>
-
 <script>
 (function(){
 "use strict";
 var TS=16, COLS=22, ROWS=13, W=COLS*TS, H=ROWS*TS;
-
 var MAP=[
 "######################",
 "#.....#........#.....#",
@@ -641,311 +893,456 @@ var MAP=[
 "#.C...#.D...D..#.TTT.#",
 "#.C.K.#........#.TTT.#",
 "#.....#.D...D..#.....#",
-"#.PP..#........#....S#",
+"#.PP.W#........#....S#",
 "######################"];
 function at(x,y){ if(x<0||y<0||x>=COLS||y>=ROWS) return "#"; return MAP[y][x]; }
-function blocked(x,y){ return "#DBTCKPSOR".indexOf(at(x,y))>=0; }
+function blocked(x,y){ return "#DBTCKPSORW".indexOf(at(x,y))>=0; }
 var ENTRANCE=[0,5];
 
-/* ── 스프라이트 정의 ───────────────────────────────────────────── */
-/* hair: short|long|bun|cap  outfit: tee|hoodie|blazer|vest */
-var SK={ light:["#f4d3b3","#dcae86"], mid:["#eabf99","#c99268"], warm:["#f1c9a4","#d19a6e"] };
-var STAFF=[
- {id:"ceo",name:"김효태",role:"대표이사",kind:"human",zone:"ceo",seat:[3,1],player:true,
-  look:{hair:"short",hairC:["#2b2118","#4a3a2c"],skin:SK.mid,outfit:"blazer",top:["#2e3352","#1f2238"],shirt:"#e9ecf5",bottom:"#26283a",shoe:"#1a1a22"},
-  out:"승인 · 방향 결정",lines:["좋습니다. 이 방향으로 갑시다.","이건 클라이언트 톤이랑 안 맞아요. 다시.","승인 큐부터 봅시다."]},
- {id:"jk",name:"김정기",role:"디자이너",kind:"human",zone:"design",seat:[12,3],
-  look:{hair:"cap",hairC:["#1e1e26","#33334a"],cap:["#3f3a8f","#2c2866"],skin:SK.light,outfit:"hoodie",top:["#6e7387","#4f5468"],bottom:"#2e3145",shoe:"#e6e6ea"},
-  out:"실제 아트웍 · AD 감수",lines:["AD 시안 방향 확인했습니다. 아트웍 들어갈게요.","픽셀 캐릭터 12종 스프라이트 정리 중입니다.","이 여백이면 모바일에서 깨져요."]},
- {id:"sh",name:"김성헌",role:"글로벌 그로스 마케터",kind:"human",zone:"growth",seat:[12,9],
-  look:{hair:"short",hairC:["#161616","#2e2e36"],skin:SK.warm,outfit:"tee",top:["#2f7d6f","#215a50"],bottom:"#26283a",shoe:"#1a1a22"},
-  out:"해외 시딩 총괄",lines:["시아가 뽑은 후보 리스트 실측 돌립니다.","베트남 쪽 응답률이 확실히 좋네요.","이번 주 CPE 기준 다시 잡을게요."]},
- {id:"sora",name:"소라",role:"아트 디렉터",kind:"agent",zone:"design",seat:[8,1],model:"claude-opus-5",
-  look:{hair:"long",hairC:["#3a2418","#5a3c2a"],skin:SK.light,outfit:"blazer",top:["#7a2f4a","#571f33"],shirt:"#f3e9ec",bottom:"#2b2e42",shoe:"#1a1a22"},
-  out:"컨셉 방향 · 무드보드 · 시안 리뷰",lines:["무드보드 3안 정리했어요. 톤은 뉴트럴 + 포인트 오렌지.","이 시안은 여백이 부족해요. 그리드 12 → 8로.","레퍼런스 12건 중 우리 톤은 4건입니다."]},
- {id:"dodam",name:"도담",role:"그래픽 디자이너",kind:"agent",zone:"design",seat:[12,1],model:"claude-opus-5",
-  look:{hair:"bun",hairC:["#402a1c","#5e4030"],skin:SK.mid,outfit:"vest",top:["#c9932c","#9a6e1e"],shirt:"#f6f1e6",bottom:"#33364a",shoe:"#4a3020"},
-  out:"상세페이지 · 배너 · SNS 카드",lines:["상세페이지 배리에이션 6종 뽑았습니다.","배너 A/B용으로 카피 위치만 바꾼 버전 올렸어요.","카드뉴스 20종 큐에 넣어두겠습니다."]},
- {id:"yeoul",name:"여울",role:"브랜드 카피라이터",kind:"agent",zone:"design",seat:[8,3],model:"claude-opus-5",
-  look:{hair:"long",hairC:["#1c1c22","#34343f"],skin:SK.light,outfit:"tee",top:["#5f8f74","#427055"],bottom:"#2b2e42",shoe:"#e6e6ea"},
-  out:"네이밍 · 슬로건 · 톤앤매너",lines:["네이밍 후보 20개 중 상표 충돌 없는 7개 남았습니다.","슬로건 톤을 조금 낮췄어요. 과장 표현 뺐습니다.","영문 카피는 오늘 큐 끝나고 정리하겠습니다."]},
- {id:"haram",name:"하람",role:"퍼포먼스 마케터",kind:"agent",zone:"growth",seat:[8,7],model:"claude-sonnet-5",
-  look:{hair:"short",hairC:["#5a3620","#7a4e30"],skin:SK.warm,outfit:"hoodie",top:["#c9612b","#96431c"],bottom:"#2e3145",shoe:"#1a1a22"},
-  out:"소재 테스트 설계 · 지표 해석",lines:["지난주 CPE가 12% 내려갔어요. 소재 3번이 효율 좋습니다.","예산 재배분안 리포트에 정리해 뒀습니다.","이 캠페인은 도달보다 참여로 봐야 합니다."]},
- {id:"sia",name:"시아",role:"글로벌 그로스 · 시딩",kind:"agent",zone:"growth",seat:[12,7],model:"claude-sonnet-5",
-  look:{hair:"bun",hairC:["#241a14","#3e2c22"],skin:SK.mid,outfit:"blazer",top:["#5b4a9e","#3f3372"],shirt:"#efeaf8",bottom:"#26283a",shoe:"#1a1a22"},
-  out:"인플루언서 후보 · 아웃리치 초안",lines:["베트남 뷰티 마이크로 인플루언서 14명 후보 올렸습니다.","아웃리치 메일 초안 준비 완료. 승인만 주시면 발송 대기.","SeedScore 70 이상만 남기니 9명입니다."]},
- {id:"naru",name:"나루",role:"리서치 · 인사이트",kind:"agent",zone:"growth",seat:[8,9],model:"claude-sonnet-5",glasses:true,
-  look:{hair:"short",hairC:["#2b2118","#463628"],skin:SK.light,outfit:"tee",top:["#8a6a44","#645030"],bottom:"#33364a",shoe:"#4a3020"},
-  out:"경쟁사 · 트렌드 브리프",lines:["경쟁사 리브랜딩 사례 5건 브리프로 묶었어요.","이번 분기 패키지 트렌드는 미니멀 회귀입니다.","레퍼런스 더 모아서 무드보드에 붙여둘게요."]},
- {id:"hangyeol",name:"한결",role:"세일즈 리드",kind:"agent",zone:"sales",seat:[18,1],model:"claude-opus-5",
-  look:{hair:"short",hairC:["#1a1a1e","#33333c"],skin:SK.warm,outfit:"blazer",top:["#1f4f7a","#163a5a"],shirt:"#eaf1f8",bottom:"#26283a",shoe:"#1a1a22"},
-  out:"리드 · 제안서 · 견적 초안",lines:["리드 32건 중 응답 6건. 제안서 초안 2건 작성했습니다.","견적 레인지는 기존 대비 8% 상향 제안드립니다.","미국 동부 오전에 맞춰 팔로업 겁니다."]},
- {id:"onyu",name:"온유",role:"세일즈 CS · 온보딩",kind:"agent",zone:"sales",seat:[18,3],model:"claude-sonnet-5",
-  look:{hair:"long",hairC:["#4a3020","#6a4a34"],skin:SK.light,outfit:"tee",top:["#b8456f","#8a3253"],bottom:"#2e3145",shoe:"#e6e6ea"},
-  out:"문의 응대 · 킥오프 · 공유 리포트",lines:["신규 문의 응대 초안 4건 검토 대기입니다.","킥오프 문서 템플릿 업데이트했어요.","광고주 공유 리포트 링크 발행해 두겠습니다."]},
- {id:"mugyeol",name:"무결",role:"오피스 매니저 · PM",kind:"agent",zone:"reception",seat:[10,5],model:"claude-opus-5",
-  look:{hair:"short",hairC:["#553318","#744a2a"],skin:SK.mid,outfit:"vest",top:["#3b3f57","#2b2e42"],shirt:"#f2f2f5",bottom:"#26283a",shoe:"#1a1a22"},
-  out:"편성 · 호출 · 승인 큐 · 일일 리포트",lines:["오늘 승인 대기 7건입니다, 대표님.","소라 큐가 비어서 라운지로 보냈습니다. 비용 0.","리브랜딩 편성 완료. 나루 호출했습니다."]}
-];
-
-var PROJECTS=[
- {name:"A사 리브랜딩",team:["sora","dodam","yeoul","naru","mugyeol"]},
- {name:"B사 해외 시딩",team:["sia","haram","onyu","mugyeol"]},
- {name:"신규 영업 스프린트",team:["hangyeol","onyu","naru","mugyeol"]},
- {name:"전원 호출",team:["sora","dodam","yeoul","haram","sia","naru","hangyeol","onyu","mugyeol"]}
-];
-
-var ZONES={
- ceo:{x1:1,y1:1,x2:5,y2:4,rug:["#6a5c8c","#655786"],border:"#57497a"},
- design:{x1:7,y1:1,x2:14,y2:4,rug:["#557a8c","#507486"],border:"#43657a"},
- sales:{x1:16,y1:1,x2:20,y2:4,rug:["#8c6a5c","#866456"],border:"#72544a"},
- growth:{x1:7,y1:7,x2:14,y2:11,rug:["#5a8a70","#54846a"],border:"#45705a"},
- meet:{x1:16,y1:7,x2:20,y2:11,rug:["#7a6c8c","#746686"],border:"#605478"}
+/* ══════════════ 1. 스프라이트 템플릿 시스템 ══════════════ */
+var TPL={
+front:[
+"...HHHHHH...",
+"..HHHHHHHh..",
+"..HHHHHHhh..",
+"..hSWSSWsh..",
+"..hSPSSPsh..",
+"...SSSSSs...",
+"...sSssSs...",
+"....TssT....",
+".TTTTTTTTtt.",
+".TTTTTTTTtt.",
+".TTTTTTTTtt.",
+".TTTTTTTTtt.",
+".TTTTTTTTtt.",
+".SsTTTTTTss.",
+"...BBBBBb...",
+"...BBBBBb...",
+"...BBbBBb...",
+"...BBbBBb...",
+"...kKKkKK...",
+"...KKKKKK..."],
+back:[
+"...HHHHHH...",
+"..HHHHHHHh..",
+"..HHHHHHHh..",
+"..HHHHHHHh..",
+"..hHHHHHhh..",
+"...HHHHHh...",
+"...sSSSSs...",
+"....ssss....",
+".TTTTTTTTtt.",
+".TTTTTTTTtt.",
+".TTTTTTTTtt.",
+".TTTTTTTTtt.",
+".TTTTTTTTtt.",
+".SsTTTTTTss.",
+"...BBBBBb...",
+"...BBBBBb...",
+"...BBbBBb...",
+"...BBbBBb...",
+"...kKKkKK...",
+"...KKKKKK..."],
+side:[
+"....HHHHH...",
+"...HHHHHHh..",
+"...HHHHSSs..",
+"...hHSSWSs..",
+"...hHSSPSs..",
+"....SSSSSs..",
+"....sSSSs...",
+".....sTT....",
+"....TTTTTt..",
+"....TTTttt..",
+"....TTTttt..",
+"....TTTttt..",
+"....TTTttt..",
+"....TTTTSs..",
+"....bbBBB...",
+"....bbBBB...",
+"....bbBBB...",
+"....bbBBB...",
+"....kkKKk...",
+"....KKKKK..."]
 };
-var LOUNGE={x1:1,y1:7,x2:5,y2:11};
-var WANDER={ lounge:[[1,8],[3,8],[1,9],[3,9],[4,10],[5,9]], meet:[[16,8],[16,9],[20,8],[20,9],[17,7],[19,7],[17,10],[19,10]], corridor:[[4,5],[7,6],[14,5],[17,6],[2,6],[19,5]] };
-
-/* ── 스프라이트 렌더링 (12×20, 아웃라인 포함 14×22) ───────────── */
-var spriteCache={};
-function buildSprite(def, dir, frame, mood){
-  var key=def.id+"|"+dir+"|"+frame+"|"+mood;
-  if(spriteCache[key]) return spriteCache[key];
-  var L=def.look, tmp=document.createElement("canvas"); tmp.width=12; tmp.height=20;
-  var g=tmp.getContext("2d");
-  function r(x,y,w,h,c){ g.fillStyle=c; g.fillRect(x,y,w,h); }
-  var walking = frame!==0 && mood!=="rest";
-  var bob = (frame===1||frame===3) ? 1 : 0;
-  var b = bob;
-  var legL = frame===1 ? 1 : (frame===3 ? -1 : 0);
-  var legR = -legL;
-  var side = dir==="left"||dir==="right";
-  var back = dir==="up";
-  var flip = dir==="left";
-  var hair=L.hairC[0], hairSh=L.hairC[1], skin=L.skin[0], skinSh=L.skin[1];
-  var top=L.top[0], topSh=L.top[1], pants=L.bottom, shoe=L.shoe;
-
-  /* shoes + legs (y14..19) */
-  var ly=14+b;
-  if(side){
-    r(4,ly,2,4-Math.max(0,legL),pants); r(6,ly,2,4-Math.max(0,legR),pants);
-    r(4,ly+4-Math.max(0,legL),2,2,shoe); r(6,ly+4-Math.max(0,legR),2,2,shoe);
+function grid(rows){ return rows.map(function(r){ return r.split(""); }); }
+function set(g,x,y,c){ if(y>=0&&y<20&&x>=0&&x<12) g[y][x]=c; }
+function fillR(g,x1,y1,x2,y2,c){ for(var y=y1;y<=y2;y++) for(var x=x1;x<=x2;x++) set(g,x,y,c); }
+function shiftRegion(g,x1,y1,x2,y2,dx,dy){
+  var tmp=[]; for(var y=y1;y<=y2;y++){ for(var x=x1;x<=x2;x++){ tmp.push([x,y,g[y][x]]); g[y][x]="."; } }
+  tmp.forEach(function(c){ if(c[2]!==".") set(g,c[0]+dx,c[1]+dy,c[2]); });
+}
+function applyHair(g,view,hair){
+  if(view==="front"){
+    if(hair==="long"){ for(var y=3;y<=10;y++){ set(g,2,y,"H"); set(g,9,y,"h"); } }
+    else if(hair==="bun"){ set(g,9,0,"h"); set(g,10,0,"h"); set(g,9,1,"h"); set(g,10,1,"h"); set(g,8,0,"H"); }
+    else if(hair==="cap"){ fillR(g,3,0,8,1,"C"); set(g,7,0,"c"); set(g,8,0,"c"); set(g,7,1,"c"); set(g,8,1,"c"); fillR(g,2,2,9,2,"c"); set(g,2,4,"."); set(g,9,4,"."); }
+  } else if(view==="back"){
+    if(hair==="long"){ fillR(g,3,6,8,10,"H"); fillR(g,8,6,8,10,"h"); }
+    else if(hair==="bun"){ set(g,5,0,"h"); set(g,6,0,"h"); set(g,5,1,"h"); set(g,6,1,"h"); }
+    else if(hair==="cap"){ fillR(g,3,0,8,3,"C"); fillR(g,8,0,8,3,"c"); fillR(g,3,4,8,4,"c"); set(g,2,4,"."); set(g,9,4,"."); }
   } else {
-    r(3,ly,3,4,pants); r(6,ly,3,4,pants);
-    r(3,ly+4,3,2,shoe); r(6,ly+4,3,2,shoe);
-    if(walking){ if(legL>0){ r(3,ly+3,3,1,shoe); } if(legR>0){ r(6,ly+3,3,1,shoe); } }
+    if(hair==="long"){ for(var y2=3;y2<=10;y2++){ set(g,3,y2,"h"); set(g,4,y2,"H"); } }
+    else if(hair==="bun"){ set(g,2,1,"h"); set(g,3,1,"h"); set(g,2,2,"h"); set(g,3,2,"h"); }
+    else if(hair==="cap"){ fillR(g,3,0,8,1,"C"); fillR(g,3,2,6,2,"C"); fillR(g,7,2,10,2,"c"); set(g,8,1,"c"); set(g,4,3,"C"); }
   }
-  /* torso (y8..13) */
-  var ty=8+b;
-  r(3,ty,6,6,top); r(7,ty,2,6,topSh);
-  /* arms */
-  var armSw = walking ? (frame===1?1:(frame===3?-1:0)) : 0;
-  if(side){
-    r(5,ty+1+Math.max(0,armSw),2,4,topSh); r(5,ty+5+Math.max(0,armSw),2,1,skin);
+}
+function applyOutfit(g,view,o){
+  if(view==="front"){
+    if(o==="blazer"){ fillR(g,4,8,4,12,"t"); fillR(g,7,8,7,12,"t"); fillR(g,5,8,6,12,"X"); set(g,5,8,"R"); set(g,6,8,"R"); fillR(g,6,9,6,11,"R"); }
+    else if(o==="hoodie"){ fillR(g,3,7,8,7,"t"); fillR(g,4,8,7,8,"t"); fillR(g,5,9,5,10,"R"); fillR(g,6,9,6,10,"R"); fillR(g,4,12,7,12,"t"); }
+    else if(o==="vest"){ fillR(g,5,8,6,13,"X"); set(g,4,7,"X"); set(g,7,7,"X"); set(g,5,10,"R"); set(g,5,12,"R"); }
+    else { fillR(g,5,10,6,11,"R"); }
+  } else if(view==="back"){
+    if(o==="hoodie"){ fillR(g,3,7,8,8,"t"); }
+    else if(o==="blazer"){ fillR(g,5,8,6,13,"t"); }
   } else {
-    r(1,ty+1+Math.max(0,armSw),2,4,top);  r(1,ty+5+Math.max(0,armSw),2,1,skin);
-    r(9,ty+1+Math.max(0,-armSw),2,4,topSh); r(9,ty+5+Math.max(0,-armSw),2,1,skinSh);
+    if(o==="blazer"){ fillR(g,8,8,8,9,"X"); set(g,8,10,"R"); }
+    else if(o==="hoodie"){ fillR(g,4,7,8,7,"t"); fillR(g,8,8,8,9,"R"); fillR(g,5,12,7,12,"t"); }
+    else if(o==="vest"){ fillR(g,8,8,8,12,"X"); }
   }
-  /* outfit details */
-  if(!back){
-    if(L.outfit==="blazer"){ r(5,ty,2,5,L.shirt||"#eee"); r(4,ty,1,5,topSh); r(7,ty,1,5,topSh); r(5,ty+1,2,1,"#c0392b"); }
-    else if(L.outfit==="hoodie"){ r(4,ty,4,1,topSh); r(5,ty+1,1,2,"#f4f1ea"); r(6,ty+1,1,2,"#f4f1ea"); r(4,ty+4,4,1,topSh); }
-    else if(L.outfit==="vest"){ r(5,ty,2,6,L.shirt||"#eee"); r(4,ty,1,1,L.shirt||"#eee"); r(7,ty,1,1,L.shirt||"#eee"); }
-    else { r(5,ty,2,1,skinSh); }
-  } else if(L.outfit==="hoodie"){ r(4,ty,4,2,topSh); }
-  /* neck */
-  r(5,7+b,2,1,skinSh);
-  /* head (y2..6) */
-  r(4,2+b,4,5,skin); r(7,2+b,1,5,skinSh);
-  if(!back){
-    if(side){
-      var ex = flip?4:7;
-      r(ex,4+b,1,1,mood==="rest"?skinSh:"#1c1c24");
-      if(def.glasses){ r(flip?3:6,4+b,3,1,"#3b3f57"); }
+}
+function applyGlasses(g,view){
+  if(view==="front"){ set(g,3,4,"G"); set(g,5,4,"G"); set(g,6,4,"G"); set(g,8,4,"G"); }
+  else if(view==="side"){ set(g,6,4,"G"); set(g,8,4,"G"); set(g,9,4,"G"); }
+}
+function applyEyes(g,view,mode){ /* mode: closed */
+  if(view==="front"){ set(g,4,3,"S"); set(g,7,3,"S"); set(g,4,4,"s"); set(g,7,4,"s"); }
+  else if(view==="side"){ set(g,7,3,"S"); set(g,7,4,"s"); }
+}
+function applyPose(g,view,pose,frame){
+  if(pose==="walk"){
+    if(view==="front"||view==="back"){
+      if(frame===1){ shiftRegion(g,3,14,5,19,0,-1); shiftRegion(g,1,8,2,13,0,-1); shiftRegion(g,9,8,10,13,0,1); }
+      if(frame===3){ shiftRegion(g,6,14,8,19,0,-1); shiftRegion(g,9,8,10,13,0,-1); shiftRegion(g,1,8,2,13,0,1); }
     } else {
-      if(mood==="rest"){ r(4,4+b,2,1,skinSh); r(6,4+b,2,1,skinSh); }
-      else { r(4,4+b,1,1,"#1c1c24"); r(7,4+b,1,1,"#1c1c24"); r(5,4+b,1,1,"#fff"); }
-      if(def.glasses){ r(3,4+b,2,1,"#3b3f57"); r(7,4+b,2,1,"#3b3f57"); r(5,4+b,2,1,"#3b3f57"); r(3,5+b,1,1,"#3b3f57"); r(8,5+b,1,1,"#3b3f57"); }
-      r(5,6+b,2,1,skinSh);
+      if(frame===1){ shiftRegion(g,6,14,8,19,1,-1); shiftRegion(g,4,14,5,19,-1,0); shiftRegion(g,7,9,9,13,1,0); }
+      if(frame===3){ shiftRegion(g,6,14,8,19,-1,-1); shiftRegion(g,4,14,5,19,1,0); shiftRegion(g,7,9,9,13,-1,0); }
     }
+  } else if(pose==="type" && view==="front"){
+    fillR(g,1,13,2,13,"."); fillR(g,9,13,10,13,".");
+    if(frame%2===0){ set(g,1,12,"S"); set(g,2,12,"S"); set(g,9,12,"s"); set(g,10,12,"s"); }
+    else { set(g,1,12,"T"); set(g,2,12,"S"); set(g,9,12,"s"); set(g,10,12,"t"); set(g,2,13,"S"); set(g,9,13,"s"); }
+  } else if(pose==="coffee" && view==="front"){
+    if(frame%2===0){ set(g,10,10,"M"); set(g,10,11,"M"); set(g,11,10,"M"); set(g,10,12,"S"); set(g,9,13,"."); set(g,10,13,"."); }
+    else { fillR(g,9,8,10,12,"t"); set(g,9,7,"M"); set(g,9,8,"M"); set(g,10,7,"M"); set(g,9,9,"S"); set(g,9,13,"."); set(g,10,13,"."); }
   }
-  /* hair */
-  var hs=L.hair;
-  if(hs==="cap"){
-    var cap=L.cap[0], capSh=L.cap[1];
-    r(3,0+b,6,3,cap); r(7,0+b,2,3,capSh);
-    if(!back){ r(side?(flip?1:6):2, 2+b, side?5:8, 1, capSh); }
-    r(3,3+b,1,1,hair); r(8,3+b,1,1,hairSh);
-  } else {
-    r(3,0+b,6,2,hair); r(7,0+b,2,2,hairSh); r(4,0+b,2,1,hairSh===hair?hair:hair);
-    r(3,2+b,1,2,hair); r(8,2+b,1,2,hairSh);
-    if(back){ r(3,2+b,6,3,hair); r(7,2+b,2,3,hairSh); }
-    else if(!side){ r(4,2+b,1,1,hair); r(7,2+b,1,1,hairSh); }
-    else { r(flip?3:8, 2+b, 1, 3, flip?hair:hairSh); r(flip?4:7,2+b,4,1,hair); }
-    if(hs==="long"){
-      r(3,4+b,1,5,hair); r(8,4+b,1,5,hairSh);
-      if(back){ r(3,4+b,6,5,hair); r(7,4+b,2,5,hairSh); }
-    } else if(hs==="bun"){
-      r(back?4:7, (back?0:0)+b, 2, 2, hairSh); r(back?4:7,0+b,1,1,hair);
-      if(back) r(3,4+b,6,1,hair);
-    }
-    r(4,0+b,2,1,"rgba(255,255,255,.12)");
-  }
-  /* outline pass */
-  var out=document.createElement("canvas"); out.width=14; out.height=22;
-  var og=out.getContext("2d"); og.imageSmoothingEnabled=false;
+}
+var spriteCache={};
+function buildSprite(def,dir,frame,pose){
+  var L=def.look, key=(def.id==="preview"?JSON.stringify(L):def.id)+"|"+dir+"|"+frame+"|"+pose;
+  if(spriteCache[key]) return spriteCache[key];
+  var view = dir==="up"?"back":(dir==="down"?"front":"side");
+  var g=grid(TPL[view]);
+  applyHair(g,view,L.hair); applyOutfit(g,view,L.outfit);
+  if(L.glasses) applyGlasses(g,view);
+  if(pose==="sleep"||pose==="blink") applyEyes(g,view,"closed");
+  applyPose(g,view,pose,frame);
+  var col={H:L.hair_c[0],h:L.hair_c[1],S:L.skin[0],s:L.skin[1],W:"#ffffff",P:"#1c1c24",T:L.top[0],t:L.top[1],X:L.shirt||"#f2f2f5",R:L.accent||"#c0392b",B:L.bottom[0],b:L.bottom[1],K:L.shoe[0],k:L.shoe[1],C:(L.cap||["#3f3a8f","#2c2866"])[0],c:(L.cap||["#3f3a8f","#2c2866"])[1],G:"#3b3f57",M:"#f4f1ea"};
+  var tmp=document.createElement("canvas"); tmp.width=12; tmp.height=20; var tg=tmp.getContext("2d");
+  for(var y=0;y<20;y++) for(var x=0;x<12;x++){ var c=g[y][x]; if(c!=="."&&col[c]){ tg.fillStyle=col[c]; tg.fillRect(x,y,1,1); } }
+  if(dir==="left"){ var m=document.createElement("canvas"); m.width=12; m.height=20; var mg=m.getContext("2d"); mg.translate(12,0); mg.scale(-1,1); mg.drawImage(tmp,0,0); tmp=m; }
+  var out=document.createElement("canvas"); out.width=14; out.height=22; var og=out.getContext("2d"); og.imageSmoothingEnabled=false;
   [[0,1],[2,1],[1,0],[1,2]].forEach(function(o){ og.drawImage(tmp,o[0],o[1]); });
   og.globalCompositeOperation="source-in"; og.fillStyle="#141420"; og.fillRect(0,0,14,22);
   og.globalCompositeOperation="source-over"; og.drawImage(tmp,1,1);
   spriteCache[key]=out; return out;
 }
 
-/* ── 정적 배경 ────────────────────────────────────────────────── */
+/* ══════════════ 2. 근무자 ══════════════ */
+var SK={ light:["#f4d3b3","#dcae86"], mid:["#eabf99","#c99268"], warm:["#f1c9a4","#d19a6e"] };
+var STAFF=[
+ {id:"ceo",name:"김효태",role:"대표이사",kind:"human",zone:"ceo",seat:[3,1],player:true,screen:"doc",
+  look:{hair:"short",hair_c:["#2b2118","#4a3a2c"],skin:SK.mid,outfit:"blazer",top:["#2e3352","#1f2238"],shirt:"#e9ecf5",accent:"#b8452f",bottom:["#26283a","#1b1c2a"],shoe:["#1a1a22","#3a3a48"]},
+  out:"승인 · 방향 결정",lines:["좋습니다. 이 방향으로 갑시다.","이건 클라이언트 톤이랑 안 맞아요. 다시.","승인 큐부터 봅시다."]},
+ {id:"jk",name:"김정기",role:"디자이너",kind:"human",zone:"design",seat:[12,3],screen:"design",
+  look:{hair:"cap",hair_c:["#1e1e26","#33334a"],cap:["#3f3a8f","#2c2866"],skin:SK.light,outfit:"hoodie",top:["#6e7387","#4f5468"],accent:"#f4f1ea",bottom:["#2e3145","#22243a"],shoe:["#e6e6ea","#b8b8c4"]},
+  out:"실제 아트웍 · AD 감수",lines:["AD 시안 방향 확인했습니다. 아트웍 들어갈게요.","픽셀 템플릿에 헤어 한 종 더 추가했어요.","이 여백이면 모바일에서 깨져요."]},
+ {id:"sh",name:"김성헌",role:"글로벌 그로스 마케터",kind:"human",zone:"growth",seat:[12,9],screen:"growth",
+  look:{hair:"short",hair_c:["#161616","#2e2e36"],skin:SK.warm,outfit:"tee",top:["#2f7d6f","#215a50"],accent:"#e8f3ef",bottom:["#26283a","#1b1c2a"],shoe:["#1a1a22","#3a3a48"]},
+  out:"해외 시딩 총괄",lines:["시아가 뽑은 후보 리스트 실측 돌립니다.","베트남 쪽 응답률이 확실히 좋네요.","이번 주 CPE 기준 다시 잡을게요."]},
+ {id:"sora",name:"소라",role:"아트 디렉터",kind:"agent",zone:"design",seat:[8,1],model:"claude-opus-5",screen:"design",
+  look:{hair:"long",hair_c:["#3a2418","#5a3c2a"],skin:SK.light,outfit:"blazer",top:["#7a2f4a","#571f33"],shirt:"#f3e9ec",accent:"#2b2e42",bottom:["#2b2e42","#1e2032"],shoe:["#1a1a22","#3a3a48"]},
+  out:"컨셉 방향 · 무드보드 · 시안 리뷰",lines:["무드보드 3안 정리했어요. 톤은 뉴트럴 + 포인트 오렌지.","이 시안은 여백이 부족해요. 그리드 12 → 8로.","레퍼런스 12건 중 우리 톤은 4건입니다."]},
+ {id:"dodam",name:"도담",role:"그래픽 디자이너",kind:"agent",zone:"design",seat:[12,1],model:"claude-opus-5",screen:"design",
+  look:{hair:"bun",hair_c:["#402a1c","#5e4030"],skin:SK.mid,outfit:"vest",top:["#c9932c","#9a6e1e"],shirt:"#f6f1e6",accent:"#5a3620",bottom:["#33364a","#25273a"],shoe:["#4a3020","#6a4a34"]},
+  out:"상세페이지 · 배너 · SNS 카드",lines:["상세페이지 배리에이션 6종 뽑았습니다.","배너 A/B용으로 카피 위치만 바꾼 버전 올렸어요.","카드뉴스 20종 큐에 넣어두겠습니다."]},
+ {id:"yeoul",name:"여울",role:"브랜드 카피라이터",kind:"agent",zone:"design",seat:[8,3],model:"claude-opus-5",screen:"doc",
+  look:{hair:"long",hair_c:["#1c1c22","#34343f"],skin:SK.light,outfit:"tee",top:["#5f8f74","#427055"],accent:"#eef5ef",bottom:["#2b2e42","#1e2032"],shoe:["#e6e6ea","#b8b8c4"]},
+  out:"네이밍 · 슬로건 · 톤앤매너",lines:["네이밍 후보 20개 중 상표 충돌 없는 7개 남았습니다.","슬로건 톤을 조금 낮췄어요. 과장 표현 뺐습니다.","영문 카피는 오늘 큐 끝나고 정리하겠습니다."]},
+ {id:"haram",name:"하람",role:"퍼포먼스 마케터",kind:"agent",zone:"growth",seat:[8,7],model:"claude-sonnet-5",screen:"growth",
+  look:{hair:"short",hair_c:["#5a3620","#7a4e30"],skin:SK.warm,outfit:"hoodie",top:["#c9612b","#96431c"],accent:"#f4f1ea",bottom:["#2e3145","#22243a"],shoe:["#1a1a22","#3a3a48"]},
+  out:"소재 테스트 설계 · 지표 해석",lines:["지난주 CPE가 12% 내려갔어요. 소재 3번이 효율 좋습니다.","예산 재배분안 리포트에 정리해 뒀습니다.","이 캠페인은 도달보다 참여로 봐야 합니다."]},
+ {id:"sia",name:"시아",role:"글로벌 그로스 · 시딩",kind:"agent",zone:"growth",seat:[12,7],model:"claude-sonnet-5",screen:"list",
+  look:{hair:"bun",hair_c:["#241a14","#3e2c22"],skin:SK.mid,outfit:"blazer",top:["#5b4a9e","#3f3372"],shirt:"#efeaf8",accent:"#2b2e42",bottom:["#26283a","#1b1c2a"],shoe:["#1a1a22","#3a3a48"]},
+  out:"인플루언서 후보 · 아웃리치 초안",lines:["베트남 뷰티 마이크로 인플루언서 14명 후보 올렸습니다.","아웃리치 메일 초안 준비 완료. 승인만 주시면 발송 대기.","SeedScore 70 이상만 남기니 9명입니다."]},
+ {id:"naru",name:"나루",role:"리서치 · 인사이트",kind:"agent",zone:"growth",seat:[8,9],model:"claude-sonnet-5",screen:"doc",
+  look:{hair:"short",hair_c:["#2b2118","#463628"],skin:SK.light,outfit:"tee",top:["#8a6a44","#645030"],accent:"#f4ede0",bottom:["#33364a","#25273a"],shoe:["#4a3020","#6a4a34"],glasses:true},
+  out:"경쟁사 · 트렌드 브리프",lines:["경쟁사 리브랜딩 사례 5건 브리프로 묶었어요.","이번 분기 패키지 트렌드는 미니멀 회귀입니다.","레퍼런스 더 모아서 무드보드에 붙여둘게요."]},
+ {id:"hangyeol",name:"한결",role:"세일즈 리드",kind:"agent",zone:"sales",seat:[18,1],model:"claude-opus-5",screen:"list",
+  look:{hair:"short",hair_c:["#1a1a1e","#33333c"],skin:SK.warm,outfit:"blazer",top:["#1f4f7a","#163a5a"],shirt:"#eaf1f8",accent:"#b8452f",bottom:["#26283a","#1b1c2a"],shoe:["#1a1a22","#3a3a48"]},
+  out:"리드 · 제안서 · 견적 초안",lines:["리드 32건 중 응답 6건. 제안서 초안 2건 작성했습니다.","견적 레인지는 기존 대비 8% 상향 제안드립니다.","미국 동부 오전에 맞춰 팔로업 겁니다."]},
+ {id:"onyu",name:"온유",role:"세일즈 CS · 온보딩",kind:"agent",zone:"sales",seat:[18,3],model:"claude-sonnet-5",screen:"list",
+  look:{hair:"long",hair_c:["#4a3020","#6a4a34"],skin:SK.light,outfit:"tee",top:["#b8456f","#8a3253"],accent:"#fbe9f0",bottom:["#2e3145","#22243a"],shoe:["#e6e6ea","#b8b8c4"]},
+  out:"문의 응대 · 킥오프 · 공유 리포트",lines:["신규 문의 응대 초안 4건 검토 대기입니다.","킥오프 문서 템플릿 업데이트했어요.","광고주 공유 리포트 링크 발행해 두겠습니다."]},
+ {id:"mugyeol",name:"무결",role:"오피스 매니저 · PM",kind:"agent",zone:"reception",seat:[10,5],model:"claude-opus-5",screen:"grid",
+  look:{hair:"short",hair_c:["#553318","#744a2a"],skin:SK.mid,outfit:"vest",top:["#3b3f57","#2b2e42"],shirt:"#f2f2f5",accent:"#1c1c24",bottom:["#26283a","#1b1c2a"],shoe:["#1a1a22","#3a3a48"]},
+  out:"편성 · 호출 · 승인 큐 · 일일 리포트",lines:["오늘 승인 대기 7건입니다, 대표님.","소라 큐가 비어서 라운지로 보냈습니다. 비용 0.","리브랜딩 편성 완료. 나루 호출했습니다."]}
+];
+var PROJECTS=[
+ {name:"A사 리브랜딩",team:["sora","dodam","yeoul","naru","mugyeol"]},
+ {name:"B사 해외 시딩",team:["sia","haram","onyu","mugyeol"]},
+ {name:"신규 영업 스프린트",team:["hangyeol","onyu","naru","mugyeol"]},
+ {name:"전원 호출",team:["sora","dodam","yeoul","haram","sia","naru","hangyeol","onyu","mugyeol"]}
+];
+var ZONES={
+ ceo:{x1:1,y1:1,x2:5,y2:4,rug:["#6a5c8c","#655786"],border:"#57497a",inner:"#75679a"},
+ design:{x1:7,y1:1,x2:14,y2:4,rug:["#557a8c","#507486"],border:"#43657a",inner:"#62889a"},
+ sales:{x1:16,y1:1,x2:20,y2:4,rug:["#8c6a5c","#866456"],border:"#72544a",inner:"#98776a"},
+ growth:{x1:7,y1:7,x2:14,y2:11,rug:["#5a8a70","#54846a"],border:"#45705a",inner:"#68987e"},
+ meet:{x1:16,y1:7,x2:20,y2:11,rug:["#6f628a","#6a5d84"],border:"#564a72",inner:"#7c6f98"}
+};
+var LOUNGE={x1:1,y1:7,x2:5,y2:11};
+var WANDER={ lounge:[[1,8],[3,8],[1,9],[3,9],[4,10],[3,10]], meet:[[16,8],[16,9],[20,8],[20,9],[17,7],[19,7],[17,10],[19,10]], corridor:[[4,5],[7,6],[14,5],[17,6],[2,6],[19,5]] };
+var WINDOWS=[1,4,7,12,16,19];
+
+/* ══════════════ 3. 픽셀 폰트 ══════════════ */
+var FONT={D:["110","101","101","101","110"],A:["010","101","111","101","101"],N:["101","111","111","101","101"],O:["111","101","101","101","111"],F:["111","100","110","100","100"],I:["111","010","010","010","111"],C:["111","100","100","100","111"],E:["111","100","110","100","111"],L:["100","100","100","100","111"],S:["111","100","111","001","111"]," ":["000","000","000","000","000"]};
+function drawText(g,x,y,str,c){ g.fillStyle=c; for(var i=0;i<str.length;i++){ var f=FONT[str[i]]||FONT[" "]; for(var r=0;r<5;r++) for(var k=0;k<3;k++) if(f[r][k]==="1") g.fillRect(x+i*4+k,y+r,1,1); } }
+
+/* ══════════════ 4. 환경 렌더러 ══════════════ */
 function skyFor(hour){
-  if(hour>=6&&hour<8)   return ["#e8a26a","#f4c98f"];
-  if(hour>=8&&hour<17)  return ["#7fb6e8","#bfe0f8"];
+  if(hour>=5&&hour<7)   return ["#5a4a7a","#c98a6a"];
+  if(hour>=7&&hour<9)   return ["#e8a26a","#f4c98f"];
+  if(hour>=9&&hour<17)  return ["#7fb6e8","#c4e2f8"];
   if(hour>=17&&hour<19) return ["#e07a5a","#f2b27a"];
   if(hour>=19&&hour<21) return ["#3e3f78","#6a5a95"];
-  return ["#141a3a","#232b58"];
+  return ["#10152e","#1d2550"];
 }
-function drawFloorTile(g,x,y){
-  var X=x*TS,Y=y*TS, inZone=null;
-  for(var k in ZONES){ var z=ZONES[k]; if(x>=z.x1&&x<=z.x2&&y>=z.y1&&y<=z.y2) inZone=z; }
-  if(inZone){
-    var rug=inZone.rug;
-    g.fillStyle=rug[(x+y)%2]; g.fillRect(X,Y,TS,TS);
-    /* subtle dither */
-    g.fillStyle=rug[(x+y+1)%2]; g.fillRect(X+2,Y+2,1,1); g.fillRect(X+9,Y+9,1,1); g.fillRect(X+13,Y+5,1,1); g.fillRect(X+5,Y+13,1,1);
-    /* rug border */
-    g.fillStyle=inZone.border;
-    if(x===inZone.x1) g.fillRect(X,Y,1,TS); if(x===inZone.x2) g.fillRect(X+TS-1,Y,1,TS);
-    if(y===inZone.y1) g.fillRect(X,Y,TS,1); if(y===inZone.y2) g.fillRect(X,Y+TS-1,TS,1);
+function inZone(x,y){ for(var k in ZONES){ var z=ZONES[k]; if(x>=z.x1&&x<=z.x2&&y>=z.y1&&y<=z.y2) return z; } return null; }
+function drawFloor(g,x,y){
+  var X=x*TS,Y=y*TS,z=inZone(x,y);
+  if(z){
+    g.fillStyle=z.rug[(x+y)%2]; g.fillRect(X,Y,TS,TS);
+    g.fillStyle=z.rug[(x+y+1)%2];
+    for(var i=0;i<4;i++){ g.fillRect(X+2+i*4,Y+2+((i%2)*8),1,1); g.fillRect(X+4+i*4,Y+12-((i%2)*8),1,1); }
+    g.fillStyle=z.inner; g.fillRect(X+((x*3+y)%8)+4,Y+((x+y*3)%8)+4,1,1);
+    g.fillStyle=z.border;
+    if(x===z.x1) g.fillRect(X,Y,1,TS); if(x===z.x2) g.fillRect(X+TS-1,Y,1,TS);
+    if(y===z.y1) g.fillRect(X,Y,TS,1); if(y===z.y2) g.fillRect(X,Y+TS-1,TS,1);
+    g.fillStyle=z.inner;
+    if(x===z.x1) g.fillRect(X+2,Y,1,TS); if(x===z.x2) g.fillRect(X+TS-3,Y,1,TS);
+    if(y===z.y1) g.fillRect(X,Y+2,TS,1); if(y===z.y2) g.fillRect(X,Y+TS-3,TS,1);
   } else if(x>=LOUNGE.x1&&x<=LOUNGE.x2&&y>=LOUNGE.y1&&y<=LOUNGE.y2){
-    /* wood planks */
     g.fillStyle=(y%2===0)?"#9a7452":"#a37b58"; g.fillRect(X,Y,TS,TS);
-    g.fillStyle="#7d5c40"; g.fillRect(X,Y+7,TS,1); g.fillRect(X+((x*5+y*3)%12),Y,1,7); g.fillRect(X+((x*7+y*5)%12),Y+8,1,8);
+    g.fillStyle="#7d5c40"; g.fillRect(X,Y+7,TS,1); g.fillRect(X,Y+15,TS,1);
+    var o1=(x*5+y*3)%12, o2=(x*7+y*5)%12; g.fillRect(X+o1,Y,1,7); g.fillRect(X+o2,Y+8,1,7);
     g.fillStyle="#b08a64"; g.fillRect(X+3,Y+2,4,1); g.fillRect(X+9,Y+11,3,1);
+    if((x*y)%5===1){ g.fillStyle="#6b4c33"; g.fillRect(X+10,Y+4,2,1); g.fillRect(X+9,Y+5,1,1); }
   } else {
-    /* corridor tile */
-    g.fillStyle=((x+y)%2===0)?"#b9b6c4":"#b2afbe"; g.fillRect(X,Y,TS,TS);
+    g.fillStyle=((x+y)%2===0)?"#bab7c6":"#b3b0bf"; if((x*7+y*3)%11===0) g.fillStyle="#aca9b9";
+    g.fillRect(X,Y,TS,TS);
     g.fillStyle="#9e9bab"; g.fillRect(X,Y+TS-1,TS,1); g.fillRect(X+TS-1,Y,1,TS);
-    g.fillStyle="#c6c3d0"; g.fillRect(X,Y,TS-1,1); g.fillRect(X,Y,1,TS-1);
+    g.fillStyle="#c9c6d3"; g.fillRect(X,Y,TS-1,1); g.fillRect(X,Y,1,TS-1);
   }
 }
 function drawWall(g,x,y,hour){
   var X=x*TS,Y=y*TS;
-  g.fillStyle="#3a3d55"; g.fillRect(X,Y,TS,TS);
+  g.fillStyle="#383b52"; g.fillRect(X,Y,TS,TS);
+  g.fillStyle="#33364c"; for(var i=6;i<14;i+=4) g.fillRect(X,Y+i,TS,1);
   g.fillStyle="#4c5070"; g.fillRect(X,Y,TS,5);
-  g.fillStyle="#5a5f82"; g.fillRect(X,Y,TS,1);
+  g.fillStyle="#5c6188"; g.fillRect(X,Y,TS,1);
   g.fillStyle="#2a2c40"; g.fillRect(X,Y+TS-2,TS,2);
-  /* windows on the top wall */
-  if(y===0 && (x%3===1) && x>0 && x<COLS-1 && at(x,1)!=="#"){
+  g.fillStyle="#4a4d66"; g.fillRect(X,Y+TS-3,TS,1);
+  if(y===0 && WINDOWS.indexOf(x)>=0){
     var sky=skyFor(hour);
-    g.fillStyle="#22243a"; g.fillRect(X+2,Y+3,12,11);
+    g.fillStyle="#1e2033"; g.fillRect(X+1,Y+2,14,13);
+    g.fillStyle="#d9d6e6"; g.fillRect(X+2,Y+3,12,11);
     var grd=g.createLinearGradient(0,Y+4,0,Y+13); grd.addColorStop(0,sky[0]); grd.addColorStop(1,sky[1]);
     g.fillStyle=grd; g.fillRect(X+3,Y+4,10,9);
-    if(hour>=21||hour<5){ g.fillStyle="#fff"; g.fillRect(X+5,Y+6,1,1); g.fillRect(X+10,Y+8,1,1); g.fillRect(X+8,Y+5,1,1); }
-    g.fillStyle="#22243a"; g.fillRect(X+8,Y+4,1,9); g.fillRect(X+3,Y+8,10,1);
-  }
-}
-function drawFurniture(g,x,y,ctx){
-  var c=at(x,y), X=x*TS, Y=y*TS;
-  if(c==="D"){
-    /* desk: person sits above, monitor faces viewer */
-    g.fillStyle="#6b4a2f"; g.fillRect(X,Y+4,TS,10);
-    g.fillStyle="#8a6340"; g.fillRect(X,Y+4,TS,2);
-    g.fillStyle="#54391f"; g.fillRect(X,Y+13,TS,1);
-    g.fillStyle="#2b2e42"; g.fillRect(X+3,Y,10,8); g.fillRect(X+7,Y+8,2,1);
-    var on = ctx.monitorOn[x+","+y];
-    g.fillStyle= on ? "#8fd6e8" : "#1a1c2a"; g.fillRect(X+4,Y+1,8,6);
-    if(on){ g.fillStyle="#d6f3fa"; g.fillRect(X+5,Y+2,4,1); g.fillRect(X+5,Y+4,6,1); g.fillStyle="#4b44c4"; g.fillRect(X+5,Y+5,2,1); }
-    g.fillStyle="#3b3f57"; g.fillRect(X+4,Y+10,6,2); g.fillStyle="#cfd2de"; g.fillRect(X+5,Y+10,4,1);
-    g.fillStyle="#cfd2de"; g.fillRect(X+12,Y+10,2,2);
-  } else if(c==="B"){
-    g.fillStyle="#5a3c24"; g.fillRect(X+1,Y,14,15);
-    g.fillStyle="#7a5434"; g.fillRect(X+2,Y+1,12,1); g.fillRect(X+2,Y+6,12,1); g.fillRect(X+2,Y+11,12,1);
-    var books=["#c0392b","#2f7d6f","#c9932c","#4b44c4","#8f2f5a","#e8e8f0"];
-    for(var i=0;i<5;i++){ g.fillStyle=books[i]; g.fillRect(X+3+i*2,Y+2,1,4); g.fillStyle=books[(i+2)%6]; g.fillRect(X+3+i*2,Y+7,1,4); }
-    g.fillStyle="#2a2c40"; g.fillRect(X+1,Y+15,14,1);
-  } else if(c==="T"){
-    g.fillStyle="#8a6a44"; g.fillRect(X,Y+2,TS,TS-3);
-    g.fillStyle="#a58255"; g.fillRect(X,Y+2,TS,2);
-    g.fillStyle="#5e4528"; g.fillRect(X,Y+TS-1,TS,1);
-    if((x+y)%3===0){ g.fillStyle="#f4f1ea"; g.fillRect(X+4,Y+6,7,5); g.fillStyle="#9e9bab"; g.fillRect(X+5,Y+7,5,1); g.fillRect(X+5,Y+9,4,1); }
-  } else if(c==="C"){
-    g.fillStyle="#3f4c8a"; g.fillRect(X+1,Y+2,14,12);
-    g.fillStyle="#5a68a8"; g.fillRect(X+2,Y+4,5,7); g.fillRect(X+9,Y+4,5,7);
-    g.fillStyle="#2e3868"; g.fillRect(X+1,Y+13,14,1); g.fillRect(X+1,Y+2,1,12); g.fillRect(X+14,Y+2,1,12);
-  } else if(c==="K"){
-    g.fillStyle="#6b4a2f"; g.fillRect(X,Y+6,TS,8); g.fillStyle="#8a6340"; g.fillRect(X,Y+6,TS,1);
-    g.fillStyle="#2b2e42"; g.fillRect(X+3,Y,8,7); g.fillStyle="#e8a33d"; g.fillRect(X+5,Y+2,1,1);
-    g.fillStyle="#f4f1ea"; g.fillRect(X+12,Y+3,3,3); g.fillRect(X+4,Y+7,3,2);
-  } else if(c==="P"){
-    g.fillStyle="#8a5a3c"; g.fillRect(X+5,Y+10,6,5); g.fillStyle="#a8714b"; g.fillRect(X+5,Y+10,6,1);
-    g.fillStyle="#3f7a4d"; g.fillRect(X+3,Y+3,10,7); g.fillStyle="#5aa66a"; g.fillRect(X+5,Y+1,6,4); g.fillRect(X+3,Y+5,3,2);
-    g.fillStyle="#2e5c3a"; g.fillRect(X+9,Y+6,4,3);
-  } else if(c==="S"){
-    g.fillStyle="#22243a"; g.fillRect(X+2,Y,12,15); g.fillStyle="#3b3f57"; g.fillRect(X+3,Y+1,10,1); g.fillRect(X+3,Y+5,10,1); g.fillRect(X+3,Y+9,10,1);
-    var t=ctx.t;
-    g.fillStyle=(Math.floor(t*3)%2)?"#4fc0bc":"#1f7a78"; g.fillRect(X+4,Y+3,2,1);
-    g.fillStyle=(Math.floor(t*5)%2)?"#4fc0bc":"#1f7a78"; g.fillRect(X+4,Y+7,2,1);
-    g.fillStyle=ctx.apiDown?"#e9736a":"#e8a33d"; g.fillRect(X+4,Y+11,2,1);
-  } else if(c==="O"){
-    g.fillStyle="#2b2e42"; g.fillRect(X+2,Y,12,15);
-    g.fillStyle="rgba(143,214,232,.55)"; g.fillRect(X+4,Y+2,8,9);
-    g.fillStyle="#e8a33d"; g.fillRect(X+7,Y+12,2,1);
-  } else if(c==="R"){
-    g.fillStyle="#4b44c4"; g.fillRect(X-8,Y+3,32,9);
-    g.fillStyle="#6a63e0"; g.fillRect(X-8,Y+3,32,2);
-    g.fillStyle="#2f2a8a"; g.fillRect(X-8,Y+11,32,1);
-    g.fillStyle="#f4f1ea"; g.fillRect(X+5,Y+5,6,4); g.fillStyle="#e8a33d"; g.fillRect(X+13,Y+5,2,2);
-  } else if(c==="E"){
-    var open=ctx.doorOpen;
-    g.fillStyle="#2a2c40"; g.fillRect(X,Y,TS,TS);
-    g.fillStyle=open?"#b9b6c4":"#7a5434"; g.fillRect(X+3,Y+1,10,14);
-    if(!open){ g.fillStyle="#5a3c24"; g.fillRect(X+4,Y+2,8,12); g.fillStyle="#e8a33d"; g.fillRect(X+10,Y+8,1,1); }
-    g.fillStyle="#5a5f82"; g.fillRect(X,Y,TS,1);
+    if(hour>=20||hour<5){ g.fillStyle="#fff"; g.fillRect(X+5,Y+6,1,1); g.fillRect(X+10,Y+8,1,1); g.fillRect(X+8,Y+5,1,1); g.fillStyle="#f4f1d0"; g.fillRect(X+11,Y+5,2,2); g.fillRect(X+10,Y+6,1,1); }
+    if(hour>=9&&hour<17){ g.fillStyle="rgba(255,255,255,.55)"; g.fillRect(X+4,Y+5,3,1); g.fillRect(X+5,Y+6,4,1); }
+    g.fillStyle="#d9d6e6"; g.fillRect(X+8,Y+4,1,9); g.fillRect(X+3,Y+8,10,1);
+    g.fillStyle="#6a5f8c"; g.fillRect(X+1,Y+3,1,11); g.fillRect(X+14,Y+3,1,11);
+    g.fillStyle="#c9c6d3"; g.fillRect(X,Y+14,TS,1);
   }
 }
 function drawChair(g,x,y){
   var X=x*TS,Y=y*TS;
-  g.fillStyle="#2b2e42"; g.fillRect(X+3,Y-2,10,6); g.fillStyle="#3b3f57"; g.fillRect(X+4,Y-1,8,4);
-  g.fillStyle="#2b2e42"; g.fillRect(X+2,Y+10,12,3);
+  g.fillStyle="#262838"; g.fillRect(X+3,Y-3,10,6); g.fillStyle="#3b3f57"; g.fillRect(X+4,Y-2,8,4); g.fillStyle="#4a4f6d"; g.fillRect(X+5,Y-1,6,1);
+  g.fillStyle="#262838"; g.fillRect(X+1,Y+5,2,5); g.fillRect(X+13,Y+5,2,5);
+  g.fillStyle="#262838"; g.fillRect(X+2,Y+11,12,3); g.fillStyle="#3b3f57"; g.fillRect(X+3,Y+11,10,1);
+  g.fillStyle="#1c1e2c"; g.fillRect(X+7,Y+14,2,1); g.fillRect(X+4,Y+15,8,1);
 }
-function drawShadow(g,px,py){ g.fillStyle="rgba(10,10,20,.28)"; g.fillRect(px+3,py+14,10,2); g.fillRect(px+4,py+13,8,1); }
+function drawDesk(g,x,y,ctx){
+  var X=x*TS,Y=y*TS, st=ctx.desk[x+","+y]||{on:false,screen:"doc"};
+  g.fillStyle="#6b4a2f"; g.fillRect(X,Y+3,TS,11);
+  g.fillStyle="#8a6340"; g.fillRect(X,Y+3,TS,2); g.fillStyle="#7a5636"; g.fillRect(X+((x*3)%9)+2,Y+7,5,1);
+  g.fillStyle="#4a3220"; g.fillRect(X,Y+14,TS,1); g.fillStyle="#3a2718"; g.fillRect(X+1,Y+15,2,1); g.fillRect(X+13,Y+15,2,1);
+  /* papers + sticky */
+  g.fillStyle="#f4f1ea"; g.fillRect(X,Y+5,3,5); g.fillStyle="#b9b6c4"; g.fillRect(X+1,Y+6,1,1); g.fillRect(X+1,Y+8,1,1);
+  g.fillStyle="#f2d54a"; g.fillRect(X+1,Y+11,2,2);
+  /* lamp */
+  g.fillStyle="#3b3f57"; g.fillRect(X+14,Y+1,1,7); g.fillRect(X+13,Y+8,3,1); g.fillStyle="#4a4f6d"; g.fillRect(X+12,Y+1,3,2);
+  g.fillStyle= ctx.night&&st.on ? "#ffd27a" : "#2b2e42"; g.fillRect(X+12,Y+3,3,1);
+  /* monitor */
+  g.fillStyle="#262838"; g.fillRect(X+3,Y-1,10,9); g.fillRect(X+7,Y+8,2,1); g.fillRect(X+5,Y+9,6,1);
+  g.fillStyle= st.on?"#0f2a36":"#141626"; g.fillRect(X+4,Y,8,7);
+  if(st.on){
+    var t=ctx.t;
+    if(st.screen==="design"){ var sw=["#c9612b","#2f7d6f","#c9932c","#8f2f5a"]; for(var i=0;i<4;i++){ g.fillStyle=sw[i]; g.fillRect(X+4+(i%2)*4,Y+(i<2?0:4),3,3); } g.fillStyle="#8fd6e8"; g.fillRect(X+4,Y+3,8,1); }
+    else if(st.screen==="growth"){ var hs=[3,5,2,6]; for(var j=0;j<4;j++){ var hh=Math.max(1,Math.round(hs[j]+Math.sin(t*1.3+j)*1.5)); g.fillStyle=j%2?"#4fc0bc":"#8fd6e8"; g.fillRect(X+4+j*2,Y+7-hh,1,hh); } }
+    else if(st.screen==="list"){ g.fillStyle="#8fd6e8"; for(var k=0;k<3;k++){ g.fillRect(X+4,Y+1+k*2,5-(k%2),1); } g.fillStyle="#e8a33d"; g.fillRect(X+10,Y+1,1,1); }
+    else if(st.screen==="grid"){ g.fillStyle="#8fd6e8"; for(var a=0;a<3;a++) for(var b=0;b<2;b++) g.fillRect(X+4+a*3,Y+1+b*3,2,2); }
+    else { g.fillStyle="#cfe9f2"; g.fillRect(X+5,Y+1,6,1); g.fillRect(X+5,Y+3,4,1); g.fillRect(X+5,Y+5,5,1); g.fillStyle="#4b44c4"; g.fillRect(X+5,Y+3,1,1); }
+    if(Math.floor(t*6)%17===0){ g.fillStyle="rgba(255,255,255,.08)"; g.fillRect(X+4,Y,8,7); }
+  }
+  /* keyboard + mouse */
+  g.fillStyle="#3b3f57"; g.fillRect(X+4,Y+11,7,2); g.fillStyle="#cfd2de"; for(var m=0;m<3;m++) g.fillRect(X+5+m*2,Y+11,1,1);
+  g.fillStyle="#cfd2de"; g.fillRect(X+12,Y+11,2,2); g.fillStyle="#9e9bab"; g.fillRect(X+12,Y+11,1,1);
+  /* mug */
+  g.fillStyle="#f4f1ea"; g.fillRect(X+13,Y+5,2,3); g.fillStyle=st.mug||"#4b44c4"; g.fillRect(X+13,Y+6,2,1); g.fillStyle="#f4f1ea"; g.fillRect(X+15,Y+6,1,1);
+  if(st.on){ var ph=Math.floor(ctx.t*2)%3; g.fillStyle="rgba(255,255,255,.55)"; g.fillRect(X+13+(ph%2),Y+3-ph,1,1); g.fillRect(X+14,Y+2-((ph+1)%3),1,1); }
+}
+function drawBookshelf(g,x,y){
+  var X=x*TS,Y=y*TS;
+  g.fillStyle="#5a3c24"; g.fillRect(X+1,Y-4,14,19);
+  g.fillStyle="#7a5434"; g.fillRect(X+2,Y-3,12,1); g.fillRect(X+2,Y+2,12,1); g.fillRect(X+2,Y+7,12,1); g.fillRect(X+2,Y+12,12,1);
+  var books=["#c0392b","#2f7d6f","#c9932c","#4b44c4","#8f2f5a","#e8e8f0","#1f4f7a"];
+  for(var s=0;s<3;s++){ var by=Y-2+s*5; for(var i=0;i<6;i++){ g.fillStyle=books[(i+s*2)%7]; g.fillRect(X+3+i*2,by+((i+s)%2),1,4-((i+s)%2)); } }
+  g.fillStyle="#3f7a4d"; g.fillRect(X+4,Y-8,6,4); g.fillStyle="#5aa66a"; g.fillRect(X+5,Y-9,3,2); g.fillStyle="#8a5a3c"; g.fillRect(X+5,Y-5,4,2);
+  g.fillStyle="#2a2c40"; g.fillRect(X+1,Y+15,14,1);
+}
+function drawCouch(g,x,y){
+  var X=x*TS,Y=y*TS, top=(at(x,y-1)!=="C");
+  g.fillStyle="#3f4c8a"; g.fillRect(X+1,Y+(top?1:0),14,TS-(top?1:0));
+  g.fillStyle="#5a68a8"; g.fillRect(X+3,Y+3,10,5); g.fillRect(X+3,Y+9,10,5);
+  g.fillStyle="#6f7cb8"; g.fillRect(X+4,Y+4,3,1); g.fillRect(X+4,Y+10,3,1);
+  g.fillStyle="#2e3868"; g.fillRect(X+1,Y+(top?1:0),2,TS-(top?1:0)); g.fillRect(X+13,Y+(top?1:0),2,TS-(top?1:0)); g.fillRect(X+3,Y+8,10,1);
+  if(top){ g.fillStyle="#2e3868"; g.fillRect(X+1,Y+1,14,2); }
+  if(!top){ g.fillStyle="#1c1e2c"; g.fillRect(X+2,Y+15,2,1); g.fillRect(X+12,Y+15,2,1); }
+}
+function drawCoffee(g,x,y,ctx){
+  var X=x*TS,Y=y*TS;
+  g.fillStyle="#6b4a2f"; g.fillRect(X,Y+6,TS,9); g.fillStyle="#8a6340"; g.fillRect(X,Y+6,TS,1); g.fillStyle="#4a3220"; g.fillRect(X,Y+14,TS,1);
+  g.fillStyle="#262838"; g.fillRect(X+3,Y-2,8,9); g.fillStyle="#3b3f57"; g.fillRect(X+4,Y-1,6,2);
+  g.fillStyle="#e8a33d"; g.fillRect(X+5,Y+2,1,1); g.fillStyle="#4fc0bc"; g.fillRect(X+7,Y+2,1,1);
+  g.fillStyle="#f4f1ea"; g.fillRect(X+5,Y+4,3,2); g.fillRect(X+12,Y+2,3,3); g.fillRect(X+12,Y+8,3,2);
+  var ph=Math.floor(ctx.t*2.5)%3; g.fillStyle="rgba(255,255,255,.5)"; g.fillRect(X+6,Y+2-ph,1,1);
+}
+function drawCooler(g,x,y){
+  var X=x*TS,Y=y*TS;
+  g.fillStyle="#d9d6e6"; g.fillRect(X+4,Y+5,8,10); g.fillStyle="#b9b6c4"; g.fillRect(X+10,Y+5,2,10);
+  g.fillStyle="#4b8fd6"; g.fillRect(X+5,Y-3,6,8); g.fillStyle="#8fd6e8"; g.fillRect(X+6,Y-2,2,4); g.fillStyle="#2a5f9e"; g.fillRect(X+9,Y-3,2,8);
+  g.fillStyle="#4fc0bc"; g.fillRect(X+6,Y+8,1,1); g.fillStyle="#e9736a"; g.fillRect(X+8,Y+8,1,1);
+  g.fillStyle="#2a2c40"; g.fillRect(X+4,Y+15,8,1);
+}
+function drawPlant(g,x,y,v){
+  var X=x*TS,Y=y*TS;
+  if(v===0){
+    g.fillStyle="#8a5a3c"; g.fillRect(X+5,Y+9,6,6); g.fillStyle="#a8714b"; g.fillRect(X+5,Y+9,6,1); g.fillStyle="#6b4229"; g.fillRect(X+5,Y+14,6,1);
+    g.fillStyle="#3f7a4d"; g.fillRect(X+3,Y+2,10,7); g.fillStyle="#5aa66a"; g.fillRect(X+5,Y,6,4); g.fillRect(X+2,Y+4,3,2); g.fillRect(X+11,Y+3,3,2);
+    g.fillStyle="#2e5c3a"; g.fillRect(X+9,Y+6,4,3); g.fillRect(X+3,Y+7,3,2); g.fillStyle="#7dc48c"; g.fillRect(X+6,Y+1,2,1);
+  } else {
+    g.fillStyle="#d9d6e6"; g.fillRect(X+5,Y+8,6,7); g.fillStyle="#b9b6c4"; g.fillRect(X+9,Y+8,2,7);
+    g.fillStyle="#3f7a4d"; g.fillRect(X+7,Y+1,2,7); g.fillRect(X+4,Y+3,3,2); g.fillRect(X+9,Y+4,4,2); g.fillRect(X+5,Y+6,2,2); g.fillRect(X+10,Y+7,2,1);
+    g.fillStyle="#5aa66a"; g.fillRect(X+7,Y,2,2); g.fillRect(X+3,Y+2,2,2); g.fillRect(X+12,Y+3,2,2);
+  }
+}
+function drawServer(g,x,y,ctx){
+  var X=x*TS,Y=y*TS,t=ctx.t;
+  g.fillStyle="#1e2033"; g.fillRect(X+2,Y-3,12,18); g.fillStyle="#2f3247"; g.fillRect(X+3,Y-2,10,1); g.fillRect(X+3,Y+2,10,1); g.fillRect(X+3,Y+6,10,1); g.fillRect(X+3,Y+10,10,1);
+  g.fillStyle="#3b3f57"; for(var r=0;r<4;r++){ g.fillRect(X+8,Y-1+r*4,4,2); }
+  g.fillStyle=(Math.floor(t*3)%2)?"#4fc0bc":"#1f7a78"; g.fillRect(X+4,Y-1,2,1); g.fillRect(X+4,Y+7,2,1);
+  g.fillStyle=(Math.floor(t*5)%2)?"#4fc0bc":"#1f7a78"; g.fillRect(X+4,Y+3,2,1);
+  g.fillStyle=ctx.apiDown?"#e9736a":"#e8a33d"; g.fillRect(X+4,Y+11,2,1);
+  g.fillStyle="#2a2c40"; g.fillRect(X+2,Y+15,12,1); g.fillStyle="#1c1e2c"; g.fillRect(X+14,Y+8,1,7);
+}
+function drawBooth(g,x,y){
+  var X=x*TS,Y=y*TS;
+  g.fillStyle="#2b2e42"; g.fillRect(X+1,Y-4,14,19); g.fillStyle="#3b3f57"; g.fillRect(X+2,Y-3,12,1);
+  g.fillStyle="rgba(143,214,232,.5)"; g.fillRect(X+3,Y-1,10,10); g.fillStyle="rgba(255,255,255,.35)"; g.fillRect(X+4,Y,1,8); g.fillRect(X+5,Y,1,3);
+  g.fillStyle="#3b3f57"; g.fillRect(X+3,Y+9,10,1); g.fillStyle="#e8a33d"; g.fillRect(X+12,Y+4,1,1);
+  g.fillStyle="#5c6188"; g.fillRect(X+5,Y-3,6,1); g.fillStyle="#e9736a"; g.fillRect(X+7,Y-3,2,1);
+}
+function drawReception(g,x,y,ctx){
+  var X=x*TS-8,Y=y*TS;
+  g.fillStyle="#3b34a8"; g.fillRect(X,Y+2,32,11); g.fillStyle="#4b44c4"; g.fillRect(X,Y+2,32,3); g.fillStyle="#5a54d8"; g.fillRect(X,Y+2,32,1);
+  g.fillStyle="#2a2580"; g.fillRect(X,Y+12,32,1); g.fillStyle="#1f1b60"; g.fillRect(X,Y+13,32,1);
+  drawText(g,X+3,Y+6,"DANA","#f4f1ea");
+  g.fillStyle="#f4f1ea"; g.fillRect(X+22,Y+6,7,5); g.fillStyle="#e8a33d"; g.fillRect(X+23,Y+7,2,3); g.fillStyle="#3b34a8"; g.fillRect(X+26,Y+7,1,1); g.fillRect(X+26,Y+9,1,1);
+  g.fillStyle="#e8a33d"; g.fillRect(X+29,Y+3,2,2);
+  g.fillStyle="#3f7a4d"; g.fillRect(X-1,Y-1,4,4); g.fillStyle="#8a5a3c"; g.fillRect(X,Y+3,2,1);
+}
+function drawDoor(g,x,y,open){
+  var X=x*TS,Y=y*TS;
+  g.fillStyle="#2a2c40"; g.fillRect(X,Y,TS,TS);
+  g.fillStyle="#5c6188"; g.fillRect(X,Y,TS,1); g.fillStyle="#4c5070"; g.fillRect(X+1,Y+1,14,2);
+  if(open){ g.fillStyle="#bab7c6"; g.fillRect(X+3,Y+3,10,12); g.fillStyle="#7a5434"; g.fillRect(X+1,Y+3,2,12); g.fillStyle="#5a3c24"; g.fillRect(X+1,Y+3,1,12); }
+  else { g.fillStyle="#7a5434"; g.fillRect(X+3,Y+3,10,12); g.fillStyle="#5a3c24"; g.fillRect(X+4,Y+4,8,10); g.fillStyle="#7a5434"; g.fillRect(X+5,Y+5,6,4); g.fillStyle="#e8a33d"; g.fillRect(X+10,Y+9,1,1); }
+  g.fillStyle="#4fc0bc"; g.fillRect(X+6,Y+1,4,1);
+}
+function drawTable(g,x,y){
+  var X=x*TS,Y=y*TS, top=at(x,y-1)!=="T", bot=at(x,y+1)!=="T", lef=at(x-1,y)!=="T", rig=at(x+1,y)!=="T";
+  g.fillStyle="#8a6a44"; g.fillRect(X,Y,TS,TS);
+  if(top){ g.fillStyle="#a58255"; g.fillRect(X,Y+1,TS,2); g.fillStyle="#6e5436"; g.fillRect(X,Y,TS,1); }
+  if(bot){ g.fillStyle="#5e4528"; g.fillRect(X,Y+TS-2,TS,2); }
+  if(lef){ g.fillStyle="#6e5436"; g.fillRect(X,Y,1,TS); } if(rig){ g.fillStyle="#6e5436"; g.fillRect(X+TS-1,Y,1,TS); }
+  if(x===18&&y===8){ g.fillStyle="#262838"; g.fillRect(X+3,Y+4,10,7); g.fillStyle="#8fd6e8"; g.fillRect(X+4,Y+5,8,4); g.fillStyle="#3b3f57"; g.fillRect(X+4,Y+11,8,1); }
+  if(x===17&&y===9){ g.fillStyle="#f4f1ea"; g.fillRect(X+4,Y+5,7,6); g.fillStyle="#9e9bab"; g.fillRect(X+5,Y+6,5,1); g.fillRect(X+5,Y+8,4,1); }
+  if(x===19&&y===9){ g.fillStyle="#f4f1ea"; g.fillRect(X+5,Y+6,2,3); g.fillStyle="#4b44c4"; g.fillRect(X+5,Y+7,2,1); g.fillStyle="#f4f1ea"; g.fillRect(X+7,Y+7,1,1); }
+}
+function drawBin(g,x,y){ var X=x*TS,Y=y*TS; g.fillStyle="#6e7387"; g.fillRect(X+5,Y+6,6,8); g.fillStyle="#8a8fa3"; g.fillRect(X+5,Y+6,6,1); g.fillStyle="#4f5468"; g.fillRect(X+9,Y+7,2,7); g.fillStyle="#f4f1ea"; g.fillRect(X+6,Y+5,3,1); }
 
-function drawWorld(g, ctx){
-  g.imageSmoothingEnabled=false;
-  g.fillStyle="#0e0f18"; g.fillRect(0,0,W,H);
+var bgCanvas=document.createElement("canvas"); bgCanvas.width=W; bgCanvas.height=H; var bgHour=-1;
+function buildBackground(hour){
+  var g=bgCanvas.getContext("2d"); g.imageSmoothingEnabled=false;
+  g.fillStyle="#0b0c14"; g.fillRect(0,0,W,H);
   var x,y;
-  for(y=0;y<ROWS;y++) for(x=0;x<COLS;x++){ if(at(x,y)!=="#") drawFloorTile(g,x,y); }
-  for(y=0;y<ROWS;y++) for(x=0;x<COLS;x++){ if(at(x,y)==="#") drawWall(g,x,y,ctx.hour); }
-  /* wall art */
-  var arts=["#c9612b","#2f7d6f","#c9932c","#8f2f5a"];
-  for(var i=0;i<4;i++){ g.fillStyle="#f4f1ea"; g.fillRect((8+i)*TS+2,5,11,9); g.fillStyle=arts[i]; g.fillRect((8+i)*TS+4,7,7,5); }
-  g.fillStyle="#f4f1ea"; g.fillRect(2*TS+2,5,12,9); g.fillStyle="#4b44c4"; g.fillRect(2*TS+4,7,4,5); g.fillStyle="#9e9bab"; g.fillRect(2*TS+9,8,4,1); g.fillRect(2*TS+9,10,3,1);
-  /* gallery frames on partition wall x6 (y7..9) */
-  for(var j=0;j<3;j++){ var fy=(7+j)*TS; g.fillStyle="#f4f1ea"; g.fillRect(6*TS+3,fy+4,10,8); g.fillStyle=arts[(j+1)%4]; g.fillRect(6*TS+5,fy+6,6,4); }
-  /* growth wall monitor on partition x15 (y8) */
-  g.fillStyle="#1f2233"; g.fillRect(15*TS+2,8*TS+3,12,9); g.fillStyle="#4fc0bc"; g.fillRect(15*TS+4,8*TS+6,3,4); g.fillRect(15*TS+8,8*TS+5,2,5); g.fillRect(15*TS+11,8*TS+8,2,2);
-  for(y=0;y<ROWS;y++) for(x=0;x<COLS;x++){ var c=at(x,y); if(c!=="#"&&c!==".") drawFurniture(g,x,y,ctx); }
+  for(y=0;y<ROWS;y++) for(x=0;x<COLS;x++){ if(at(x,y)!=="#") drawFloor(g,x,y); }
+  /* meeting rug */
+  g.fillStyle="#4f4470"; g.fillRect(16*TS+3,7*TS+8,5*TS-6,4*TS-2); g.fillStyle="#5d5282"; g.fillRect(16*TS+5,7*TS+10,5*TS-10,4*TS-6); g.fillStyle="#4f4470"; for(var i=0;i<6;i++){ g.fillRect(16*TS+7+i*12,7*TS+12,4,1); g.fillRect(16*TS+7+i*12,11*TS+2,4,1); }
+  /* day light shafts */
+  if(hour>=8&&hour<17){ g.fillStyle="rgba(255,250,220,.10)"; WINDOWS.forEach(function(wx){ g.fillRect(wx*TS+1,TS,14,TS*2); g.fillStyle="rgba(255,250,220,.05)"; g.fillRect(wx*TS-1,TS*3,18,TS); g.fillStyle="rgba(255,250,220,.10)"; }); }
+  for(y=0;y<ROWS;y++) for(x=0;x<COLS;x++){ if(at(x,y)==="#") drawWall(g,x,y,hour); }
+  /* top-wall decor */
+  g.fillStyle="#f4f1ea"; g.fillRect(2*TS+2,4,28,10); g.fillStyle="#9e9bab"; g.fillRect(2*TS+4,6,10,1); g.fillRect(2*TS+4,9,18,1); g.fillRect(2*TS+4,12,8,1); g.fillStyle="#4b44c4"; g.fillRect(2*TS+18,6,6,2); g.fillStyle="#c0392b"; g.fillRect(2*TS+26,11,2,2);
+  var arts=["#c9612b","#2f7d6f","#c9932c","#8f2f5a","#4b44c4","#1f4f7a"];
+  g.fillStyle="#3b2f24"; g.fillRect(8*TS+1,3,62,12);
+  for(var a=0;a<6;a++){ g.fillStyle="#f4f1ea"; g.fillRect(8*TS+3+a*10,5,8,8); g.fillStyle=arts[a]; g.fillRect(8*TS+4+a*10,6,6,5); g.fillStyle="#e8a33d"; g.fillRect(8*TS+6+a*10,4,2,1); }
+  g.fillStyle="#1f2233"; g.fillRect(17*TS+2,4,28,10); g.fillStyle="#4fc0bc"; g.fillRect(17*TS+4,6,3,6); g.fillRect(17*TS+8,8,3,4); g.fillRect(17*TS+12,7,3,5); g.fillRect(17*TS+16,10,3,2); g.fillStyle="#e8a33d"; g.fillRect(17*TS+20,5,6,1); g.fillRect(17*TS+20,7,4,1);
+  /* clock face */
+  g.fillStyle="#f4f1ea"; g.fillRect(6*TS+4,4,8,8); g.fillStyle="#262838"; g.fillRect(6*TS+3,5,1,6); g.fillRect(6*TS+12,5,1,6); g.fillRect(6*TS+5,3,6,1); g.fillRect(6*TS+5,12,6,1);
+  /* gallery frames on partition x6 */
+  for(var f=0;f<3;f++){ var fy=(7+f)*TS; g.fillStyle="#3b2f24"; g.fillRect(6*TS+2,fy+3,12,10); g.fillStyle="#f4f1ea"; g.fillRect(6*TS+3,fy+4,10,8); g.fillStyle=arts[(f+2)%6]; g.fillRect(6*TS+4,fy+5,8,6); g.fillStyle="#fff"; g.fillRect(6*TS+5,fy+6,2,1); }
+  /* growth wall monitor frame */
+  g.fillStyle="#1f2233"; g.fillRect(15*TS+2,8*TS+2,12,10);
+  /* company sign on bottom wall */
+  drawText(g,9*TS+2,12*TS+5,"DANA OFFICE","#8fd6e8"); g.fillStyle="#e8a33d"; g.fillRect(9*TS-4,12*TS+5,3,5);
+  /* static furniture */
+  for(y=0;y<ROWS;y++) for(x=0;x<COLS;x++){ var c=at(x,y);
+    if(c==="B") drawBookshelf(g,x,y); else if(c==="C") drawCouch(g,x,y); else if(c==="W") drawCooler(g,x,y);
+    else if(c==="P") drawPlant(g,x,y,(x+y)%2); else if(c==="O") drawBooth(g,x,y); else if(c==="T") drawTable(g,x,y);
+  }
+  drawBin(g,1,4); drawBin(g,14,4); drawBin(g,14,10);
+  /* side table lamp in lounge */
+  g.fillStyle="#6b4a2f"; g.fillRect(1*TS+4,10*TS+6,8,6); g.fillStyle="#3b3f57"; g.fillRect(1*TS+7,10*TS+1,2,5); g.fillStyle="#e8a33d"; g.fillRect(1*TS+5,10*TS,6,2);
+  /* plant on meeting corner */
+  drawPlant(g,20,7,1);
 }
-function nightAlpha(hour){
-  if(hour>=8&&hour<17) return 0;
-  if(hour>=17&&hour<20) return (hour-17)/3*.45;
-  if(hour>=20||hour<5) return .45;
-  return .45*(8-hour)/3;
-}
-function drawLight(g,hour,lamps,monitors){
+function nightAlpha(hour){ if(hour>=8&&hour<17) return 0; if(hour>=17&&hour<20) return (hour-17)/3*.48; if(hour>=20||hour<5) return .48; return .48*(8-hour)/3; }
+function drawLight(g,hour,lamps,monitors,zonesLit){
   var a=nightAlpha(hour); if(a<=0) return;
-  g.fillStyle=(hour>=4&&hour<8)?"#2a2148":"#0c1230"; g.globalAlpha=a; g.fillRect(0,0,W,H); g.globalAlpha=1;
+  g.fillStyle=(hour>=4&&hour<8)?"#2a2148":"#0b1030"; g.globalAlpha=a; g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.globalCompositeOperation="lighter";
-  lamps.forEach(function(t){ var cx=t[0]*TS+8, cy=t[1]*TS+8; var grd=g.createRadialGradient(cx,cy,1,cx,cy,30); grd.addColorStop(0,"rgba(255,196,110,.45)"); grd.addColorStop(1,"rgba(255,196,110,0)"); g.fillStyle=grd; g.fillRect(cx-32,cy-32,64,64); });
-  monitors.forEach(function(t){ var cx=t[0]*TS+8, cy=t[1]*TS+4; var grd=g.createRadialGradient(cx,cy,1,cx,cy,14); grd.addColorStop(0,"rgba(143,214,232,.35)"); grd.addColorStop(1,"rgba(143,214,232,0)"); g.fillStyle=grd; g.fillRect(cx-16,cy-16,32,32); });
+  zonesLit.forEach(function(z){ var cx=(z.x1+z.x2+1)/2*TS, cy=(z.y1+z.y2+1)/2*TS; var grd=g.createRadialGradient(cx,cy,4,cx,cy,64); grd.addColorStop(0,"rgba(255,235,190,.16)"); grd.addColorStop(1,"rgba(255,235,190,0)"); g.fillStyle=grd; g.fillRect(cx-70,cy-70,140,140); });
+  lamps.forEach(function(t){ var cx=t[0]*TS+13, cy=t[1]*TS+18; var grd=g.createRadialGradient(cx,cy,1,cx,cy,26); grd.addColorStop(0,"rgba(255,200,110,.5)"); grd.addColorStop(1,"rgba(255,200,110,0)"); g.fillStyle=grd; g.fillRect(cx-28,cy-28,56,56); });
+  monitors.forEach(function(t){ var cx=t[0]*TS+8, cy=t[1]*TS+3; var grd=g.createRadialGradient(cx,cy,1,cx,cy,13); grd.addColorStop(0,"rgba(143,214,232,.4)"); grd.addColorStop(1,"rgba(143,214,232,0)"); g.fillStyle=grd; g.fillRect(cx-14,cy-14,28,28); });
+  WINDOWS.forEach(function(wx){ var grd=g.createLinearGradient(0,TS,0,TS*3); grd.addColorStop(0,"rgba(170,190,255,.14)"); grd.addColorStop(1,"rgba(170,190,255,0)"); g.fillStyle=grd; g.fillRect(wx*TS+1,TS,14,TS*2); });
   g.globalCompositeOperation="source-over";
 }
 
-/* ── 경로 (BFS) ───────────────────────────────────────────────── */
+/* ══════════════ 5. 경로 · 액터 ══════════════ */
 function path(from,to){
   if(from[0]===to[0]&&from[1]===to[1]) return [];
   var q=[from],prev={},seen={}; seen[from]=1; var dirs=[[1,0],[-1,0],[0,1],[0,-1]];
@@ -956,95 +1353,42 @@ function path(from,to){
       q.push([nx,ny]); } }
   return [];
 }
-
-/* ── 액터 상태 ────────────────────────────────────────────────── */
-var actors=STAFF.map(function(s){
-  var human=s.kind==="human";
-  return {def:s, present:human, desired:human, tx:s.seat[0], ty:s.seat[1], px:s.seat[0]*TS, py:s.seat[1]*TS,
-          dir:"down", frame:0, anim:0, path:[], wait:2+Math.random()*3, mode:"work", queue:0, workT:0,
-          bubble:null, bubbleT:0, el:null, tagEl:null};
-});
-var player=actors[0];
-var byId={}; actors.forEach(function(a){ byId[a.def.id]=a; });
-
+var actors=STAFF.map(function(s){ var human=s.kind==="human";
+  return {def:s, present:human, desired:human, tx:s.seat[0], ty:s.seat[1], px:s.seat[0]*TS, py:s.seat[1]*TS, dir:"down", frame:0, anim:0, path:[], wait:2+Math.random()*3, mode:"work", queue:0, workT:0, cost:0, blink:2+Math.random()*4, bubble:null, bubbleT:0, el:null, tagEl:null}; });
+var player=actors[0]; var byId={}; actors.forEach(function(a){ byId[a.def.id]=a; });
 var simMin=9*60+20, running=true, outCount=0, cost=0, lastBubble=1.5, projectIdx=0;
 var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches; if(reduce) running=false;
-
 var cv=document.getElementById("world"), g=cv.getContext("2d");
 var actorLayer=document.getElementById("actors"), chatBox=document.getElementById("chat");
-
-/* labels */
-var LABELS=[["대표실",4.6,0.5],["디자인 스튜디오",13.6,0.5],["세일즈",18,0.5],["정문 · 리셉션",3.4,5.5],["갤러리 · 라운지",3.5,6.55],["그로스",13.4,6.55],["회의실",18,6.55],["서버룸",20.2,11.9]];
+var LABELS=[["대표실",2.6,4.5],["디자인",10.5,4.5],["세일즈",16.6,4.5],["정문 · 리셉션",3.4,5.5],["갤러리 · 라운지",3.5,6.55],["그로스",13.4,6.55],["회의실",18,6.55],["서버룸",20.2,11.9]];
 var labelBox=document.getElementById("labels");
 LABELS.forEach(function(l){ var d=document.createElement("div"); d.className="zlabel"; d.textContent=l[0]; d.style.left=(l[1]*TS/W*100)+"%"; d.style.top=(l[2]*TS/H*100)+"%"; labelBox.appendChild(d); });
-
-actors.forEach(function(a){
-  var tag=document.createElement("div"); tag.className="tag"+(a.def.player?" you":(a.def.kind==="human"?" human":""));
-  tag.innerHTML=a.def.name+'<em data-st>✏️</em>'; actorLayer.appendChild(tag); a.tagEl=tag;
-  var b=document.createElement("div"); b.className="bubble"; b.style.display="none"; actorLayer.appendChild(b); a.el=b;
-});
-
+actors.forEach(function(a){ var tag=document.createElement("div"); tag.className="tag"+(a.def.player?" you":(a.def.kind==="human"?" human":"")); tag.innerHTML=a.def.name+'<em data-st>✏️</em>'; actorLayer.appendChild(tag); a.tagEl=tag; var b=document.createElement("div"); b.className="bubble"; b.style.display="none"; actorLayer.appendChild(b); a.el=b; });
 function fmtTime(){ var hh=Math.floor(simMin/60)%24, mm=Math.floor(simMin%60); return (hh<10?"0":"")+hh+":"+(mm<10?"0":"")+mm; }
-function log(name,text,kind){
-  var row=document.createElement("div"); row.className="row";
-  var t=document.createElement("time"); t.textContent=fmtTime();
-  var w=document.createElement("span"); w.className="who"; w.textContent=name; w.style.color=kind==="human"?"var(--accent-ink)":(kind==="sys"?"var(--amber)":"var(--teal)");
-  var m=document.createElement("span"); m.className="msg"; m.textContent=text;
-  row.appendChild(t); row.appendChild(w); row.appendChild(m); chatBox.appendChild(row);
-  while(chatBox.children.length>60) chatBox.removeChild(chatBox.firstChild);
-  chatBox.scrollTop=chatBox.scrollHeight;
-}
+function log(name,text,kind){ var row=document.createElement("div"); row.className="row"; var t=document.createElement("time"); t.textContent=fmtTime(); var w=document.createElement("span"); w.className="who"; w.textContent=name; w.style.color=kind==="human"?"var(--accent-ink)":(kind==="sys"?"var(--amber)":"var(--teal)"); var m=document.createElement("span"); m.className="msg"; m.textContent=text; row.appendChild(t); row.appendChild(w); row.appendChild(m); chatBox.appendChild(row); while(chatBox.children.length>60) chatBox.removeChild(chatBox.firstChild); chatBox.scrollTop=chatBox.scrollHeight; }
 function say(a,text){ a.bubble=text; a.bubbleT=3.4; log(a.def.name,text,a.def.kind); }
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-/* ── 편성 / 호출 ─────────────────────────────────────────────── */
-function applyProject(idx){
-  projectIdx=idx; var team=PROJECTS[idx].team;
-  actors.forEach(function(a){
-    if(a.def.kind!=="agent") return;
-    var want=team.indexOf(a.def.id)>=0;
-    if(want&&!a.desired){ a.desired=true; if(a.queue===0) a.queue=1+Math.floor(Math.random()*3); }
-    if(!want&&a.desired){ a.desired=false; }
-  });
-  log("무결","「"+PROJECTS[idx].name+"」 편성 적용. "+team.length+"명 호출, 나머지 퇴근.","agent");
-  renderProjects(); renderRosterMini();
-}
+function applyProject(idx){ projectIdx=idx; var team=PROJECTS[idx].team;
+  actors.forEach(function(a){ if(a.def.kind!=="agent") return; var want=team.indexOf(a.def.id)>=0; if(want&&!a.desired){ a.desired=true; if(a.queue===0) a.queue=1+Math.floor(Math.random()*3); } if(!want&&a.desired){ a.desired=false; } });
+  log("무결","「"+PROJECTS[idx].name+"」 편성 적용. "+team.length+"명 호출, 나머지 퇴근.","agent"); renderProjects(); renderRosterMini(); }
 function callAgent(a){ a.desired=true; if(a.queue===0) a.queue=1; renderRosterMini(); }
 function dismissAgent(a){ a.desired=false; renderRosterMini(); }
-function assignTeam(n){
-  var c=0; actors.forEach(function(a){ if(a.def.kind==="agent"&&a.desired){ a.queue+=n; c++; } });
-  log("김효태","팀 전원에게 작업 "+n+"건씩 배정 ("+c+"명)","human");
-}
-
-/* ── 행동 결정 ───────────────────────────────────────────────── */
+function assignTeam(n){ var c=0; actors.forEach(function(a){ if(a.def.kind==="agent"&&a.desired){ a.queue+=n; c++; } }); log("김효태","팀 전원에게 작업 "+n+"건씩 배정 ("+c+"명)","human"); renderRosterMini(); }
 function decide(a){
-  if(a.def.player) return;
-  var seat=a.def.seat;
-  if(a.def.kind==="human"){ /* humans mostly work, occasionally coffee */
-    if(Math.random()<.8){ a.mode="work"; a.path=path([a.tx,a.ty],seat); a.wait=6+Math.random()*8; }
-    else { a.mode="talk"; a.path=path([a.tx,a.ty],pick(WANDER.lounge)); a.wait=4+Math.random()*3; }
-    return;
-  }
-  if(!a.present){
-    if(a.desired){ a.present=true; a.tx=ENTRANCE[0]; a.ty=ENTRANCE[1]; a.px=a.tx*TS; a.py=a.ty*TS; a.mode="arrive"; a.path=path([a.tx,a.ty],seat); log("무결",a.def.name+" 호출 — 정문 통과",'agent'); }
-    else a.wait=1;
-    return;
-  }
+  if(a.def.player) return; var seat=a.def.seat;
+  if(a.def.kind==="human"){ if(Math.random()<.8){ a.mode="work"; a.path=path([a.tx,a.ty],seat); a.wait=6+Math.random()*8; } else { a.mode="talk"; a.path=path([a.tx,a.ty],pick(WANDER.lounge)); a.wait=4+Math.random()*3; } return; }
+  if(!a.present){ if(a.desired){ a.present=true; a.tx=ENTRANCE[0]; a.ty=ENTRANCE[1]; a.px=a.tx*TS; a.py=a.ty*TS; a.mode="arrive"; a.path=path([a.tx,a.ty],seat); log("무결",a.def.name+" 호출 — 정문 통과","agent"); } else a.wait=1; return; }
   if(!a.desired){ a.mode="leave"; a.path=path([a.tx,a.ty],ENTRANCE); return; }
-  if(a.queue<=0){
-    if(a.mode!=="idle"){ a.mode="idle"; a.path=path([a.tx,a.ty],pick(WANDER.lounge)); }
-    a.wait=4+Math.random()*4; return;
-  }
+  if(a.queue<=0){ if(a.mode!=="idle"){ a.mode="idle"; a.path=path([a.tx,a.ty],pick(WANDER.lounge)); } a.wait=4+Math.random()*4; return; }
   var r=Math.random();
   if(r<.72){ a.mode="work"; a.path=path([a.tx,a.ty],seat); a.wait=6+Math.random()*6; a.workT=a.wait; }
-  else if(r<.86){ a.mode="meet"; a.path=path([a.tx,a.ty],pick(WANDER.meet)); a.wait=4+Math.random()*4; cost+=0.03; }
-  else { a.mode="talk"; a.path=path([a.tx,a.ty],pick(WANDER.corridor)); a.wait=3+Math.random()*3; cost+=0.006; }
+  else if(r<.86){ a.mode="meet"; a.path=path([a.tx,a.ty],pick(WANDER.meet)); a.wait=4+Math.random()*4; a.cost+=0.03; cost+=0.03; }
+  else { a.mode="talk"; a.path=path([a.tx,a.ty],pick(WANDER.corridor)); a.wait=3+Math.random()*3; a.cost+=0.006; cost+=0.006; }
 }
-
 function step(dt){
-  var hour=Math.floor(simMin/60)%24;
   actors.forEach(function(a){
     if(a.bubbleT>0){ a.bubbleT-=dt; if(a.bubbleT<=0) a.bubble=null; }
+    a.blink-=dt; if(a.blink<-0.15) a.blink=2.5+Math.random()*4;
     if(a.path.length){
       var n=a.path[0], tx=n[0]*TS, ty=n[1]*TS, sp=28*dt, dx=tx-a.px, dy=ty-a.py;
       if(Math.abs(dx)>Math.abs(dy)) a.dir=dx>0?"right":"left"; else if(dy!==0) a.dir=dy>0?"down":"up";
@@ -1055,120 +1399,175 @@ function step(dt){
         if(!a.path.length){
           if(a.mode==="leave"){ a.present=false; log("무결",a.def.name+" 퇴근 — 편성 없음, 비용 0","agent"); renderRosterMini(); }
           else if(a.mode==="arrive"){ a.mode="work"; a.dir="down"; a.workT=6; a.wait=6; renderRosterMini(); }
-          else if(a.mode==="work"||a.mode==="idle") a.dir="down";
-          else renderRosterMini();
-        }
-      }
+          else if(a.mode==="work"||a.mode==="idle") a.dir="down"; else renderRosterMini();
+        } }
     } else {
-      a.frame=0;
-      if(a.def.player) return;
-      if(a.mode==="work"&&a.present&&a.queue>0){
-        a.workT-=dt; cost+=dt*0.0018;
-        if(a.workT<=0){ a.queue--; outCount++; cost+=0.09+Math.random()*0.16; a.workT=6+Math.random()*6;
-          say(a,pick(a.def.lines)); renderRosterMini(); if(a.queue<=0){ a.wait=0.5; } }
-      }
+      a.frame=0; if(a.def.player) return;
+      if(a.mode==="work"&&a.present&&a.queue>0){ a.workT-=dt; var d=dt*0.0018; a.cost+=d; cost+=d;
+        if(a.workT<=0){ a.queue--; outCount++; var c=0.09+Math.random()*0.16; a.cost+=c; cost+=c; a.workT=6+Math.random()*6; say(a,pick(a.def.lines)); renderRosterMini(); if(a.queue<=0){ a.wait=0.5; } } }
       a.wait-=dt; if(a.wait<=0) decide(a);
     }
   });
   lastBubble-=dt;
-  if(lastBubble<=0){
-    var pool=actors.filter(function(a){ return !a.def.player&&a.present&&!a.path.length&&(a.def.kind==="human"||a.queue>0); });
-    if(pool.length&&Math.random()<.6){ var s=pick(pool); say(s,pick(s.def.lines)); if(s.def.kind==="agent") cost+=0.003; }
-    lastBubble=3+Math.random()*3;
-  }
+  if(lastBubble<=0){ var pool=actors.filter(function(a){ return !a.def.player&&a.present&&!a.path.length&&(a.def.kind==="human"||a.queue>0); });
+    if(pool.length&&Math.random()<.6){ var s=pick(pool); say(s,pick(s.def.lines)); if(s.def.kind==="agent"){ s.cost+=0.003; cost+=0.003; } }
+    lastBubble=3+Math.random()*3; }
 }
 
-/* ── 렌더 ────────────────────────────────────────────────────── */
+/* ══════════════ 6. 프레임 렌더 ══════════════ */
 var t0=performance.now();
+function poseOf(a,t){
+  if(a.path.length) return "walk";
+  if(!a.present) return "idle";
+  if(a.mode==="idle") return "sleep";
+  if(a.blink<0) return "blink";
+  if(a.mode==="work"&&(a.def.kind==="human"||a.queue>0)) return "type";
+  if(a.mode==="talk"||a.mode==="meet") return "idle";
+  return "idle";
+}
 function render(){
   var hour=Math.floor(simMin/60)%24, t=(performance.now()-t0)/1000;
-  var monitorOn={}, lamps=[], mons=[];
-  actors.forEach(function(a){ if(a.present&&a.mode==="work"&&!a.path.length&&(a.def.kind==="human"||a.queue>0)){ var d=[a.def.seat[0],a.def.seat[1]+1]; monitorOn[d[0]+","+d[1]]=true; lamps.push(a.def.seat); mons.push(d); } });
+  if(hour!==bgHour){ buildBackground(hour); bgHour=hour; }
+  g.imageSmoothingEnabled=false; g.drawImage(bgCanvas,0,0);
+  var desk={}, lamps=[], mons=[], zonesLit=[], zoneSeen={};
+  actors.forEach(function(a){ var d=[a.def.seat[0],a.def.seat[1]+1]; var working=a.present&&a.mode==="work"&&!a.path.length&&(a.def.kind==="human"||a.queue>0);
+    if(at(d[0],d[1])==="D") desk[d[0]+","+d[1]]={on:working,screen:a.def.screen,mug:a.def.look.top[0]};
+    if(working){ lamps.push(d); mons.push(d); var z=inZone(a.tx,a.ty); if(z&&!zoneSeen[z.x1+","+z.y1]){ zoneSeen[z.x1+","+z.y1]=1; zonesLit.push(z); } } });
+  var ctx={t:t,hour:hour,night:nightAlpha(hour)>0.1,desk:desk,apiDown:false};
   var doorOpen=actors.some(function(a){ return a.present&&Math.abs(a.tx-ENTRANCE[0])+Math.abs(a.ty-ENTRANCE[1])<=1; });
-  drawWorld(g,{hour:hour,t:t,monitorOn:monitorOn,doorOpen:doorOpen,apiDown:false});
-  /* chairs at seats */
+  /* dynamic furniture */
+  for(var y=0;y<ROWS;y++) for(var x=0;x<COLS;x++){ var c=at(x,y); if(c==="D") drawDesk(g,x,y,ctx); else if(c==="K") drawCoffee(g,x,y,ctx); else if(c==="S") drawServer(g,x,y,ctx); else if(c==="E") drawDoor(g,x,y,doorOpen); }
+  drawReception(g,10,6,ctx);
+  /* wall monitor bars + clock hands */
+  for(var b=0;b<4;b++){ var hh=Math.max(1,Math.round(4+Math.sin(t*0.9+b*1.3)*2.5)); g.fillStyle=b%2?"#4fc0bc":"#8fd6e8"; g.fillRect(15*TS+4+b*3,8*TS+10-hh,2,hh); }
+  var ang=((simMin/60)%12)/12*Math.PI*2, mang=(simMin%60)/60*Math.PI*2, cx=6*TS+8, cy=8;
+  g.fillStyle="#262838"; g.fillRect(Math.round(cx+Math.sin(ang)*2),Math.round(cy-Math.cos(ang)*2),1,1); g.fillRect(Math.round(cx+Math.sin(mang)*3),Math.round(cy-Math.cos(mang)*3),1,1); g.fillRect(cx,cy,1,1);
+  /* chairs */
   actors.forEach(function(a){ if(a.def.id!=="mugyeol") drawChair(g,a.def.seat[0],a.def.seat[1]); });
+  /* actors */
   var sorted=actors.filter(function(a){ return a.present; }).sort(function(a,b){ return a.py-b.py; });
   sorted.forEach(function(a){
-    var mood=(a.mode==="idle"&&!a.path.length)?"rest":"ok";
-    var px=Math.round(a.px), py=Math.round(a.py);
-    drawShadow(g,px,py);
-    var fr=a.path.length?a.frame:((mood!=="rest"&&Math.floor(t*1.2)%2===0)?0:0);
-    var spr=buildSprite(a.def,a.dir,fr,mood);
-    var breathe=(!a.path.length&&Math.floor(t*1.4)%2===0)?0:0;
-    g.drawImage(spr,px+1,py-6+breathe);
+    var px=Math.round(a.px), py=Math.round(a.py), pose=poseOf(a,t), fr;
+    if(pose==="walk") fr=a.frame; else if(pose==="type") fr=Math.floor(t*4)%2; else if(pose==="sleep"){ pose= (a.mode==="idle" && (Math.floor(t*0.5)%2===0)) ? "coffee":"sleep"; fr=Math.floor(t*0.8)%2; } else fr=0;
+    var breathe=(pose!=="walk"&&Math.floor(t*1.2)%2===0)?1:0;
+    g.fillStyle="rgba(10,10,20,.28)"; g.fillRect(px+3,py+14,10,2); g.fillRect(px+4,py+13,8,1);
+    g.drawImage(buildSprite(a.def,a.dir,fr,pose),px+1,py-7+breathe);
+    if(a.mode==="idle"&&!a.path.length){ var zp=Math.floor(t*1.5)%3; g.fillStyle="rgba(255,255,255,.85)"; g.fillRect(px+13,py-9-zp*2,2,1); g.fillRect(px+13+((zp+1)%2),py-8-zp*2,1,1); g.fillRect(px+13,py-7-zp*2,2,1); }
   });
-  drawLight(g,hour,lamps,mons);
+  /* dust motes by day */
+  if(hour>=9&&hour<17){ g.fillStyle="rgba(255,255,255,.35)"; WINDOWS.forEach(function(wx,i){ for(var k=0;k<2;k++){ var mx=wx*TS+3+((t*3+i*7+k*5)%10), my=TS+4+((t*5+i*3+k*9)%24); g.fillRect(Math.round(mx),Math.round(my),1,1); } }); }
+  drawLight(g,hour,lamps,mons,zonesLit);
   /* overlay */
   actors.forEach(function(b){
     if(!b.present){ b.tagEl.style.display="none"; b.el.style.display="none"; return; }
     b.tagEl.style.display="";
-    var lx=(b.px+TS/2)/W*100, top=(b.py+TS-1)/H*100, bx=Math.min(88,Math.max(12,lx));
+    var lx=(b.px+TS/2)/W*100, top=(b.py-8)/H*100, bx=Math.min(88,Math.max(12,lx));
     b.tagEl.style.left=lx+"%"; b.tagEl.style.top=top+"%";
-    var st=b.tagEl.querySelector("[data-st]");
-    st.textContent = b.path.length ? "" : (b.mode==="idle"?"💤":(b.mode==="meet"||b.mode==="talk")?"💬":"✏️");
-    if(b.bubble){ b.el.style.display="block"; b.el.textContent=b.bubble; b.el.style.left=bx+"%"; b.el.style.top=((b.py-8)/H*100)+"%"; } else b.el.style.display="none";
+    var st=b.tagEl.querySelector("[data-st]"); st.textContent=b.path.length?"":(b.mode==="idle"?"💤":(b.mode==="meet"||b.mode==="talk")?"💬":"✏️");
+    if(b.bubble){ b.el.style.display="block"; b.el.textContent=b.bubble; b.el.style.left=bx+"%"; b.el.style.top=((b.py-19)/H*100)+"%"; } else b.el.style.display="none";
   });
   document.getElementById("clock").textContent=fmtTime();
   var w=0,aw=0,q=0; actors.forEach(function(a){ if(a.def.kind!=="agent") return; if(!a.present) aw++; else if(a.mode==="idle") aw++; else w++; q+=a.queue; });
-  document.getElementById("stWork").textContent=w; document.getElementById("stAway").textContent=aw;
-  document.getElementById("stQueue").textContent=q; document.getElementById("stOut").textContent=outCount;
-  document.getElementById("stCost").textContent="$"+cost.toFixed(2);
+  document.getElementById("stWork").textContent=w; document.getElementById("stAway").textContent=aw; document.getElementById("stQueue").textContent=q; document.getElementById("stOut").textContent=outCount; document.getElementById("stCost").textContent="$"+cost.toFixed(2);
 }
-var last=0;
+var last=0, costTick=0;
 function loop(ts){ var dt=last?Math.min((ts-last)/1000,.05):0; last=ts;
-  if(running){ simMin+=dt*360; if(simMin>=24*60){ simMin-=24*60; outCount=0; cost=0; } step(dt); }
+  if(running){ simMin+=dt*360; if(simMin>=24*60){ simMin-=24*60; outCount=0; cost=0; actors.forEach(function(a){ a.cost=0; }); } step(dt); costTick+=dt; if(costTick>1){ costTick=0; renderRosterCosts(); } }
   render(); requestAnimationFrame(loop); }
-
-/* ── 정수 배율 ──────────────────────────────────────────────── */
 var stage=document.getElementById("stage"), view=document.getElementById("view");
 function fit(){ var s=Math.max(1,Math.floor(stage.clientWidth/W)); cv.style.width=(W*s)+"px"; cv.style.height=(H*s)+"px"; view.style.width=(W*s)+"px"; view.style.height=(H*s)+"px"; }
 window.addEventListener("resize",fit); fit();
 
-/* ── 입력 ───────────────────────────────────────────────────── */
+/* ══════════════ 7. 입력 · 패널 ══════════════ */
 function movePlayer(dx,dy){ if(player.path.length) return; var nx=player.tx+dx, ny=player.ty+dy; player.dir=dx>0?"right":dx<0?"left":dy>0?"down":"up"; if(blocked(nx,ny)) return; player.path=[[nx,ny]]; }
-function talkNear(){
-  var best=null,bd=99; actors.forEach(function(a){ if(a===player||!a.present) return; var d=Math.abs(a.tx-player.tx)+Math.abs(a.ty-player.ty); if(d<bd){bd=d;best=a;} });
-  if(best&&bd<=2){
-    if(best.def.kind==="agent"){ best.queue++; say(player,best.def.name+"님, 이거 하나 더 부탁해요."); setTimeout(function(){ best.mode="work"; best.path=path([best.tx,best.ty],best.def.seat); best.workT=5; say(best,"네, 큐에 넣었습니다. 바로 시작할게요."); renderRosterMini(); },600); }
-    else { say(player,pick(player.def.lines)); setTimeout(function(){ say(best,pick(best.def.lines)); },700); }
-  } else say(player,"가까이 가서 말을 걸어야 합니다.");
-}
-window.addEventListener("keydown",function(e){ var k=e.key; if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].indexOf(k)<0) return; e.preventDefault();
+function talkNear(){ var best=null,bd=99; actors.forEach(function(a){ if(a===player||!a.present) return; var d=Math.abs(a.tx-player.tx)+Math.abs(a.ty-player.ty); if(d<bd){bd=d;best=a;} });
+  if(best&&bd<=2){ if(best.def.kind==="agent"){ best.queue++; say(player,best.def.name+"님, 이거 하나 더 부탁해요."); setTimeout(function(){ best.mode="work"; best.path=path([best.tx,best.ty],best.def.seat); best.workT=5; say(best,"네, 큐에 넣었습니다. 바로 시작할게요."); renderRosterMini(); },600); }
+    else { say(player,pick(player.def.lines)); setTimeout(function(){ say(best,pick(best.def.lines)); },700); } }
+  else say(player,"가까이 가서 말을 걸어야 합니다."); }
+window.addEventListener("keydown",function(e){ var k=e.key; if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].indexOf(k)<0) return; if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; e.preventDefault();
   if(!running){ running=true; playBtn.textContent="일시정지"; }
   if(k==="ArrowUp") movePlayer(0,-1); else if(k==="ArrowDown") movePlayer(0,1); else if(k==="ArrowLeft") movePlayer(-1,0); else if(k==="ArrowRight") movePlayer(1,0); else talkNear(); });
 Array.prototype.forEach.call(document.querySelectorAll(".dpad button"),function(b){ b.addEventListener("click",function(){ var d=b.getAttribute("data-d"); if(d==="up") movePlayer(0,-1); else if(d==="down") movePlayer(0,1); else if(d==="left") movePlayer(-1,0); else if(d==="right") movePlayer(1,0); else if(d==="talk") talkNear(); }); });
-var playBtn=document.getElementById("playBtn"); playBtn.textContent=running?"일시정지":"재생";
-playBtn.addEventListener("click",function(){ running=!running; playBtn.textContent=running?"일시정지":"재생"; });
+var playBtn=document.getElementById("playBtn"); playBtn.textContent=running?"일시정지":"재생"; playBtn.addEventListener("click",function(){ running=!running; playBtn.textContent=running?"일시정지":"재생"; });
 document.getElementById("assignBtn").addEventListener("click",function(){ assignTeam(2); });
-
-/* ── 패널 ───────────────────────────────────────────────────── */
-function renderProjects(){ var box=document.getElementById("projects"); box.innerHTML="";
-  PROJECTS.forEach(function(p,i){ var b=document.createElement("button"); b.type="button"; b.className="btn sm"+(i===projectIdx?" on":""); b.textContent=p.name; b.addEventListener("click",function(){ applyProject(i); }); box.appendChild(b); }); }
-function renderRosterMini(){ var box=document.getElementById("rosterMini"); box.innerHTML="";
-  actors.forEach(function(a){ if(a.def.kind!=="agent") return;
-    var r=document.createElement("div"); r.className="r";
-    var st = !a.present ? (a.desired?["move","출근 중"]:["away","부재"]) : (!a.desired?["move","퇴근 중"]:(a.mode==="idle"&&a.queue===0?["idle","대기 · 큐 0"]:["work","근무 · 큐 "+a.queue]));
-    r.innerHTML='<span class="n">'+a.def.name+'<small>'+a.def.role+'</small></span><span class="chip '+st[0]+'">'+st[1]+'</span>';
-    var b=document.createElement("button"); b.type="button"; b.className="btn sm"; b.textContent=a.desired?"내보내기":"호출";
-    b.addEventListener("click",function(){ if(a.desired) dismissAgent(a); else callAgent(a); });
-    r.appendChild(b); box.appendChild(r); }); }
-
-/* ── 명단 카드 ─────────────────────────────────────────────── */
+function renderProjects(){ var box=document.getElementById("projects"); box.innerHTML=""; PROJECTS.forEach(function(p,i){ var b=document.createElement("button"); b.type="button"; b.className="btn sm"+(i===projectIdx?" on":""); b.textContent=p.name; b.addEventListener("click",function(){ applyProject(i); }); box.appendChild(b); }); }
+var costEls={};
+function renderRosterMini(){ var box=document.getElementById("rosterMini"); box.innerHTML=""; costEls={};
+  actors.forEach(function(a){ if(a.def.kind!=="agent") return; var r=document.createElement("div"); r.className="r";
+    var st=!a.present?(a.desired?["move","출근 중"]:["away","부재"]):(!a.desired?["move","퇴근 중"]:(a.mode==="idle"&&a.queue===0?["idle","대기 · 큐 0"]:["work","근무 · 큐 "+a.queue]));
+    r.innerHTML='<span class="n">'+a.def.name+'<small>'+a.def.role+'</small></span><span class="chip '+st[0]+'">'+st[1]+'</span><span class="cost">$'+a.cost.toFixed(2)+'</span>';
+    costEls[a.def.id]=r.querySelector(".cost");
+    var b=document.createElement("button"); b.type="button"; b.className="btn sm"; b.textContent=a.desired?"내보내기":"호출"; b.addEventListener("click",function(){ if(a.desired) dismissAgent(a); else callAgent(a); }); r.appendChild(b); box.appendChild(r); }); }
+function renderRosterCosts(){ actors.forEach(function(a){ if(costEls[a.def.id]) costEls[a.def.id].textContent="$"+a.cost.toFixed(2); }); }
 var roster=document.getElementById("roster");
-STAFF.forEach(function(s){
-  var card=document.createElement("div"); card.className="card"+(s.kind==="human"?" is-human":"");
-  var cvs=document.createElement("canvas"); cvs.width=14; cvs.height=22; var cg=cvs.getContext("2d"); cg.imageSmoothingEnabled=false; cg.drawImage(buildSprite(s,"down",0,"ok"),0,0);
-  var info=document.createElement("div");
-  info.innerHTML='<div class="nm">'+s.name+' <span class="pill '+(s.kind==="human"?"h":"a")+'">'+(s.kind==="human"?"직원":"AI")+'</span></div><div class="rl">'+s.role+'</div><div class="out">'+s.out+'</div><div class="mdl">'+(s.kind==="human"?"본인 로그인":s.model+" · 대기 시 비용 0")+'</div>';
-  card.appendChild(cvs); card.appendChild(info); roster.appendChild(card);
-});
-
-/* seed */
+STAFF.forEach(function(s){ var card=document.createElement("div"); card.className="card"+(s.kind==="human"?" is-human":""); var cvs=document.createElement("canvas"); cvs.className="px"; cvs.width=14; cvs.height=22; var cg=cvs.getContext("2d"); cg.imageSmoothingEnabled=false; cg.drawImage(buildSprite(s,"down",0,"idle"),0,0); var info=document.createElement("div");
+  info.innerHTML='<div class="nm">'+s.name+' <span class="pill '+(s.kind==="human"?"h":"a")+'">'+(s.kind==="human"?"직원":"AI")+'</span></div><div class="rl">'+s.role+'</div><div class="out">'+s.out+'</div><div class="mdl">'+(s.kind==="human"?"본인 로그인 · 캐릭터 직접 제작":s.model+" · 대기 시 $0.00")+'</div>';
+  card.appendChild(cvs); card.appendChild(info); roster.appendChild(card); });
 log("무결","오늘 승인 대기 7건입니다, 대표님.","agent");
 applyProject(0);
 actors.forEach(function(a){ if(a.def.kind==="agent"&&a.desired){ a.present=true; a.mode="work"; a.workT=4+Math.random()*6; } });
-renderRosterMini();
-requestAnimationFrame(loop);
+renderRosterMini(); requestAnimationFrame(loop);
+
+/* ══════════════ 8. 로그인 화면 스트립 ══════════════ */
+(function(){ var c=document.getElementById("loginStrip"), sg=c.getContext("2d"); var walkers=[{d:STAFF[3],x:-20},{d:STAFF[1],x:30},{d:STAFF[11],x:80}]; var lt=0;
+  function fitStrip(){ var pw=c.parentElement.clientWidth-56; var s=Math.max(1,Math.min(3,Math.floor(pw/160))); c.style.width=(160*s)+"px"; c.style.height=(44*s)+"px"; } window.addEventListener("resize",fitStrip); fitStrip();
+  function frame(ts){ lt=ts/1000; sg.imageSmoothingEnabled=false; sg.fillStyle="#0b0c14"; sg.fillRect(0,0,160,44);
+    for(var x=0;x<10;x++){ sg.fillStyle=(x%2)?"#bab7c6":"#b3b0bf"; sg.fillRect(x*16,26,16,16); sg.fillStyle="#9e9bab"; sg.fillRect(x*16,41,16,1); sg.fillRect(x*16+15,26,1,16); }
+    sg.fillStyle="#383b52"; sg.fillRect(0,14,160,12); sg.fillStyle="#4c5070"; sg.fillRect(0,14,160,4); sg.fillStyle="#2a2c40"; sg.fillRect(0,24,160,2);
+    drawText(sg,60,17,"DANA OFFICE","#8fd6e8");
+    walkers.forEach(function(w,i){ w.x+=0.25; if(w.x>170) w.x=-30; var fr=Math.floor(lt*8+i*2)%4; sg.fillStyle="rgba(10,10,20,.28)"; sg.fillRect(Math.round(w.x)+3,38,10,2); sg.drawImage(buildSprite(w.d,"right",fr,"walk"),Math.round(w.x),17); });
+    requestAnimationFrame(frame); }
+  requestAnimationFrame(frame); })();
+
+/* ══════════════ 9. 캐릭터 만들기 (동작) ══════════════ */
+(function(){
+  var HAIR_C=[["#2b2118","#4a3a2c"],["#1a1a1e","#33333c"],["#5a3620","#7a4e30"],["#8a5a3c","#a8714b"],["#c9932c","#e0b04a"],["#6e7387","#8a8fa3"]];
+  var TOP_C=[["#2e3352","#1f2238"],["#7a2f4a","#571f33"],["#2f7d6f","#215a50"],["#c9612b","#96431c"],["#5b4a9e","#3f3372"],["#c9932c","#9a6e1e"],["#6e7387","#4f5468"],["#b8456f","#8a3253"]];
+  var BOT_C=[["#26283a","#1b1c2a"],["#2e3145","#22243a"],["#5a4a3a","#3e3228"],["#8a8fa3","#6e7387"]];
+  var SKINS=[["연",SK.light],["중",SK.mid],["진",SK.warm]];
+  var look={hair:"cap",hair_c:HAIR_C[1],cap:["#3f3a8f","#2c2866"],skin:SK.light,outfit:"hoodie",top:TOP_C[6],accent:"#f4f1ea",shirt:"#f2f2f5",bottom:BOT_C[1],shoe:["#e6e6ea","#b8b8c4"],glasses:false};
+  var def={id:"preview",look:look}, dirs=["down","right","up","left"], di=0, walking=false;
+  var cvs=document.getElementById("makerCv"), mg=cvs.getContext("2d"); mg.imageSmoothingEnabled=false;
+  var box=document.getElementById("makerOpts");
+  function seg(label,opts,get,setv){ var d=document.createElement("div"); d.className="opt"; d.innerHTML='<label>'+label+'</label>'; var s=document.createElement("div"); s.className="seg"; opts.forEach(function(o){ var b=document.createElement("button"); b.type="button"; b.textContent=o[0]; if(get()===o[1]) b.className="on"; b.addEventListener("click",function(){ setv(o[1]); Array.prototype.forEach.call(s.children,function(x){ x.className=""; }); b.className="on"; }); s.appendChild(b); }); d.appendChild(s); box.appendChild(d); }
+  function sw(label,cols,get,setv){ var d=document.createElement("div"); d.className="opt"; d.innerHTML='<label>'+label+'</label>'; var s=document.createElement("div"); s.className="sw"; cols.forEach(function(c){ var b=document.createElement("button"); b.type="button"; b.style.background=c[0]; b.setAttribute("aria-label",c[0]); if(get()===c) b.className="on"; b.addEventListener("click",function(){ setv(c); Array.prototype.forEach.call(s.children,function(x){ x.className=""; }); b.className="on"; }); s.appendChild(b); }); d.appendChild(s); box.appendChild(d); }
+  seg("헤어",[["숏","short"],["롱","long"],["번","bun"],["캡","cap"]],function(){return look.hair;},function(v){ look.hair=v; });
+  sw("헤어 색",HAIR_C,function(){return look.hair_c;},function(v){ look.hair_c=v; });
+  seg("피부",SKINS.map(function(s){return [s[0],s[1]];}),function(){return look.skin;},function(v){ look.skin=v; });
+  seg("의상",[["티","tee"],["후디","hoodie"],["블레이저","blazer"],["베스트","vest"]],function(){return look.outfit;},function(v){ look.outfit=v; });
+  sw("상의 색",TOP_C,function(){return look.top;},function(v){ look.top=v; });
+  sw("하의 색",BOT_C,function(){return look.bottom;},function(v){ look.bottom=v; });
+  seg("안경",[["없음",false],["있음",true]],function(){return look.glasses;},function(v){ look.glasses=v; });
+  var nm=document.createElement("div"); nm.className="opt"; nm.innerHTML='<label>이름표</label><div class="field"><input type="text" value="김정기" maxlength="8" id="makerNameIn"></div>'; box.appendChild(nm);
+  document.getElementById("makerNameIn").addEventListener("input",function(e){ document.getElementById("makerName").textContent=e.target.value||"이름"; });
+  var foot=document.createElement("div"); foot.className="foot"; foot.innerHTML='<span>좌석: 디자인 스튜디오 D-4 (대표가 지정)</span><span><button class="btn" type="button">랜덤</button> &nbsp;<button class="btn primary" type="button">이 모습으로 출근</button></span>'; box.appendChild(foot);
+  foot.querySelector(".btn").addEventListener("click",function(){ look.hair=pick(["short","long","bun","cap"]); look.hair_c=pick(HAIR_C); look.skin=pick(SKINS)[1]; look.outfit=pick(["tee","hoodie","blazer","vest"]); look.top=pick(TOP_C); look.bottom=pick(BOT_C); look.glasses=Math.random()<.3; Array.prototype.forEach.call(box.querySelectorAll(".seg button,.sw button"),function(b){ b.className=""; }); });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-rot]"),function(b){ b.addEventListener("click",function(){ di=(di+parseInt(b.getAttribute("data-rot"),10)+4)%4; }); });
+  document.getElementById("makerWalk").addEventListener("click",function(){ walking=!walking; document.getElementById("makerWalk").textContent=walking?"멈춤":"걷기"; });
+  var mt=0; function frame(ts){ mt=ts/1000; mg.clearRect(0,0,14,22); var fr=walking?Math.floor(mt*8)%4:0; mg.drawImage(buildSprite(def,dirs[di],fr,walking?"walk":"idle"),0,0); requestAnimationFrame(frame); } requestAnimationFrame(frame);
+})();
+
+/* ══════════════ 10. 비용 차트 (예시 데이터) ══════════════ */
+(function(){
+  var NS="http://www.w3.org/2000/svg";
+  function el(n,attrs){ var e=document.createElementNS(NS,n); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+  var daily=[3.2,4.1,2.8,5.6,4.9,0.4,0.2,6.1,5.3,4.7,7.2,5.8,0.6,0.3,4.4,5.1,6.3,4.8,5.5,0.5,0.4,4.9,6.8,5.2,4.6,5.9,0.3,0.6,4.1,4.82];
+  var box=document.getElementById("chartDaily"), tip=document.getElementById("tipDaily");
+  var Wd=560,Hd=170,pl=34,pr=8,pt=10,pb=22, max=8, iw=(Wd-pl-pr)/daily.length;
+  var svg=el("svg",{viewBox:"0 0 "+Wd+" "+Hd,role:"img","aria-label":"최근 30일 일별 비용 막대 차트, 최대 $7.2, 주말은 $1 미만"});
+  [0,2,4,6,8].forEach(function(v){ var y=pt+(Hd-pt-pb)*(1-v/max); svg.appendChild(el("line",{x1:pl,x2:Wd-pr,y1:y,y2:y,"class":"grid"})); var tx=el("text",{x:pl-6,y:y+3,"text-anchor":"end","class":"ax"}); tx.textContent="$"+v; svg.appendChild(tx); });
+  daily.forEach(function(v,i){ var x=pl+i*iw+1, h=(Hd-pt-pb)*(v/max), y=pt+(Hd-pt-pb)-h; var r=el("rect",{x:x,y:y,width:Math.max(2,iw-2),height:h,rx:2,fill:i===daily.length-1?"var(--accent)":"var(--s1)",opacity:i===daily.length-1?1:0.85}); var hit=el("rect",{x:x-1,y:pt,width:iw,height:Hd-pt-pb,fill:"transparent"});
+    hit.addEventListener("mousemove",function(e){ var b=box.getBoundingClientRect(); tip.style.display="block"; tip.style.left=(e.clientX-b.left)+"px"; tip.style.top=(e.clientY-b.top)+"px"; tip.textContent="8/"+(6+i>31?(6+i-31)+"일(9월)":(6+i)+"일")+" · $"+v.toFixed(2); });
+    hit.addEventListener("mouseleave",function(){ tip.style.display="none"; }); svg.appendChild(r); svg.appendChild(hit); });
+  var lastX=pl+(daily.length-1)*iw+iw/2; var lb=el("text",{x:lastX,y:pt+(Hd-pt-pb)*(1-4.82/max)-5,"text-anchor":"middle","class":"lbl b"}); lb.textContent="오늘 $4.82"; svg.appendChild(lb);
+  [0,9,19,29].forEach(function(i){ var tx=el("text",{x:pl+i*iw+iw/2,y:Hd-6,"text-anchor":"middle","class":"ax"}); tx.textContent=i===29?"오늘":(i===0?"30일 전":(30-i)+"일 전"); svg.appendChild(tx); });
+  box.appendChild(svg);
+  var zones=[["디자인",18.4,"var(--s1)"],["그로스",11.2,"var(--s3)"],["세일즈",5.6,"var(--s2)"],["PM · 회의",3.4,"var(--s4)"],["이미지 생성",0,"var(--line-strong)"]];
+  var zb=document.getElementById("chartZone"), Wz=360,Hz=150,rowH=26,lp=78, mx=20;
+  var s2=el("svg",{viewBox:"0 0 "+Wz+" "+Hz,role:"img","aria-label":"이번 달 존별 비용: 디자인 $18.4, 그로스 $11.2, 세일즈 $5.6, PM·회의 $3.4, 이미지 생성 $0"});
+  zones.forEach(function(z,i){ var y=8+i*rowH; var lab=el("text",{x:lp-8,y:y+14,"text-anchor":"end","class":"lbl"}); lab.textContent=z[0]; s2.appendChild(lab); var w=(Wz-lp-70)*(z[1]/mx); s2.appendChild(el("rect",{x:lp,y:y+3,width:Math.max(w,z[1]>0?4:0),height:14,rx:2,fill:z[2]})); if(z[1]===0) s2.appendChild(el("rect",{x:lp,y:y+3,width:2,height:14,fill:"var(--line-strong)"})); var val=el("text",{x:lp+w+8,y:y+14,"class":"lbl b"}); val.textContent="$"+z[1].toFixed(1); s2.appendChild(val); });
+  zb.appendChild(s2);
+  var lg=document.createElement("div"); lg.className="legend"; lg.innerHTML='<span><i style="background:var(--s1)"></i>디자인</span><span><i style="background:var(--s3)"></i>그로스</span><span><i style="background:var(--s2)"></i>세일즈</span><span><i style="background:var(--s4)"></i>PM · 회의</span>'; zb.appendChild(lg);
+})();
 })();
 </script>
