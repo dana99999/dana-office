@@ -17,7 +17,7 @@ export function CharacterMaker({ initial, name, onChange, footer }: { initial: L
   return (
     <div className="maker">
       <div className="stagebox">
-        <SpriteView look={look} dir={DIRS[di]} scale={8} animate={walk} />
+        <SpriteView look={look} dir={DIRS[di]} scale={6} animate={walk} />
         <div className="nametag">{name || "이름"}</div>
         <div className="row"><button type="button" className="btn sm" onClick={() => setDi((di + 3) % 4)}>◀ 회전</button><button type="button" className="btn sm" onClick={() => setDi((di + 1) % 4)}>회전 ▶</button><button type="button" className="btn sm" onClick={() => setWalk(!walk)}>{walk ? "멈춤" : "걷기"}</button></div>
       </div>

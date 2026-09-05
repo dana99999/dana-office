@@ -30,7 +30,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .nav a .ic{width:18px;text-align:center;font-size:14px}
 .nav .grp{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase;padding:12px 10px 4px}
 .nav .me{margin-top:auto;border-top:1px solid var(--line);padding-top:12px;display:flex;align-items:center;gap:10px;font-size:13px}
-.nav .me canvas{width:28px;height:44px}
+
 .main{min-width:0;padding:22px 24px 40px}
 .tabs{display:none}
 @media (max-width:860px){

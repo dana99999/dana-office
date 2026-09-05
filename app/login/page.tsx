@@ -24,7 +24,7 @@ export default function Login() {
     <div className="login-wrap">
       <div className="login-art">
         <div><div className="logo">DANA OFFICE</div><div className="sub">다나나인 버추얼 오피스</div></div>
-        <div style={{ display: "flex", gap: 18, alignItems: "flex-end" }}>{looks.map((l, i) => <SpriteView key={i} look={l} dir="right" scale={4} animate />)}</div>
+        <div style={{ display: "flex", gap: 18, alignItems: "flex-end" }}>{looks.map((l, i) => <SpriteView key={i} look={l} dir="right" scale={3} animate />)}</div>
         <div className="sub">필요한 사람만 자리에 있고, 부르면 걸어 들어오는 픽셀 사무실.</div>
       </div>
       <form className="login-form" onSubmit={submit}>

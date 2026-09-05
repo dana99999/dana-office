@@ -1,5 +1,5 @@
 /** 맵·경로 — 서버/클라이언트 공용 (순수 함수만) */
-export const TS = 16, COLS = 22, ROWS = 13;
+export const TS = 24, COLS = 22, ROWS = 13;
 export const W = COLS * TS, H = ROWS * TS;
 export const MAP = [
   "######################",

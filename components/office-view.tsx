@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { buildSprite, type Pose } from "@/lib/pixel/sprite";
-import { buildBackground, drawDynamic, drawLight, deskStatesFor, nightAlpha } from "@/lib/pixel/render";
-import { TS, W, H, ZONE_LABELS, ENTRANCE, blocked } from "@/lib/world/map";
+import { buildSprite, OW, OH, type Pose } from "@/lib/pixel/sprite";
+import { buildBackground, drawDynamic, drawLight, deskStatesFor, nightAlpha, drawChair } from "@/lib/pixel/render";
+import { TS, W, H, ZONE_LABELS, ENTRANCE, WINDOWS, blocked, COLS, ROWS } from "@/lib/world/map";
 import type { ActorSnap, WorldSnapshot } from "@/lib/world/types";
 
 type Me = { id: number; name: string; role: string };
@@ -22,7 +22,8 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
   const [panel, setPanel] = useState<"team" | "chat" | "ctl">("team"); const [text, setText] = useState(""); const [sel, setSel] = useState<RosterRow | null>(null);
   const [taskTitle, setTaskTitle] = useState(""); const [taskBrief, setTaskBrief] = useState(""); const [taskProject, setTaskProject] = useState<number | "">(""); const [busy, setBusy] = useState(false);
   const [cost, setCost] = useState<{ today: number; live: boolean } | null>(null); const [alertMsg, setAlertMsg] = useState<string | null>(null);
-  const [scale, setScale] = useState(1); const chatRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1); const [vw, setVw] = useState(W); const chatRef = useRef<HTMLDivElement>(null);
+  const camRef = useRef({ x: 0, manual: 0 }); const meIdRef = useRef(me.id);
 
   /* SSE */
   useEffect(() => {
@@ -45,7 +46,7 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
   useEffect(() => { chatRef.current?.scrollTo({ top: 1e9 }); }, [msgs, panel]);
 
   /* 정수 배율 */
-  useEffect(() => { const fit = () => { const w = stageRef.current?.clientWidth || W; setScale(Math.max(1, Math.floor(w / W))); }; fit(); window.addEventListener("resize", fit); return () => window.removeEventListener("resize", fit); }, []);
+  useEffect(() => { const fit = () => { const w = stageRef.current?.clientWidth || W; const sc = w >= 780 ? 2 : 1; setScale(sc); setVw(Math.min(W, Math.floor(w / sc))); }; fit(); window.addEventListener("resize", fit); return () => window.removeEventListener("resize", fit); }, []);
 
   /* 렌더 루프 */
   useEffect(() => {
@@ -55,7 +56,6 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
       const dt = Math.min(0.05, (now - last) / 1000); last = now; const t = (now - t0) / 1000;
       const snap = snapRef.current; const d = new Date(); const hour = d.getHours() + d.getMinutes() / 60; const simMin = d.getHours() * 60 + d.getMinutes();
       if (Math.floor(hour) !== bgHour.current) { buildBackground(bgRef.current!, Math.floor(hour)); bgHour.current = Math.floor(hour); }
-      g.imageSmoothingEnabled = false; g.drawImage(bgRef.current!, 0, 0);
       // interpolate
       const anims = animRef.current; const live = new Set<string>();
       for (const a of snap.actors) {
@@ -67,33 +67,40 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
         an.blink -= dt; if (an.blink < -0.15) an.blink = 2.5 + Math.random() * 4;
       }
       for (const k of [...anims.keys()]) if (!live.has(k)) anims.delete(k);
+      // camera (viewport narrower than map → follow me)
+      const cam = camRef.current; const curVw = cv.width;
+      if (curVw < W) { const meAn = anims.get(`human:${meIdRef.current}`); if (cam.manual > 0) cam.manual -= dt; else if (meAn) { const target = Math.max(0, Math.min(W - curVw, meAn.px + TS / 2 - curVw / 2)); cam.x += (target - cam.x) * Math.min(1, dt * 4); } } else cam.x = 0;
+      cam.x = Math.max(0, Math.min(W - curVw, cam.x)); const camX = Math.round(cam.x);
+      g.imageSmoothingEnabled = false; g.setTransform(1, 0, 0, 1, -camX, 0); g.fillStyle = "#0b0c14"; g.fillRect(camX, 0, curVw, H); g.drawImage(bgRef.current!, 0, 0);
       const { desk, lamps, mons, zonesLit } = deskStatesFor(snap.actors);
       const doorOpen = snap.actors.some((a) => Math.abs(a.x - ENTRANCE[0]) + Math.abs(a.y - ENTRANCE[1]) <= 1);
       drawDynamic(g, { t, hour, night: nightAlpha(hour) > 0.1, desk, apiDown: false, doorOpen }, simMin);
-      for (const a of snap.actors) { const X = a.seat[0] * TS, Y = a.seat[1] * TS; if (a.zone !== "reception") { g.fillStyle = "#262838"; g.fillRect(X + 3, Y - 3, 10, 6); g.fillStyle = "#3b3f57"; g.fillRect(X + 4, Y - 2, 8, 4); g.fillStyle = "#262838"; g.fillRect(X + 1, Y + 5, 2, 5); g.fillRect(X + 13, Y + 5, 2, 5); g.fillRect(X + 2, Y + 11, 12, 3); g.fillStyle = "#1c1e2c"; g.fillRect(X + 4, Y + 15, 8, 1); } }
+      for (const a of snap.actors) if (a.zone !== "reception") drawChair(g, a.seat[0], a.seat[1]);
       const sorted = [...snap.actors].sort((a, b) => (anims.get(`${a.kind}:${a.id}`)?.py || 0) - (anims.get(`${b.kind}:${b.id}`)?.py || 0));
       for (const a of sorted) {
-        const an = anims.get(`${a.kind}:${a.id}`)!; const moving = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5;
+        const an = anims.get(`${a.kind}:${a.id}`)!; const mv = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5;
         const atSeat = a.x === a.seat[0] && a.y === a.seat[1];
         let pose: Pose = "idle"; let fr = 0;
-        if (moving) { pose = "walk"; fr = Math.floor(an.anim) % 4; }
+        if (mv) { pose = "walk"; fr = Math.floor(an.anim) % 4; }
         else if (a.kind === "agent" && a.state === "idle") { pose = Math.floor(t * 0.5) % 2 === 0 ? "coffee" : "sleep"; fr = Math.floor(t * 0.8) % 2; }
         else if (atSeat && (a.kind === "human" || (a.state === "work" && a.queue > 0))) { pose = "type"; fr = Math.floor(t * 4) % 2; }
         else if (an.blink < 0) pose = "blink";
-        const px = Math.round(an.px), py = Math.round(an.py); const breathe = !moving && Math.floor(t * 1.2) % 2 === 0 ? 1 : 0;
-        g.fillStyle = "rgba(10,10,20,.28)"; g.fillRect(px + 3, py + 14, 10, 2); g.fillRect(px + 4, py + 13, 8, 1);
-        g.drawImage(buildSprite(a.look, moving ? an.dir : a.dir, fr, pose), px + 1, py - 7 + breathe);
-        if (a.kind === "agent" && a.state === "idle" && !moving) { const zp = Math.floor(t * 1.5) % 3; g.fillStyle = "rgba(255,255,255,.85)"; g.fillRect(px + 13, py - 9 - zp * 2, 2, 1); g.fillRect(px + 13 + ((zp + 1) % 2), py - 8 - zp * 2, 1, 1); g.fillRect(px + 13, py - 7 - zp * 2, 2, 1); }
-        if (a.mode === "busy") { g.fillStyle = Math.floor(t * 4) % 2 ? "#e8a33d" : "#f4f1ea"; g.fillRect(px + 6, py - 12, 4, 1); g.fillRect(px + 7, py - 13, 2, 3); }
+        const px = Math.round(an.px), py = Math.round(an.py); const breathe = !mv && Math.floor(t * 1.2) % 2 === 0 ? 1 : 0;
+        g.fillStyle = "rgba(10,10,20,.28)"; g.fillRect(px + 5, py + 21, 14, 3); g.fillRect(px + 6, py + 20, 12, 1); g.fillRect(px + 7, py + 24, 10, 1);
+        g.drawImage(buildSprite(a.look, mv ? an.dir : a.dir, fr, pose), px + (TS - OW) / 2, py + TS - OH + breathe);
+        if (a.kind === "agent" && a.state === "idle" && !mv) { const zp = Math.floor(t * 1.5) % 3; g.fillStyle = "rgba(255,255,255,.85)"; const zx = px + 19, zy = py - 12 - zp * 3; g.fillRect(zx, zy, 3, 1); g.fillRect(zx + 1 + ((zp + 1) % 2), zy + 1, 1, 1); g.fillRect(zx, zy + 2, 3, 1); }
+        if (a.mode === "busy") { g.fillStyle = Math.floor(t * 4) % 2 ? "#e8a33d" : "#f4f1ea"; g.fillRect(px + 9, py - 16, 6, 1); g.fillRect(px + 11, py - 18, 2, 5); }
       }
-      if (hour >= 9 && hour < 17) { g.fillStyle = "rgba(255,255,255,.35)"; [1, 4, 7, 12, 16, 19].forEach((wx, i) => { for (let k = 0; k < 2; k++) g.fillRect(Math.round(wx * TS + 3 + ((t * 3 + i * 7 + k * 5) % 10)), Math.round(TS + 4 + ((t * 5 + i * 3 + k * 9) % 24)), 1, 1); }); }
+      if (hour >= 9 && hour < 17) { g.fillStyle = "rgba(255,255,255,.35)"; WINDOWS.forEach((wx, i) => { for (let k = 0; k < 2; k++) g.fillRect(Math.round(wx * TS + 4 + ((t * 4 + i * 7 + k * 5) % 16)), Math.round(TS + 6 + ((t * 7 + i * 3 + k * 9) % 36)), 1, 1); }); }
       drawLight(g, hour, lamps, mons, zonesLit);
-      // overlay DOM
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      // overlay DOM (카메라 보정)
       const layer = viewRef.current?.querySelector<HTMLDivElement>(".actors"); if (layer) {
         const nowMs = Date.now(); const parts: string[] = [];
-        for (const a of snap.actors) { const an = anims.get(`${a.kind}:${a.id}`)!; const lx = (an.px + TS / 2) / W * 100, top = (an.py - 8) / H * 100; const you = a.kind === "human" && a.id === me.id; const icon = moving(an, a) ? "" : a.mode === "busy" ? "⚙️" : a.kind === "agent" && a.state === "idle" ? "💤" : "✏️";
+        for (const l of ZONE_LABELS) { const lx = (l[1] * TS - camX) / curVw * 100; if (lx > -10 && lx < 110) parts.push(`<div class="zlabel" style="left:${lx}%;top:${l[2] * TS / H * 100}%">${l[0]}</div>`); }
+        for (const a of snap.actors) { const an = anims.get(`${a.kind}:${a.id}`)!; const lx = (an.px + TS / 2 - camX) / curVw * 100, top = (an.py - 10) / H * 100; if (lx < -10 || lx > 110) continue; const you = a.kind === "human" && a.id === me.id; const mv = moving(an, a); const icon = mv ? "" : a.mode === "busy" ? "⚙️" : a.kind === "agent" && a.state === "idle" ? "💤" : "✏️";
           parts.push(`<div class="tag ${you ? "you" : a.kind === "human" ? "human" : ""}" style="left:${lx}%;top:${top}%">${esc(a.name)}<em>${icon}</em></div>`);
-          const b = bubblesRef.current.get(`${a.kind}:${a.id}`); if (b && b.until > nowMs) parts.push(`<div class="bubble" style="left:${Math.min(88, Math.max(12, lx))}%;top:${(an.py - 19) / H * 100}%">${esc(b.text)}</div>`); }
+          const b = bubblesRef.current.get(`${a.kind}:${a.id}`); if (b && b.until > nowMs) parts.push(`<div class="bubble" style="left:${Math.min(85, Math.max(15, lx))}%;top:${(an.py - 26) / H * 100}%">${esc(b.text)}</div>`); }
         layer.innerHTML = parts.join("");
       }
       raf = requestAnimationFrame(loop);
@@ -108,8 +115,13 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
     const onKey = (e: KeyboardEvent) => { if (/INPUT|TEXTAREA|SELECT/.test((e.target as HTMLElement).tagName)) return; const m: Record<string, [number, number]> = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }; if (m[e.key]) { e.preventDefault(); postMove({ dx: m[e.key][0], dy: m[e.key][1] }); } };
     window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey);
   }, []);
+  const drag = useRef<{ x: number; cam: number; moved: boolean } | null>(null);
+  const onDown = (e: React.PointerEvent<HTMLCanvasElement>) => { drag.current = { x: e.clientX, cam: camRef.current.x, moved: false }; };
+  const onMoveP = (e: React.PointerEvent<HTMLCanvasElement>) => { const dgt = drag.current; if (!dgt || cvRef.current!.width >= W) return; const r = cvRef.current!.getBoundingClientRect(); const dxPx = (e.clientX - dgt.x) / r.width * cvRef.current!.width; if (Math.abs(dxPx) > 4) { dgt.moved = true; camRef.current.x = Math.max(0, Math.min(W - cvRef.current!.width, dgt.cam - dxPx)); camRef.current.manual = 4; } };
   const onTap = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const r = cvRef.current!.getBoundingClientRect(); const tx = Math.floor((e.clientX - r.left) / r.width * 22), ty = Math.floor((e.clientY - r.top) / r.height * 13);
+    if (drag.current?.moved) { drag.current = null; return; } drag.current = null;
+    const r = cvRef.current!.getBoundingClientRect(); const cvw = cvRef.current!.width; const tx = Math.floor(((e.clientX - r.left) / r.width * cvw + camRef.current.x) / TS), ty = Math.floor((e.clientY - r.top) / r.height * ROWS);
+    if (tx < 0 || ty < 0 || tx >= COLS || ty >= ROWS) return;
     const hit = snapRef.current.actors.find((a) => a.kind === "agent" && Math.abs(a.x - tx) <= 0 && Math.abs(a.y - ty) <= 1);
     if (hit) { const row = roster.find((x) => x.id === hit.id); if (row) { setSel(row); return; } }
     if (!blocked(tx, ty)) move({ to: [tx, ty] });
@@ -133,9 +145,8 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
           <span style={{ flex: 1 }} /><span className="stat"><b style={{ color: connected ? "var(--teal)" : "var(--danger)" }}>{connected ? "● 연결됨" : "○ 재접속 중"}</b></span>
         </div>
         <div className="stage" ref={stageRef}>
-          <div className="view" ref={viewRef} style={{ width: W * scale, height: H * scale }}>
-            <canvas ref={cvRef} className="px" width={W} height={H} style={{ width: W * scale, height: H * scale, display: "block", cursor: "pointer" }} onClick={onTap} role="img" aria-label="다나 오피스 — 탭한 곳으로 이동, AI를 탭하면 업무 지시" />
-            <div className="layer">{ZONE_LABELS.map((l) => <div key={l[0]} className="zlabel" style={{ left: `${l[1] * TS / W * 100}%`, top: `${l[2] * TS / H * 100}%` }}>{l[0]}</div>)}</div>
+          <div className="view" ref={viewRef} style={{ width: vw * scale, height: H * scale }}>
+            <canvas ref={cvRef} className="px" width={vw} height={H} style={{ width: vw * scale, height: H * scale, display: "block", cursor: "pointer", touchAction: "pan-y" }} onPointerDown={onDown} onPointerMove={onMoveP} onClick={onTap} role="img" aria-label="다나 오피스 — 탭한 곳으로 이동, AI를 탭하면 업무 지시, 좌우로 드래그하면 화면 이동" />
             <div className="layer actors" />
           </div>
         </div>
@@ -153,7 +164,7 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
           </div>
           <div className={`pad ${panel !== "ctl" ? "hide-m" : ""}`}>
             <div className="lhead">조작</div>
-            <p className="hint">노란 이름표가 나입니다. 바닥을 탭하면 그곳으로 걸어가고, AI를 탭하면 업무를 지시할 수 있습니다. <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 이동.</p>
+            <p className="hint">노란 이름표가 나입니다. 바닥을 탭하면 그곳으로 걸어가고, AI를 탭하면 업무를 지시할 수 있습니다. 화면이 좁으면 카메라가 나를 따라오고, 좌우로 드래그해 둘러볼 수 있습니다. <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 이동.</p>
             <div className="dpad"><span /><button onClick={() => move({ dx: 0, dy: -1 })} aria-label="위">▲</button><span /><button onClick={() => move({ dx: -1, dy: 0 })} aria-label="왼쪽">◀</button><button onClick={() => move({ dx: 0, dy: 1 })} aria-label="아래">▼</button><button onClick={() => move({ dx: 1, dy: 0 })} aria-label="오른쪽">▶</button></div>
             <p className="hint" style={{ marginTop: 10 }}>대기(💤)·부재 AI는 LLM을 호출하지 않습니다. 업무를 배정한 순간부터만 과금됩니다.</p>
           </div>
