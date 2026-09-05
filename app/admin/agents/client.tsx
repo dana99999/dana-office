@@ -5,7 +5,7 @@ import type { Agent, Look } from "@/lib/types";
 import { TOOLS } from "@/lib/agent/tools";
 import { CharacterMaker } from "@/components/character-maker";
 import { SpriteView } from "@/components/sprite-view";
-import { randomLook } from "@/lib/pixel/sprite";
+import { randomLook } from "@/lib/hd/chars";
 const ZONES = [["design", "디자인 스튜디오"], ["growth", "그로스"], ["sales", "세일즈"], ["reception", "리셉션"]];
 const DESKS: [number, number, string][] = [[4, 3, "대표실 프리 데스크"], [16, 9, "회의실 옆 프리 데스크"], [20, 5, "복도 끝"], [2, 4, "대표실 창가"], [8, 1, "디자인 D-1"], [12, 1, "디자인 D-2"], [8, 3, "디자인 D-3"], [12, 3, "디자인 D-4"], [18, 1, "세일즈 S-1"], [18, 3, "세일즈 S-2"], [8, 7, "그로스 G-1"], [12, 7, "그로스 G-2"], [8, 9, "그로스 G-3"], [12, 9, "그로스 G-4"], [10, 5, "리셉션"]];
 const MODELS = [["claude-opus-5", "Claude Opus 5 — 컨셉·제안서·네이밍"], ["claude-sonnet-5", "Claude Sonnet 5 — 카피·리스트·브리프"], ["claude-haiku-4-5", "Claude Haiku 4.5 — 단순 정리"]];
@@ -24,7 +24,7 @@ export function AgentsAdmin({ agents, users }: { agents: Agent[]; users: { id: n
       <div className="topbar"><h1>AI 담당자</h1><span className="sub">코드 없이 추가·편집. 저장하면 다음 tick에 월드에 반영됩니다.</span><span className="sp" /><button className="btn primary" onClick={openNew}>+ AI 담당자 추가</button></div>
       <div className="grid g2">{agents.map((a) => (
         <div className="card" key={a.id} style={{ display: "flex", gap: 12, opacity: a.active ? 1 : 0.5 }}>
-          <SpriteView look={JSON.parse(a.sprite_json)} scale={3} />
+          <SpriteView look={JSON.parse(a.sprite_json)} size={56} />
           <div style={{ flex: 1, minWidth: 0 }}><b>{a.name}</b> <span className="muted">{a.role_title} · {ZONES.find((z) => z[0] === a.zone)?.[1]}</span><div className="muted mono">{a.model} · {a.effort} · 일일 ${a.daily_cost_cap}</div><div className="muted" style={{ whiteSpace: "pre-wrap", maxHeight: 44, overflow: "hidden", marginTop: 4 }}>{a.persona}</div>
             <div className="row" style={{ marginTop: 8 }}><button className="btn sm" onClick={() => openEdit(a)}>편집</button><button className="btn sm" onClick={() => toggleActive(a)}>{a.active ? "비활성화(퇴사)" : "다시 활성화"}</button></div></div>
         </div>))}</div>

@@ -62,7 +62,8 @@ lib/agent/live.ts       Anthropic SDK 호출 (structured output, 캐싱, usage �
 lib/agent/mock.ts       mock 두뇌
 lib/billing.ts          단가표·원장·한도·요약
 lib/image/genspark.ts   이미지 요청 핸드오프/api
-lib/pixel/*             스프라이트 템플릿(18×30)·환경 렌더러(24px 타일) (클라이언트)
+lib/hd/chars.ts         HD 벡터 캐릭터 (모던 캐주얼 게임 스타일)
+lib/hd/world.ts         HD 벡터 환경 렌더러 (48px 타일, 소프트 섀도·그라디언트)
 app/api/**              라우트 핸들러 (office/stream = SSE)
 components/office-view  캔버스·채팅·편성 패널·터치 조작
 ```
