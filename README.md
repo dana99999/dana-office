@@ -67,3 +67,14 @@ lib/hd/world.ts         HD 벡터 환경 렌더러 (48px 타일, 소프트 섀�
 app/api/**              라우트 핸들러 (office/stream = SSE)
 components/office-view  캔버스·채팅·편성 패널·터치 조작
 ```
+
+## 모바일로 확인하기 (같은 Wi-Fi)
+
+```bash
+npm install
+npm run lan        # 빌드 → LAN 주소 출력 → 서버 시작
+```
+
+터미널에 뜨는 `http://192.168.x.x:3000` 을 폰 브라우저에 입력하면 됩니다.
+로그인 `hyotae` / `dana-office-2026` (`CEO_PASSWORD` 로 변경). 직원 초대코드는 관리자 › 직원·초대 에서 확인.
+PC 방화벽이 3000 포트를 막으면 한 번 허용해 주세요. 외부(다른 네트워크)에서 보려면 `npx cloudflared tunnel --url http://localhost:3000` 같은 터널을 쓰세요.
