@@ -78,3 +78,19 @@ npm run lan        # 빌드 → LAN 주소 출력 → 서버 시작
 터미널에 뜨는 `http://192.168.x.x:3000` 을 폰 브라우저에 입력하면 됩니다.
 로그인 `hyotae` / `dana-office-2026` (`CEO_PASSWORD` 로 변경). 직원 초대코드는 관리자 › 직원·초대 에서 확인.
 PC 방화벽이 3000 포트를 막으면 한 번 허용해 주세요. 외부(다른 네트워크)에서 보려면 `npx cloudflared tunnel --url http://localhost:3000` 같은 터널을 쓰세요.
+
+## 운영 배포 — office.dananine.com
+
+이 앱은 SSE 실시간 스트림·SQLite·24시간 월드 틱 때문에 **항상 켜져 있는 서버 1대**가 필요합니다 (정적 호스팅·서버리스 불가). 홈페이지와 같은 서버여도 되고, 작은 VPS(2vCPU/2GB면 충분)여도 됩니다.
+
+```bash
+git clone https://github.com/dana99999/dana-office && cd dana-office
+cp deploy/.env.example deploy/.env && nano deploy/.env      # AUTH_SECRET, CEO_PASSWORD
+docker compose -f deploy/docker-compose.yml up -d --build   # 앱 + HTTPS(Caddy) 기동
+```
+
+1. 홈페이지 DNS에 `office.dananine.com  A  <서버 IP>` 한 줄 추가
+2. 서버 80/443 포트 오픈
+3. 위 명령 실행 → 인증서는 자동 발급, `https://office.dananine.com` 접속
+
+업데이트는 `git pull && docker compose -f deploy/docker-compose.yml up -d --build`. 데이터(DB·업로드)는 `office-data` 볼륨에 남습니다.

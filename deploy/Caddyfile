@@ -1,0 +1,12 @@
+# DNS: office.dananine.com  A  →  이 서버 IP  (홈페이지 DNS 관리 화면에 한 줄 추가)
+office.dananine.com {
+    encode zstd gzip
+    reverse_proxy office:3000 {
+        # SSE(실시간 사무실 스트림)가 끊기지 않도록 버퍼링·타임아웃 해제
+        flush_interval -1
+        transport http {
+            read_timeout 0
+            write_timeout 0
+        }
+    }
+}
