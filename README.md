@@ -81,6 +81,25 @@ PC 방화벽이 3000 포트를 막으면 한 번 허용해 주세요. 외부(다
 
 ## 운영 배포 — office.dananine.com
 
+홈페이지(dananine.com)는 Vercel에 있고 DNS도 Vercel이 관리하므로, **홈페이지는 그대로 두고** 사무실 앱만 별도 호스트에 올린 뒤 Vercel DNS에 `office` 레코드 한 줄을 추가합니다. 이 앱은 SSE·SQLite·24시간 월드 틱 때문에 Vercel(서버리스)에는 올릴 수 없습니다.
+
+### 방법 A — Fly.io (권장: 서버 관리 없음, 월 $5 내외)
+
+```bash
+fly launch --copy-config --no-deploy          # fly.toml 그대로 사용
+fly volumes create office_data -r nrt -s 1    # DB·업로드 저장 1GB
+fly secrets set AUTH_SECRET=$(openssl rand -hex 32) CEO_PASSWORD=원하는비밀번호
+fly deploy
+fly certs add office.dananine.com             # 화면에 뜨는 레코드를 Vercel DNS에 추가
+```
+
+Vercel 대시보드 → 프로젝트 → Settings → Domains → `dananine.com` DNS Records 에서
+`office  CNAME  dana-office.fly.dev` (또는 안내된 A/AAAA) 추가 → 몇 분 뒤 `https://office.dananine.com`.
+
+### 방법 B — 직접 서버(VPS) + Docker
+
+
+
 이 앱은 SSE 실시간 스트림·SQLite·24시간 월드 틱 때문에 **항상 켜져 있는 서버 1대**가 필요합니다 (정적 호스팅·서버리스 불가). 홈페이지와 같은 서버여도 되고, 작은 VPS(2vCPU/2GB면 충분)여도 됩니다.
 
 ```bash

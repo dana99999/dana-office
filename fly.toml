@@ -1,0 +1,30 @@
+# Fly.io 배포 (Dockerfile 사용) — 도쿄 리전, 데이터 볼륨, 항상 켜짐
+#   fly launch --copy-config --no-deploy   →  fly volumes create office_data -r nrt -s 1
+#   fly secrets set AUTH_SECRET=... CEO_PASSWORD=...   →  fly deploy
+#   fly certs add office.dananine.com   (Vercel DNS에 안내되는 A/AAAA 또는 CNAME 추가)
+app = "dana-office"
+primary_region = "nrt"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  TZ = "Asia/Seoul"
+  NODE_ENV = "production"
+  HOSTNAME = "0.0.0.0"
+  PORT = "3000"
+
+[[mounts]]
+  source = "office_data"
+  destination = "/app/data"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "off"     # 24시간 사무실 — 절대 재우지 않음
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"
