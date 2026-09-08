@@ -1,5 +1,5 @@
 /** HD 벡터 환경 렌더러 — 48px 타일, 안티앨리어싱·그라디언트·소프트 섀도 (클라이언트 전용) */
-import { at, COLS, ROWS, TS, W, H, WINDOWS, ZONES, WANDER, inZone, LOUNGE, ENTRANCE } from "../world/map";
+import { at, blocked, COLS, ROWS, TS, W, H, WINDOWS, ZONES, WANDER, inZone, LOUNGE, ENTRANCE } from "../world/map";
 import type { ActorSnap } from "../world/types";
 export interface DeskState { on: boolean; screen: string; mug: string }
 export interface Ctx { t: number; hour: number; night: boolean; desk: Record<string, DeskState>; apiDown: boolean; doorOpen: boolean }
@@ -7,7 +7,7 @@ type G = CanvasRenderingContext2D;
 export const BG_Q = 2; // 배경 오프스크린 품질 배율
 const FONT = "800 13px Nunito, 'IBM Plex Sans KR', system-ui, sans-serif";
 
-function rr(g: G, x: number, y: number, w: number, h: number, r: number, fill: string | CanvasGradient, stroke?: string | null, lw = 1) { g.beginPath(); g.roundRect(x, y, w, h, r); g.fillStyle = fill; g.fill(); if (stroke) { g.lineWidth = lw; g.strokeStyle = stroke; g.stroke(); } }
+function rr(g: G, x: number, y: number, w: number, h: number, r: number | number[], fill: string | CanvasGradient, stroke?: string | null, lw = 1) { g.beginPath(); g.roundRect(x, y, w, h, r); g.fillStyle = fill; g.fill(); if (stroke) { g.lineWidth = lw; g.strokeStyle = stroke; g.stroke(); } }
 function circ(g: G, x: number, y: number, r: number, fill: string | CanvasGradient, stroke?: string | null, lw = 1) { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); if (stroke) { g.lineWidth = lw; g.strokeStyle = stroke; g.stroke(); } }
 function ell(g: G, x: number, y: number, rx: number, ry: number, fill: string | CanvasGradient) { g.beginPath(); g.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); }
 function lg(g: G, x0: number, y0: number, x1: number, y1: number, a: string, b: string) { const gr = g.createLinearGradient(x0, y0, x1, y1); gr.addColorStop(0, a); gr.addColorStop(1, b); return gr; }
@@ -15,7 +15,8 @@ function rg(g: G, x: number, y: number, r0: number, r1: number, a: string, b: st
 function shadow(g: G, fn: () => void, blur = 6, dy = 3, col = "rgba(10,10,24,.35)") { g.save(); g.shadowColor = col; g.shadowBlur = blur; g.shadowOffsetY = dy; fn(); g.restore(); }
 const OUT = "rgba(24,24,40,.45)";
 export function skyFor(hour: number): [string, string] { if (hour >= 5 && hour < 7) return ["#5a4a7a", "#c98a6a"]; if (hour >= 7 && hour < 9) return ["#e8a26a", "#f4c98f"]; if (hour >= 9 && hour < 17) return ["#7fb6e8", "#c4e2f8"]; if (hour >= 17 && hour < 19) return ["#e07a5a", "#f2b27a"]; if (hour >= 19 && hour < 21) return ["#3e3f78", "#6a5a95"]; return ["#10152e", "#1d2550"]; }
-export function nightAlpha(hour: number) { if (hour >= 8 && hour < 17) return 0; if (hour >= 17 && hour < 20) return (hour - 17) / 3 * 0.5; if (hour >= 20 || hour < 5) return 0.5; return 0.5 * (8 - hour) / 3; }
+/** 사무실은 시간대와 무관하게 항상 밝게 유지 (창밖 하늘만 바뀐다) */
+export function nightAlpha(_hour: number) { return 0; }
 
 /* ── 바닥 ─────────────────────────────────────────── */
 function floors(g: G) {
@@ -56,11 +57,14 @@ function walls(g: G, hour: number) {
 /* ── 가구 ─────────────────────────────────────────── */
 export function drawChair(g: G, x: number, y: number) {
   const X = x * TS, Y = y * TS;
-  shadow(g, () => rr(g, X + 8, Y - 9, 32, 26, 9, lg(g, 0, Y - 9, 0, Y + 17, "#3a3742", "#26242c"), OUT), 5, 2);
-  rr(g, X + 11, Y - 6, 26, 19, 7, lg(g, 0, Y - 6, 0, Y + 13, "#4a4752", "#35323c")); g.fillStyle = "rgba(255,255,255,.1)"; g.fillRect(X + 15, Y - 4, 18, 1.5); rr(g, X + 21, Y + 10, 6, 1.6, .8, "#ff6a00");
-  rr(g, X + 4, Y + 16, 6, 14, 3, "#2a2830", OUT); rr(g, X + 38, Y + 16, 6, 14, 3, "#2a2830", OUT);
-  rr(g, X + 8, Y + 30, 32, 12, 5, lg(g, 0, Y + 30, 0, Y + 42, "#3a3742", "#26242c"), OUT); rr(g, X + 11, Y + 32, 26, 6, 3, "#4a4752");
-  rr(g, X + 22, Y + 42, 4, 4, 1, "#1c1a22"); g.strokeStyle = "#1c1a22"; g.lineWidth = 2.5; g.lineCap = "round"; g.beginPath(); g.moveTo(X + 24, Y + 46); g.lineTo(X + 10, Y + 47); g.moveTo(X + 24, Y + 46); g.lineTo(X + 38, Y + 47); g.stroke(); circ(g, X + 10, Y + 47, 1.6, "#3a3742"); circ(g, X + 38, Y + 47, 1.6, "#3a3742");
+  // 등받이(위) — 앉은 캐릭터 머리 뒤로 윗부분이 보인다
+  shadow(g, () => rr(g, X + 12, Y - 2, 24, 20, [8, 8, 4, 4], lg(g, 0, Y - 2, 0, Y + 18, "#3f3c47", "#2a2830"), OUT), 4, 2);
+  rr(g, X + 15, Y + 1, 18, 13, [6, 6, 3, 3], lg(g, 0, Y + 1, 0, Y + 14, "#4d4a56", "#3a3742")); g.fillStyle = "rgba(255,255,255,.1)"; g.fillRect(X + 18, Y + 3, 12, 1.5); rr(g, X + 21, Y + 10, 6, 1.5, .75, "#ff6a00");
+  // 팔걸이 + 쿠션
+  rr(g, X + 8, Y + 17, 5, 12, 2.5, "#2a2830", OUT); rr(g, X + 35, Y + 17, 5, 12, 2.5, "#2a2830", OUT);
+  rr(g, X + 12, Y + 18, 24, 13, [4, 4, 6, 6], lg(g, 0, Y + 18, 0, Y + 31, "#44414c", "#2e2c34"), OUT); rr(g, X + 15, Y + 20, 18, 7, 3, "#4d4a56");
+  // 기둥 + 바퀴
+  rr(g, X + 22.5, Y + 31, 3, 6, 1, "#1c1a22"); g.strokeStyle = "#1c1a22"; g.lineWidth = 2.2; g.lineCap = "round"; g.beginPath(); g.moveTo(X + 24, Y + 37); g.lineTo(X + 14, Y + 40); g.moveTo(X + 24, Y + 37); g.lineTo(X + 34, Y + 40); g.stroke(); circ(g, X + 14, Y + 40.5, 1.5, "#3a3742"); circ(g, X + 34, Y + 40.5, 1.5, "#3a3742");
 }
 function screenContent(g: G, x: number, y: number, w: number, h: number, screen: string, t: number) {
   if (screen === "design") { const sw = ["#e07a5a", "#3aa88f", "#e8b640", "#b35a8a", "#6c63e0", "#f0efe8"]; for (let i = 0; i < 6; i++) rr(g, x + 2 + (i % 3) * (w / 3), y + 2 + Math.floor(i / 3) * (h / 2 - 2), w / 3 - 3, h / 2 - 5, 2, sw[i]); }
@@ -80,11 +84,12 @@ export function drawDesk(g: G, x: number, y: number, c: Ctx) {
   // 램프
   g.strokeStyle = "#3b3f57"; g.lineWidth = 2; g.lineCap = "round"; g.beginPath(); g.moveTo(X + 42, Y + 20); g.lineTo(X + 42, Y + 8); g.lineTo(X + 37, Y + 4); g.stroke(); rr(g, X + 40, Y + 19, 6, 2.5, 1, "#3b3f57"); g.beginPath(); g.moveTo(X + 31, Y + 6); g.lineTo(X + 43, Y + 6); g.lineTo(X + 40, Y + 1); g.lineTo(X + 34, Y + 1); g.closePath(); g.fillStyle = lg(g, 0, Y + 1, 0, Y + 6, "#ff8a2b", "#e05a00"); g.fill();
   if (c.night && st.on) { g.fillStyle = rg(g, X + 37, Y + 7, 1, 16, "rgba(255,214,140,.55)", "rgba(255,214,140,0)"); g.fillRect(X + 20, Y - 4, 34, 30); }
-  // 모니터
-  shadow(g, () => rr(g, X + 9, Y - 7, 30, 21, 3.5, lg(g, 0, Y - 7, 0, Y + 14, "#2b2933", "#17161d"), OUT), 5, 2);
-  rr(g, X + 11, Y - 5, 26, 17, 2, st.on ? lg(g, 0, Y - 5, 0, Y + 12, "#14232e", "#0d1a24") : "#121218");
-  if (st.on) { screenContent(g, X + 11, Y - 5, 26, 17, st.screen, c.t); g.save(); g.beginPath(); g.roundRect(X + 12, Y - 4, 24, 15, 2); g.clip(); g.fillStyle = lg(g, X + 12, Y - 4, X + 36, Y + 11, "rgba(255,255,255,.18)", "rgba(255,255,255,0)"); g.beginPath(); g.moveTo(X + 12, Y + 2); g.lineTo(X + 22, Y - 4); g.lineTo(X + 30, Y - 4); g.lineTo(X + 12, Y + 8); g.fill(); g.restore(); }
-  circ(g, X + 35, Y + 12.5, 0.9, st.on ? "#ff8a2b" : "#3a3742"); rr(g, X + 22, Y + 14, 4, 4, 1, "#1c1a22"); rr(g, X + 16, Y + 17, 16, 2.5, 1.2, lg(g, 0, Y + 17, 0, Y + 20, "#3a3742", "#1c1a22"));
+  // 모니터 — 앉는 방향(위→아래)을 기준으로 뒷면만 보인다
+  shadow(g, () => rr(g, X + 9, Y - 7, 30, 21, 3.5, lg(g, 0, Y - 7, 0, Y + 14, "#34323c", "#1c1a22"), OUT), 5, 2);
+  rr(g, X + 11, Y - 5, 26, 17, 2.5, lg(g, X + 11, 0, X + 37, 0, "#2b2933", "#24222b")); g.fillStyle = "rgba(255,255,255,.06)"; g.fillRect(X + 12, Y - 4, 24, 1.5);
+  rr(g, X + 21, Y + 1, 6, 6, 1.6, "rgba(255,255,255,.08)"); circ(g, X + 24, Y + 4, 1.4, st.on ? "rgba(255,138,43,.85)" : "rgba(255,255,255,.12)");
+  if (st.on) { g.fillStyle = lg(g, 0, Y + 14, 0, Y + 30, "rgba(255,225,190,.22)", "rgba(255,225,190,0)"); g.beginPath(); g.moveTo(X + 12, Y + 14); g.lineTo(X + 36, Y + 14); g.lineTo(X + 42, Y + 30); g.lineTo(X + 6, Y + 30); g.closePath(); g.fill(); }
+  rr(g, X + 22, Y + 14, 4, 4, 1, "#1c1a22"); rr(g, X + 16, Y + 17, 16, 2.5, 1.2, lg(g, 0, Y + 17, 0, Y + 20, "#3a3742", "#1c1a22"));
   // 키보드 · 마우스 · 머그
   rr(g, X + 12, Y + 29, 20, 7, 2, lg(g, 0, Y + 29, 0, Y + 36, "#f2f0ec", "#d6d2ca"), OUT, .8); g.fillStyle = "#8f8a95"; for (let k = 0; k < 6; k++) { g.fillRect(X + 14 + k * 3, Y + 31, 2, 1.4); g.fillRect(X + 14 + k * 3, Y + 33.2, 2, 1.4); }
   rr(g, X + 34, Y + 30, 5, 7, 2.5, lg(g, 0, Y + 30, 0, Y + 37, "#e2e4ee", "#b9bccb"), OUT, .8);
@@ -202,6 +207,7 @@ export function buildBackground(bg: HTMLCanvasElement, hour: number) {
 }
 /* ── 동적 (매 프레임, 월드 좌표) ─────────────────────── */
 export function drawDynamic(g: G, c: Ctx, simMin: number, skipDesks?: Set<string>) {
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (at(x, y) === "D" && !blocked(x, y - 1)) drawChair(g, x, y - 1); // 책상마다 의자
   for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) { const ch = at(x, y); if (ch === "D") { if (!skipDesks?.has(`${x},${y}`)) drawDesk(g, x, y, c); } else if (ch === "K") coffee(g, x, y, c); else if (ch === "S") server(g, x, y, c); else if (ch === "E") door(g, x, y, c.doorOpen); }
   reception(g, 10, 6);
   for (let b = 0; b < 7; b++) { const hh = Math.max(2, 10 + Math.sin(c.t * 0.9 + b * 1.3) * 6); rr(g, 15 * TS + 10 + b * 4.2, 8 * TS + 31 - hh, 3, hh, 1, b % 2 ? "#4fc0bc" : "#8fd6e8"); }

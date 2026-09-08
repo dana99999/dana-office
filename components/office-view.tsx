@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { drawCharacter, type Pose } from "@/lib/hd/chars";
-import { buildBackground, drawDynamic, drawLight, deskStatesFor, nightAlpha, drawChair, drawDesk, type Ctx } from "@/lib/hd/world";
+import { buildBackground, drawDynamic, drawLight, deskStatesFor, nightAlpha, drawDesk, type Ctx } from "@/lib/hd/world";
 import { TS, W, H, ZONE_LABELS, ENTRANCE, blocked, COLS, ROWS, at } from "@/lib/world/map";
 import type { ActorSnap, WorldSnapshot } from "@/lib/world/types";
 import { SpriteView } from "./sprite-view";
@@ -90,7 +90,6 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
       const seatedDesks = new Set<string>();
       for (const a of snap.actors) { const an = anims.get(`${a.kind}:${a.id}`); if (!an) continue; const mv = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5; if (!mv && a.x === a.seat[0] && a.y === a.seat[1] && at(a.seat[0], a.seat[1] + 1) === "D") seatedDesks.add(`${a.seat[0]},${a.seat[1] + 1}`); }
       drawDynamic(g, ctx, simMin, seatedDesks);
-      for (const a of snap.actors) if (a.zone !== "reception") drawChair(g, a.seat[0], a.seat[1]);
       const sorted = [...snap.actors].sort((a, b) => (anims.get(`${a.kind}:${a.id}`)?.py || 0) - (anims.get(`${b.kind}:${b.id}`)?.py || 0));
       const nowMs = Date.now();
       for (const a of sorted) {

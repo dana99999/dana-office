@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   const b = (await req.json().catch(() => ({}))) as { mode?: string; title?: string; body?: string; source?: string; username?: string };
   const mode = b.mode === "dispatch" ? "dispatch" : "archive"; const title = (b.title || "").trim(); const body = (b.body || "").trim(); const source = (b.source || "Claude Code").slice(0, 40);
   if (!title) return NextResponse.json({ error: "title 필요" }, { status: 400 });
-  const u = db().prepare("SELECT * FROM users WHERE username = ?").get(b.username || "hyotae") as User | undefined; if (!u) return NextResponse.json({ error: "사용자 없음" }, { status: 400 });
+  const u = db().prepare("SELECT * FROM users WHERE username = ?").get(b.username || "ted") as User | undefined; if (!u) return NextResponse.json({ error: "사용자 없음" }, { status: 400 });
   const w = getWorld(); w.humanJoin(u);
   if (mode === "archive") { const r = archiveExternal(w, u, { title, body: body || title, source }); return NextResponse.json({ ok: true, mode, ...r, url: `/artifacts/${r.artifactId}` }); }
   const dir = startDirective(w, u, title, { source, context: body || undefined });

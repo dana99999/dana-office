@@ -17,7 +17,7 @@ npm run dev                    # http://localhost:3000
 
 | 계정 | 아이디 | 비밀번호 | 비고 |
 |---|---|---|---|
-| 김효태 (대표) | `hyotae` | `.env`의 `CEO_PASSWORD` (기본 `dana-office-2026`) | 로그인 후 즉시 변경 권장 |
+| 김효태 (대표) | `ted` | `.env`의 `CEO_PASSWORD` (기본 `dana-office-2026`) | 로그인 후 즉시 변경 권장 |
 | 김정기 (디자이너) | `jungki` | 초대 코드로 첫 출근 | 코드는 관리자 › 직원·초대 에서 확인 |
 | 김성헌 (마케터) | `seongheon` | 초대 코드로 첫 출근 | " |
 

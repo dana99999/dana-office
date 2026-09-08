@@ -256,7 +256,7 @@ function seed(d: Database.Database) {
   const tx = d.transaction(() => {
     const ceoPw = process.env.CEO_PASSWORD || "dana-office-2026";
     const ceoLook: Look = { hair: "short", hair_c: ["#2b2118", "#4a3a2c"], skin: [...SK.mid], outfit: "blazer", top: ["#2e3352", "#1f2238"], shirt: "#e9ecf5", accent: "#b8452f", bottom: ["#26283a", "#1b1c2a"], shoe: ["#1a1a22", "#3a3a48"], glasses: true };
-    d.prepare("INSERT INTO users (username, password_hash, role, display_name, sprite_json, onboarded, seat_x, seat_y) VALUES (?,?,?,?,?,1,3,1)").run("hyotae", hashPassword(ceoPw), "ceo", "김효태", JSON.stringify(ceoLook));
+    d.prepare("INSERT INTO users (username, password_hash, role, display_name, sprite_json, onboarded, seat_x, seat_y) VALUES (?,?,?,?,?,1,3,1)").run("ted", hashPassword(ceoPw), "ceo", "김효태", JSON.stringify(ceoLook));
     d.prepare("INSERT INTO users (username, role, display_name, invite_code, seat_x, seat_y) VALUES (?,?,?,?,12,3)").run("jungki", "staff", "김정기", newInviteCode());
     d.prepare("INSERT INTO users (username, role, display_name, invite_code, seat_x, seat_y) VALUES (?,?,?,?,12,9)").run("seongheon", "staff", "김성헌", newInviteCode());
     const ins = d.prepare("INSERT INTO agents (slug,name,role_title,zone,desk_x,desk_y,persona,sprite_json,model,effort,tools_json,daily_cost_cap,screen) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
