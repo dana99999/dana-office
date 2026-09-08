@@ -58,7 +58,7 @@ npm run typecheck && npm run lint && npm test && npm run build
 
 - Railway / Render: 빌드 `npm run build`, 시작 `npm run start`, 볼륨을 `/app/data`에 마운트, 환경변수 `TZ=Asia/Seoul`·`AUTH_SECRET`·`CEO_PASSWORD`(·`ANTHROPIC_API_KEY`)
 - Docker: `docker build -t dana-office . && docker run -p 3000:3000 -v dana-data:/app/data -e AUTH_SECRET=... dana-office`
-- 사무실 맥: `npm run build && npm run start` 를 LaunchAgent로 상시 실행 + Tailscale
+- 사무실 맥(현재 운영): `com.dananine.office` LaunchAgent(:3400) + Cloudflare Tunnel `dana-office`(`com.dananine.cloudflared`, `~/.cloudflared/config.yml`) → https://office.dananine.com . DNS는 Cloudflare(네임서버 salvador/sunny), 도메인 등록은 가비아.
 
 ## 구조
 
