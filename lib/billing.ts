@@ -61,6 +61,7 @@ export function limitInputsFor(agentId: number, agentDailyCap: number, projectId
 }
 export function alert(level: "info" | "warn" | "critical", body: string) { db().prepare("INSERT INTO alerts (level, body) VALUES (?,?)").run(level, body); }
 
+export const KRW_PER_USD = Number(process.env.KRW_PER_USD || 1400);
 export function billingSummary() {
   const d = db();
   const rows = <T>(sql: string, ...a: unknown[]) => d.prepare(sql).all(...a) as T[];
@@ -79,5 +80,5 @@ export function billingSummary() {
   const credits = rows<{ id: number; ts: string; amount_usd: number; receipt_ref: string; note: string }>("SELECT * FROM credits ORDER BY id DESC");
   const alerts = rows<{ id: number; ts: string; level: string; body: string }>("SELECT * FROM alerts ORDER BY id DESC LIMIT 8");
   const liveMode = !!process.env.ANTHROPIC_API_KEY && !!(d.prepare("SELECT enabled FROM features WHERE key='live_llm'").get() as { enabled: number } | undefined)?.enabled;
-  return { today: spentToday(undefined, "all"), todayLive: spentToday(), month: spentMonth("all"), monthLive: spentMonth(), creditsTotal: creditsTotal(), creditsRemaining: creditsRemaining(), limit: globalLimit(), daily, byAgent, byZone, byProject, recent, credits, alerts, liveMode, outputsToday: (d.prepare(`SELECT COUNT(*) AS c FROM artifacts WHERE date(created_at,'localtime') = ${today()}`).get() as { c: number }).c };
+  return { today: spentToday(undefined, "all"), todayLive: spentToday(), month: spentMonth("all"), monthLive: spentMonth(), creditsTotal: creditsTotal(), creditsRemaining: creditsRemaining(), limit: globalLimit(), daily, byAgent, byZone, byProject, recent, credits, alerts, liveMode, krwPerUsd: KRW_PER_USD, outputsToday: (d.prepare(`SELECT COUNT(*) AS c FROM artifacts WHERE date(created_at,'localtime') = ${today()}`).get() as { c: number }).c };
 }

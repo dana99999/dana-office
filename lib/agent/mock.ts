@@ -6,7 +6,8 @@ export function mockRun(agent: Agent, task: Task, project: Project): { out: Agen
   const t = task.title, b = task.brief || project.brief;
   const zone = agent.zone;
   let out: AgentOutput;
-  if (zone === "design" && agent.slug === "sora") out = {
+  if (agent.slug === "mugyeol" && /^\[종합\]/.test(t)) out = pmSummary(t, b, project);
+  else if (zone === "design" && agent.slug === "sora") out = {
     kind: "concept", title: `${t} — 컨셉 방향`,
     body_md: `# ${t}\n\n**프로젝트** ${project.name} · ${project.client}\n\n## 1안 · Quiet Proof\n- 키워드: 투명 / 정제 / 근거\n- 컬러: 웜 그레이 + 세이지 포인트\n- 레퍼런스 유형: 성분표를 그래픽으로 쓰는 스킨케어 패키지\n\n## 2안 · Clinical Warmth\n- 키워드: 신뢰 / 온기 / 정확\n- 컬러: 오프화이트 + 딥 네이비\n- 레퍼런스 유형: 병원 사인 시스템의 위계 + 부드러운 서체\n\n## 3안 · Field Notes\n- 키워드: 원료 / 기록 / 손글씨\n- 컬러: 크라프트 + 블랙\n- 레퍼런스 유형: 식물학 도감\n\n> 추천: 2안. 브리프의 '성분 투명성'을 신뢰감으로 번역하기 가장 쉬움.\n\n_브리프_: ${b}`,
     message: `「${t}」 3안 정리했습니다. 2안 추천드려요.`,
@@ -44,4 +45,17 @@ export function mockRun(agent: Agent, task: Task, project: Project): { out: Agen
   };
   const input = 2400 + Math.min(4000, (b.length + agent.persona.length) * 2);
   return { out, usage: { input_tokens: Math.round(input * 0.3), cached_tokens: Math.round(input * 0.7), output_tokens: 400 + Math.round(out.body_md.length * 0.9) } };
+}
+
+/** PM 종합 정리 (mock) — 브리프에 붙어 온 담당자별 산출물의 제목·소제목을 묶어 아카이브 문서를 만든다 */
+function pmSummary(t: string, brief: string, project: Project): AgentOutput {
+  const head = brief.split("\n\n")[0] || ""; const directive = (head.match(/^지시:\s*(.*)$/m) || [])[1] || t.replace(/^\[종합\]\s*/, ""); const who = (head.match(/^지시자:\s*(.*)$/m) || [])[1] || "대표";
+  const parts = brief.split(/\n(?=### )/).filter((p) => p.startsWith("### "));
+  const secs = parts.map((p) => { const [h, ...rest] = p.split("\n"); const lines = rest.filter((l) => /^(## |- |\d+\. |> )/.test(l)).slice(0, 5).map((l) => l.replace(/^## /, "**").replace(/^\*\*(.*)$/, "**$1**").replace(/^> /, "  › ")); return `## ${h.slice(4)}\n${lines.join("\n") || "- (본문 요약 없음)"}`; });
+  const names = parts.map((p) => p.slice(4).split(" · ")[0]);
+  return {
+    kind: "report", title: `${directive} — 종합 아카이브`.slice(0, 80),
+    body_md: `# ${directive}\n\n**지시자** ${who} · **프로젝트** ${project.name} · **참여** ${names.join(", ") || "-"}\n\n## 지시 요약\n${directive}\n\n${secs.join("\n\n")}\n\n## 산출물 간 충돌·공백\n- 담당자 간 톤 차이는 승인 단계에서 조정 필요 (mock 요약 — 실제 API 모드에서는 내용 기반으로 판단)\n\n## 다음 액션\n1. 승인 큐에서 담당자별 산출물 검토\n2. 반려 항목은 사유와 함께 재배정\n3. 승인분은 갤러리로, 본 문서는 아카이브에 보관`,
+    message: `「${directive.length > 20 ? directive.slice(0, 20) + "…" : directive}」 종합 정리 올렸습니다. 아카이브 보관.`,
+  };
 }

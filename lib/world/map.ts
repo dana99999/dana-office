@@ -21,11 +21,11 @@ export const WINDOWS = [1, 4, 7, 12, 16, 19];
 export type Tile = [number, number];
 export interface Zone { key: string; x1: number; y1: number; x2: number; y2: number; rug: [string, string]; border: string; inner: string; }
 export const ZONES: Zone[] = [
-  { key: "ceo", x1: 1, y1: 1, x2: 5, y2: 4, rug: ["#6a5c8c", "#655786"], border: "#57497a", inner: "#75679a" },
-  { key: "design", x1: 7, y1: 1, x2: 14, y2: 4, rug: ["#557a8c", "#507486"], border: "#43657a", inner: "#62889a" },
-  { key: "sales", x1: 16, y1: 1, x2: 20, y2: 4, rug: ["#8c6a5c", "#866456"], border: "#72544a", inner: "#98776a" },
-  { key: "growth", x1: 7, y1: 7, x2: 14, y2: 11, rug: ["#5a8a70", "#54846a"], border: "#45705a", inner: "#68987e" },
-  { key: "meet", x1: 16, y1: 7, x2: 20, y2: 11, rug: ["#6f628a", "#6a5d84"], border: "#564a72", inner: "#7c6f98" },
+  { key: "ceo", x1: 1, y1: 1, x2: 5, y2: 4, rug: ["#c9bfd9", "#bfb4d1"], border: "#ada0c4", inner: "#d7cfe4" },
+  { key: "design", x1: 7, y1: 1, x2: 14, y2: 4, rug: ["#a9c9cf", "#9fc0c7"], border: "#8fb2ba", inner: "#bcd6db" },
+  { key: "sales", x1: 16, y1: 1, x2: 20, y2: 4, rug: ["#e9c6ae", "#e0bba2"], border: "#d1a98f", inner: "#f0d5c2" },
+  { key: "growth", x1: 7, y1: 7, x2: 14, y2: 11, rug: ["#b6cfb4", "#acc6aa"], border: "#9bb899", inner: "#c8dcc6" },
+  { key: "meet", x1: 16, y1: 7, x2: 20, y2: 11, rug: ["#c8c2d8", "#bfb8d0"], border: "#ada5c2", inner: "#d6d1e2" },
 ];
 export const LOUNGE = { x1: 1, y1: 7, x2: 5, y2: 11 };
 export const WANDER = {

@@ -186,6 +186,19 @@ function migrate(d: Database.Database) {
     manual TEXT NOT NULL DEFAULT '',
     since TEXT NOT NULL DEFAULT (datetime('now'))
   );
+  CREATE TABLE IF NOT EXISTS directives (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    body TEXT NOT NULL,
+    requester_id INTEGER,
+    requester_name TEXT NOT NULL DEFAULT '',
+    project_id INTEGER NOT NULL,
+    member_task_ids TEXT NOT NULL DEFAULT '[]',
+    summary_task_id INTEGER,
+    summary_artifact_id INTEGER,
+    status TEXT NOT NULL DEFAULT 'open',
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    archived_at TEXT
+  );
   CREATE INDEX IF NOT EXISTS idx_ledger_ts ON usage_ledger(ts);
   CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
   CREATE INDEX IF NOT EXISTS idx_messages_ts ON messages(ts);
@@ -241,7 +254,7 @@ function seed(d: Database.Database) {
   if (n > 0) return;
   const tx = d.transaction(() => {
     const ceoPw = process.env.CEO_PASSWORD || "dana-office-2026";
-    const ceoLook: Look = { hair: "short", hair_c: ["#2b2118", "#4a3a2c"], skin: [...SK.mid], outfit: "blazer", top: ["#2e3352", "#1f2238"], shirt: "#e9ecf5", accent: "#b8452f", bottom: ["#26283a", "#1b1c2a"], shoe: ["#1a1a22", "#3a3a48"] };
+    const ceoLook: Look = { hair: "short", hair_c: ["#2b2118", "#4a3a2c"], skin: [...SK.mid], outfit: "blazer", top: ["#2e3352", "#1f2238"], shirt: "#e9ecf5", accent: "#b8452f", bottom: ["#26283a", "#1b1c2a"], shoe: ["#1a1a22", "#3a3a48"], glasses: true };
     d.prepare("INSERT INTO users (username, password_hash, role, display_name, sprite_json, onboarded, seat_x, seat_y) VALUES (?,?,?,?,?,1,3,1)").run("hyotae", hashPassword(ceoPw), "ceo", "김효태", JSON.stringify(ceoLook));
     d.prepare("INSERT INTO users (username, role, display_name, invite_code, seat_x, seat_y) VALUES (?,?,?,?,12,3)").run("jungki", "staff", "김정기", newInviteCode());
     d.prepare("INSERT INTO users (username, role, display_name, invite_code, seat_x, seat_y) VALUES (?,?,?,?,12,9)").run("seongheon", "staff", "김성헌", newInviteCode());

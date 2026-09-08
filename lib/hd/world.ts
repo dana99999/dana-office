@@ -20,26 +20,26 @@ export function nightAlpha(hour: number) { if (hour >= 8 && hour < 17) return 0;
 /* ── 바닥 ─────────────────────────────────────────── */
 function floors(g: G) {
   // 복도 (기본)
-  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) { if (at(x, y) === "#") continue; const X = x * TS, Y = y * TS; g.fillStyle = (x + y) % 2 ? "#cfd0dc" : "#c7c8d6"; g.fillRect(X, Y, TS, TS); g.fillStyle = "rgba(255,255,255,.35)"; g.fillRect(X + 1, Y + 1, TS - 2, 1); g.fillStyle = "rgba(60,60,90,.18)"; g.fillRect(X, Y + TS - 1.5, TS, 1.5); g.fillRect(X + TS - 1.5, Y, 1.5, TS); }
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) { if (at(x, y) === "#") continue; const X = x * TS, Y = y * TS; g.fillStyle = (x + y) % 2 ? "#e6e3df" : "#e0ddd8"; g.fillRect(X, Y, TS, TS); g.fillStyle = "rgba(255,255,255,.4)"; g.fillRect(X + 1, Y + 1, TS - 2, 1); g.fillStyle = "rgba(90,80,70,.13)"; g.fillRect(X, Y + TS - 1, TS, 1); g.fillRect(X + TS - 1, Y, 1, TS); }
   // 라운지 원목
   const L = LOUNGE; const lx = L.x1 * TS, ly = L.y1 * TS, lw = (L.x2 - L.x1 + 1) * TS, lh = (L.y2 - L.y1 + 1) * TS;
   g.save(); g.beginPath(); g.rect(lx, ly, lw, lh); g.clip();
-  for (let py = ly; py < ly + lh; py += 16) { const row = (py - ly) / 16; for (let px = lx - ((row % 2) * 40); px < lx + lw; px += 80) { const tone = ((px / 80 + row) | 0) % 3; rr(g, px + 1, py + 1, 78, 14, 2, lg(g, px, py, px, py + 16, ["#b48a63", "#a97f59", "#bd946c"][tone], ["#9c7551", "#916c4b", "#a67f5b"][tone])); g.fillStyle = "rgba(255,255,255,.12)"; g.fillRect(px + 3, py + 2, 74, 1); if ((px + row * 7) % 5 === 0) ell(g, px + 40 + (row % 3) * 10, py + 8, 3, 1.4, "rgba(80,50,30,.35)"); } }
+  for (let py = ly; py < ly + lh; py += 16) { const row = (py - ly) / 16; for (let px = lx - ((row % 2) * 40); px < lx + lw; px += 80) { const tone = ((px / 80 + row) | 0) % 3; rr(g, px + 1, py + 1, 78, 14, 2, lg(g, px, py, px, py + 16, ["#d9b48a", "#d0aa80", "#e0bd94"][tone], ["#c49a6e", "#bb9268", "#cba379"][tone])); g.fillStyle = "rgba(255,255,255,.12)"; g.fillRect(px + 3, py + 2, 74, 1); if ((px + row * 7) % 5 === 0) ell(g, px + 40 + (row % 3) * 10, py + 8, 3, 1.4, "rgba(120,80,50,.22)"); } }
   g.restore();
   // 존 러그
   for (const z of ZONES) { const X = z.x1 * TS + 3, Y = z.y1 * TS + 3, Wz = (z.x2 - z.x1 + 1) * TS - 6, Hz = (z.y2 - z.y1 + 1) * TS - 6;
     shadow(g, () => rr(g, X, Y, Wz, Hz, 10, lg(g, X, Y, X + Wz, Y + Hz, z.rug[0], z.rug[1])), 10, 2, "rgba(0,0,0,.22)");
-    rr(g, X + 5, Y + 5, Wz - 10, Hz - 10, 7, "transparent", z.inner, 1.5); g.save(); g.beginPath(); g.roundRect(X + 8, Y + 8, Wz - 16, Hz - 16, 6); g.clip(); g.fillStyle = "rgba(255,255,255,.07)"; for (let py = Y + 14; py < Y + Hz; py += 22) for (let px = X + 14; px < X + Wz; px += 22) { circ(g, px, py, 1.6, "rgba(255,255,255,.09)"); circ(g, px + 11, py + 11, 1, "rgba(0,0,0,.08)"); } g.restore(); }
+    rr(g, X + 5, Y + 5, Wz - 10, Hz - 10, 7, "transparent", z.inner, 1.5); g.save(); g.beginPath(); g.roundRect(X + 8, Y + 8, Wz - 16, Hz - 16, 6); g.clip(); g.fillStyle = "rgba(255,255,255,.07)"; for (let py = Y + 14; py < Y + Hz; py += 22) for (let px = X + 14; px < X + Wz; px += 22) { circ(g, px, py, 1.4, "rgba(255,255,255,.16)"); circ(g, px + 11, py + 11, 0.9, "rgba(0,0,0,.05)"); } g.restore(); }
   // 벽 아래 그림자(AO)
   for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) { if (at(x, y) !== "#") continue; const X = x * TS, Y = y * TS; if (at(x, y + 1) !== "#") { g.fillStyle = lg(g, 0, Y + TS, 0, Y + TS + 14, "rgba(10,10,30,.28)", "rgba(10,10,30,0)"); g.fillRect(X, Y + TS, TS, 14); } if (at(x + 1, y) !== "#") { g.fillStyle = lg(g, X + TS, 0, X + TS + 8, 0, "rgba(10,10,30,.16)", "rgba(10,10,30,0)"); g.fillRect(X + TS, Y, 8, TS); } }
 }
 /* ── 벽 · 창문 ────────────────────────────────────── */
 function walls(g: G, hour: number) {
   for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) { if (at(x, y) !== "#") continue; const X = x * TS, Y = y * TS;
-    g.fillStyle = lg(g, 0, Y + 14, 0, Y + TS, "#4a4e6e", "#353852"); g.fillRect(X, Y + 14, TS, TS - 14);
-    g.fillStyle = lg(g, 0, Y, 0, Y + 14, "#6a6f92", "#585d80"); g.fillRect(X, Y, TS, 14); g.fillStyle = "rgba(255,255,255,.18)"; g.fillRect(X, Y, TS, 1.5);
+    g.fillStyle = lg(g, 0, Y + 14, 0, Y + TS, "#5b5866", "#45424e"); g.fillRect(X, Y + 14, TS, TS - 14);
+    g.fillStyle = lg(g, 0, Y, 0, Y + 14, "#7a7684", "#66626f"); g.fillRect(X, Y, TS, 14); g.fillStyle = "rgba(255,255,255,.18)"; g.fillRect(X, Y, TS, 1.5);
     g.fillStyle = "rgba(255,255,255,.05)"; g.fillRect(X, Y + 26, TS, 1); g.fillStyle = "rgba(0,0,0,.12)"; g.fillRect(X, Y + 27, TS, 1);
-    g.fillStyle = "#2a2c40"; g.fillRect(X, Y + TS - 5, TS, 5); g.fillStyle = "rgba(255,255,255,.08)"; g.fillRect(X, Y + TS - 5, TS, 1);
+    g.fillStyle = "#2f2c36"; g.fillRect(X, Y + TS - 5, TS, 5); g.fillStyle = "rgba(255,255,255,.08)"; g.fillRect(X, Y + TS - 5, TS, 1);
     if (y === 0 && WINDOWS.includes(x)) {
       const sky = skyFor(hour); const wx = X + 5, wy = Y + 6, ww = 38, wh = 34;
       shadow(g, () => rr(g, wx - 2, wy - 2, ww + 4, wh + 4, 5, "#e4e2ee"), 4, 1, "rgba(0,0,0,.3)");
@@ -56,11 +56,11 @@ function walls(g: G, hour: number) {
 /* ── 가구 ─────────────────────────────────────────── */
 export function drawChair(g: G, x: number, y: number) {
   const X = x * TS, Y = y * TS;
-  shadow(g, () => rr(g, X + 10, Y - 12, 28, 17, 7, lg(g, 0, Y - 12, 0, Y + 5, "#3f4464", "#262a40"), OUT), 5, 2);
-  rr(g, X + 13, Y - 9, 22, 11, 5, lg(g, 0, Y - 9, 0, Y + 2, "#525880", "#3b3f5c")); g.fillStyle = "rgba(255,255,255,.12)"; g.fillRect(X + 16, Y - 7, 16, 1.5);
-  rr(g, X + 4, Y + 14, 6, 16, 3, "#2e3149", OUT); rr(g, X + 38, Y + 14, 6, 16, 3, "#2e3149", OUT);
-  rr(g, X + 8, Y + 30, 32, 12, 5, lg(g, 0, Y + 30, 0, Y + 42, "#3f4464", "#2b2e46"), OUT); rr(g, X + 11, Y + 32, 26, 6, 3, "#4b5078");
-  rr(g, X + 22, Y + 42, 4, 4, 1, "#1c1e2c"); g.strokeStyle = "#1c1e2c"; g.lineWidth = 2.5; g.lineCap = "round"; g.beginPath(); g.moveTo(X + 24, Y + 46); g.lineTo(X + 10, Y + 47); g.moveTo(X + 24, Y + 46); g.lineTo(X + 38, Y + 47); g.stroke(); circ(g, X + 10, Y + 47, 1.6, "#3b3f57"); circ(g, X + 38, Y + 47, 1.6, "#3b3f57");
+  shadow(g, () => rr(g, X + 8, Y - 9, 32, 26, 9, lg(g, 0, Y - 9, 0, Y + 17, "#3a3742", "#26242c"), OUT), 5, 2);
+  rr(g, X + 11, Y - 6, 26, 19, 7, lg(g, 0, Y - 6, 0, Y + 13, "#4a4752", "#35323c")); g.fillStyle = "rgba(255,255,255,.1)"; g.fillRect(X + 15, Y - 4, 18, 1.5); rr(g, X + 21, Y + 10, 6, 1.6, .8, "#ff6a00");
+  rr(g, X + 4, Y + 16, 6, 14, 3, "#2a2830", OUT); rr(g, X + 38, Y + 16, 6, 14, 3, "#2a2830", OUT);
+  rr(g, X + 8, Y + 30, 32, 12, 5, lg(g, 0, Y + 30, 0, Y + 42, "#3a3742", "#26242c"), OUT); rr(g, X + 11, Y + 32, 26, 6, 3, "#4a4752");
+  rr(g, X + 22, Y + 42, 4, 4, 1, "#1c1a22"); g.strokeStyle = "#1c1a22"; g.lineWidth = 2.5; g.lineCap = "round"; g.beginPath(); g.moveTo(X + 24, Y + 46); g.lineTo(X + 10, Y + 47); g.moveTo(X + 24, Y + 46); g.lineTo(X + 38, Y + 47); g.stroke(); circ(g, X + 10, Y + 47, 1.6, "#3a3742"); circ(g, X + 38, Y + 47, 1.6, "#3a3742");
 }
 function screenContent(g: G, x: number, y: number, w: number, h: number, screen: string, t: number) {
   if (screen === "design") { const sw = ["#e07a5a", "#3aa88f", "#e8b640", "#b35a8a", "#6c63e0", "#f0efe8"]; for (let i = 0; i < 6; i++) rr(g, x + 2 + (i % 3) * (w / 3), y + 2 + Math.floor(i / 3) * (h / 2 - 2), w / 3 - 3, h / 2 - 5, 2, sw[i]); }
@@ -69,24 +69,24 @@ function screenContent(g: G, x: number, y: number, w: number, h: number, screen:
   else if (screen === "grid") { for (let a = 0; a < 4; a++) for (let b = 0; b < 2; b++) rr(g, x + 2 + a * (w / 4), y + 2 + b * (h / 2), w / 4 - 2.5, h / 2 - 3, 1.5, (a + b) % 3 === 0 ? "#4fc0bc" : "#7fc9de"); }
   else { for (let k = 0; k < 4; k++) rr(g, x + 2, y + 2 + k * (h / 4), w * (0.5 + ((k * 3) % 4) * 0.1), 2.2, 1, "#d7ecf5"); rr(g, x + 2, y + 2 + h / 4, 5, 2.2, 1, "#6c63e0"); if (Math.floor(t * 2) % 2) rr(g, x + w - 6, y + h - 6, 1.5, 4, 0.5, "#8fd6e8"); }
 }
-function desk(g: G, x: number, y: number, c: Ctx) {
+export function drawDesk(g: G, x: number, y: number, c: Ctx) {
   const X = x * TS, Y = y * TS, st = c.desk[`${x},${y}`] || { on: false, screen: "doc", mug: "#4b44c4" };
-  shadow(g, () => rr(g, X + 1, Y + 12, TS - 2, 30, 5, lg(g, 0, Y + 12, 0, Y + 42, "#8a6340", "#6b4a2f"), OUT), 8, 4);
-  g.fillStyle = "rgba(255,255,255,.14)"; g.fillRect(X + 4, Y + 14, TS - 8, 1.5); g.fillStyle = "rgba(0,0,0,.12)"; for (let i = 0; i < 3; i++) g.fillRect(X + 6 + i * 13, Y + 20 + (i % 2) * 6, 9, 1);
-  rr(g, X + 3, Y + 42, 4, 5, 1, "#3a2718"); rr(g, X + 41, Y + 42, 4, 5, 1, "#3a2718");
+  shadow(g, () => rr(g, X + 1, Y + 12, TS - 2, 30, 6, lg(g, 0, Y + 12, 0, Y + 42, "#fbfaf7", "#e6e2da"), "rgba(60,50,40,.35)"), 8, 4);
+  g.fillStyle = "rgba(255,255,255,.7)"; g.fillRect(X + 4, Y + 14, TS - 8, 1.5); g.save(); g.beginPath(); g.roundRect(X + 1, Y + 38, TS - 2, 4, [0, 0, 6, 6]); g.fillStyle = "#d9b48a"; g.fill(); g.restore();
+  rr(g, X + 3, Y + 42, 4, 5, 1, "#c49a6e"); rr(g, X + 41, Y + 42, 4, 5, 1, "#c49a6e");
   // 서류 · 포스트잇 · 펜꽂이
   g.save(); g.translate(X + 7, Y + 26); g.rotate(-0.08); rr(g, -5, -5, 11, 14, 1.5, "#f6f4ee", OUT, .8); g.fillStyle = "#c4c1cf"; g.fillRect(-3, -2, 6, 1); g.fillRect(-3, 1, 5, 1); g.fillRect(-3, 4, 6, 1); g.restore();
   rr(g, X + 3, Y + 34, 6, 6, 1, "#f5d54c", OUT, .8); rr(g, X + 3, Y + 6, 6, 8, 2, lg(g, 0, Y + 6, 0, Y + 14, "#4a4f6d", "#2f3348"), OUT, .8); g.strokeStyle = "#e05a4a"; g.lineWidth = 1.4; g.beginPath(); g.moveTo(X + 5, Y + 6); g.lineTo(X + 4, Y + 1); g.stroke(); g.strokeStyle = "#6c63e0"; g.beginPath(); g.moveTo(X + 7, Y + 6); g.lineTo(X + 8, Y); g.stroke();
   // 램프
-  g.strokeStyle = "#3b3f57"; g.lineWidth = 2; g.lineCap = "round"; g.beginPath(); g.moveTo(X + 42, Y + 20); g.lineTo(X + 42, Y + 8); g.lineTo(X + 37, Y + 4); g.stroke(); rr(g, X + 40, Y + 19, 6, 2.5, 1, "#3b3f57"); g.beginPath(); g.moveTo(X + 31, Y + 6); g.lineTo(X + 43, Y + 6); g.lineTo(X + 40, Y + 1); g.lineTo(X + 34, Y + 1); g.closePath(); g.fillStyle = lg(g, 0, Y + 1, 0, Y + 6, "#5a5f88", "#3b3f57"); g.fill();
+  g.strokeStyle = "#3b3f57"; g.lineWidth = 2; g.lineCap = "round"; g.beginPath(); g.moveTo(X + 42, Y + 20); g.lineTo(X + 42, Y + 8); g.lineTo(X + 37, Y + 4); g.stroke(); rr(g, X + 40, Y + 19, 6, 2.5, 1, "#3b3f57"); g.beginPath(); g.moveTo(X + 31, Y + 6); g.lineTo(X + 43, Y + 6); g.lineTo(X + 40, Y + 1); g.lineTo(X + 34, Y + 1); g.closePath(); g.fillStyle = lg(g, 0, Y + 1, 0, Y + 6, "#ff8a2b", "#e05a00"); g.fill();
   if (c.night && st.on) { g.fillStyle = rg(g, X + 37, Y + 7, 1, 16, "rgba(255,214,140,.55)", "rgba(255,214,140,0)"); g.fillRect(X + 20, Y - 4, 34, 30); }
   // 모니터
-  shadow(g, () => rr(g, X + 10, Y - 6, 28, 20, 3.5, lg(g, 0, Y - 6, 0, Y + 14, "#2f3350", "#1c1f33"), OUT), 5, 2);
-  rr(g, X + 12, Y - 4, 24, 15, 2, st.on ? lg(g, 0, Y - 4, 0, Y + 11, "#0f2a3a", "#0c1f2c") : "#141626");
-  if (st.on) { screenContent(g, X + 12, Y - 4, 24, 15, st.screen, c.t); g.save(); g.beginPath(); g.roundRect(X + 12, Y - 4, 24, 15, 2); g.clip(); g.fillStyle = lg(g, X + 12, Y - 4, X + 36, Y + 11, "rgba(255,255,255,.18)", "rgba(255,255,255,0)"); g.beginPath(); g.moveTo(X + 12, Y + 2); g.lineTo(X + 22, Y - 4); g.lineTo(X + 30, Y - 4); g.lineTo(X + 12, Y + 8); g.fill(); g.restore(); }
-  circ(g, X + 34, Y + 12, 0.9, st.on ? "#4fc0bc" : "#3b3f57"); rr(g, X + 22, Y + 14, 4, 4, 1, "#1c1e2c"); rr(g, X + 17, Y + 17, 14, 2.5, 1.2, lg(g, 0, Y + 17, 0, Y + 20, "#3b3f57", "#1c1e2c"));
+  shadow(g, () => rr(g, X + 9, Y - 7, 30, 21, 3.5, lg(g, 0, Y - 7, 0, Y + 14, "#2b2933", "#17161d"), OUT), 5, 2);
+  rr(g, X + 11, Y - 5, 26, 17, 2, st.on ? lg(g, 0, Y - 5, 0, Y + 12, "#14232e", "#0d1a24") : "#121218");
+  if (st.on) { screenContent(g, X + 11, Y - 5, 26, 17, st.screen, c.t); g.save(); g.beginPath(); g.roundRect(X + 12, Y - 4, 24, 15, 2); g.clip(); g.fillStyle = lg(g, X + 12, Y - 4, X + 36, Y + 11, "rgba(255,255,255,.18)", "rgba(255,255,255,0)"); g.beginPath(); g.moveTo(X + 12, Y + 2); g.lineTo(X + 22, Y - 4); g.lineTo(X + 30, Y - 4); g.lineTo(X + 12, Y + 8); g.fill(); g.restore(); }
+  circ(g, X + 35, Y + 12.5, 0.9, st.on ? "#ff8a2b" : "#3a3742"); rr(g, X + 22, Y + 14, 4, 4, 1, "#1c1a22"); rr(g, X + 16, Y + 17, 16, 2.5, 1.2, lg(g, 0, Y + 17, 0, Y + 20, "#3a3742", "#1c1a22"));
   // 키보드 · 마우스 · 머그
-  rr(g, X + 12, Y + 29, 20, 7, 2, lg(g, 0, Y + 29, 0, Y + 36, "#4a4f6d", "#33364c"), OUT, .8); g.fillStyle = "#cfd2de"; for (let k = 0; k < 6; k++) { g.fillRect(X + 14 + k * 3, Y + 31, 2, 1.4); g.fillRect(X + 14 + k * 3, Y + 33.2, 2, 1.4); }
+  rr(g, X + 12, Y + 29, 20, 7, 2, lg(g, 0, Y + 29, 0, Y + 36, "#f2f0ec", "#d6d2ca"), OUT, .8); g.fillStyle = "#8f8a95"; for (let k = 0; k < 6; k++) { g.fillRect(X + 14 + k * 3, Y + 31, 2, 1.4); g.fillRect(X + 14 + k * 3, Y + 33.2, 2, 1.4); }
   rr(g, X + 34, Y + 30, 5, 7, 2.5, lg(g, 0, Y + 30, 0, Y + 37, "#e2e4ee", "#b9bccb"), OUT, .8);
   shadow(g, () => rr(g, X + 39, Y + 12, 7, 8, 1.5, lg(g, X + 39, 0, X + 46, 0, "#ffffff", "#d9d6e6"), OUT, .8), 3, 1); rr(g, X + 39, Y + 15, 7, 2, .5, st.mug); g.strokeStyle = "#e6e4ee"; g.lineWidth = 1.5; g.beginPath(); g.arc(X + 46.5, Y + 16, 2.2, -Math.PI / 2, Math.PI / 2); g.stroke();
   if (st.on) { g.fillStyle = "rgba(255,255,255,.45)"; for (let i = 0; i < 3; i++) ell(g, X + 41 + i * 2, Y + 8 - ((c.t * 6 + i * 3) % 7), 1.1, 2, "rgba(255,255,255,.4)"); }
@@ -101,9 +101,9 @@ function bookshelf(g: G, x: number, y: number) {
 function couch(g: G, x: number, y: number) {
   const X = x * TS, Y = y * TS, top = at(x, y - 1) !== "C"; if (!top) return;
   const h = TS * 2;
-  shadow(g, () => rr(g, X + 2, Y + 2, TS - 4, h - 6, 10, lg(g, X, 0, X + TS, 0, "#4c5aa0", "#37427a"), OUT), 10, 4);
-  rr(g, X + 2, Y + 2, TS - 4, 12, 6, lg(g, 0, Y, 0, Y + 14, "#5d6cb8", "#4a58a0")); for (let i = 0; i < 4; i++) { rr(g, X + 9, Y + 14 + i * 20, 30, 17, 6, lg(g, 0, Y + 14 + i * 20, 0, Y + 31 + i * 20, "#6b7bc8", "#5563ad")); g.fillStyle = "rgba(255,255,255,.14)"; g.fillRect(X + 13, Y + 17 + i * 20, 22, 1.5); }
-  rr(g, X + 2, Y + 8, 7, h - 14, 4, lg(g, X, 0, X + 9, 0, "#5563ad", "#3f4c8a")); rr(g, X + 39, Y + 8, 7, h - 14, 4, lg(g, X + 39, 0, X + 46, 0, "#5563ad", "#3f4c8a"));
+  shadow(g, () => rr(g, X + 2, Y + 2, TS - 4, h - 6, 10, lg(g, X, 0, X + TS, 0, "#e07a48", "#c2602f"), OUT), 10, 4);
+  rr(g, X + 2, Y + 2, TS - 4, 12, 6, lg(g, 0, Y, 0, Y + 14, "#ee8f5e", "#dc7546")); for (let i = 0; i < 4; i++) { rr(g, X + 9, Y + 14 + i * 20, 30, 17, 6, lg(g, 0, Y + 14 + i * 20, 0, Y + 31 + i * 20, "#f39d6d", "#e58455")); g.fillStyle = "rgba(255,255,255,.14)"; g.fillRect(X + 13, Y + 17 + i * 20, 22, 1.5); }
+  rr(g, X + 2, Y + 8, 7, h - 14, 4, lg(g, X, 0, X + 9, 0, "#e58455", "#c2602f")); rr(g, X + 39, Y + 8, 7, h - 14, 4, lg(g, X + 39, 0, X + 46, 0, "#e58455", "#c2602f"));
   rr(g, X + 6, Y + h - 6, 5, 4, 1, "#1c1e2c"); rr(g, X + 37, Y + h - 6, 5, 4, 1, "#1c1e2c");
 }
 function coffee(g: G, x: number, y: number, c: Ctx) {
@@ -119,7 +119,7 @@ function cooler(g: G, x: number, y: number) {
   const X = x * TS, Y = y * TS;
   shadow(g, () => rr(g, X + 12, Y + 12, 24, 34, 5, lg(g, X + 12, 0, X + 36, 0, "#f0eef6", "#c6c3d4"), OUT), 6, 3);
   rr(g, X + 15, Y + 24, 18, 8, 2.5, "#2f3348"); circ(g, X + 19, Y + 28, 1.6, "#4fc0bc"); circ(g, X + 29, Y + 28, 1.6, "#e9736a"); rr(g, X + 17, Y + 36, 14, 2, 1, "#9e9bab");
-  shadow(g, () => rr(g, X + 14, Y - 14, 20, 26, 7, lg(g, X + 14, 0, X + 34, 0, "#6fb3ef", "#2f6fbf"), OUT), 4, 2); rr(g, X + 17, Y - 11, 5, 16, 2.5, "rgba(255,255,255,.45)"); rr(g, X + 19, Y - 18, 10, 5, 2, "#4b8fd6");
+  shadow(g, () => rr(g, X + 14, Y - 14, 20, 26, 7, lg(g, X + 14, 0, X + 34, 0, "#9fd3f5", "#5aa6dc"), OUT), 4, 2); rr(g, X + 17, Y - 11, 5, 16, 2.5, "rgba(255,255,255,.45)"); rr(g, X + 19, Y - 18, 10, 5, 2, "#4b8fd6");
 }
 function plant(g: G, x: number, y: number, v: number) {
   const X = x * TS, Y = y * TS;
@@ -142,10 +142,10 @@ function booth(g: G, x: number, y: number) {
 }
 export function reception(g: G, x: number, y: number) {
   const X = x * TS - 24, Y = y * TS;
-  shadow(g, () => rr(g, X, Y + 6, 96, 34, 12, lg(g, 0, Y + 6, 0, Y + 40, "#5a52d8", "#3b34a8"), OUT), 10, 4);
-  rr(g, X, Y + 6, 96, 8, { tl: 12, tr: 12, bl: 0, br: 0 } as unknown as number, lg(g, 0, Y + 6, 0, Y + 14, "#7a72f0", "#5a52d8")); g.fillStyle = "rgba(255,255,255,.2)"; g.fillRect(X + 8, Y + 8, 80, 1.5);
+  shadow(g, () => rr(g, X, Y + 6, 96, 34, 12, lg(g, 0, Y + 6, 0, Y + 40, "#ff7a12", "#d95400"), OUT), 10, 4);
+  rr(g, X, Y + 6, 96, 8, { tl: 12, tr: 12, bl: 0, br: 0 } as unknown as number, lg(g, 0, Y + 6, 0, Y + 14, "#ff9a3c", "#ff7a12")); g.fillStyle = "rgba(255,255,255,.2)"; g.fillRect(X + 8, Y + 8, 80, 1.5);
   g.font = FONT; g.textAlign = "left"; g.textBaseline = "middle"; g.fillStyle = "#f6f4ee"; g.fillText("DANA", X + 10, Y + 27); g.font = "700 7px Nunito, sans-serif"; g.fillStyle = "rgba(255,255,255,.7)"; g.fillText("OFFICE", X + 10, Y + 35);
-  rr(g, X + 60, Y + 18, 28, 16, 3, "#f6f4ee", OUT, .8); rr(g, X + 63, Y + 21, 6, 10, 1.5, "#e8a33d"); g.fillStyle = "#3b34a8"; g.fillRect(X + 72, Y + 23, 12, 1.5); g.fillRect(X + 72, Y + 26.5, 12, 1.5); g.fillRect(X + 72, Y + 30, 8, 1.5);
+  rr(g, X + 60, Y + 18, 28, 16, 3, "#f6f4ee", OUT, .8); rr(g, X + 63, Y + 21, 6, 10, 1.5, "#ff6a00"); g.fillStyle = "#d95400"; g.fillRect(X + 72, Y + 23, 12, 1.5); g.fillRect(X + 72, Y + 26.5, 12, 1.5); g.fillRect(X + 72, Y + 30, 8, 1.5);
   circ(g, X + 90, Y + 11, 3, "#ffc060"); ell(g, X - 2, Y + 4, 8, 6, "#3f7a4d"); ell(g, X - 4, Y + 1, 4, 3, "#6ab87a"); rr(g, X - 5, Y + 8, 7, 5, 1.5, "#a8714b", OUT, .8);
 }
 function door(g: G, x: number, y: number, open: boolean) {
@@ -186,7 +186,7 @@ function decor(g: G) {
   // 그로스 벽 모니터 프레임
   shadow(g, () => rr(g, 15 * TS + 5, 8 * TS + 6, 38, 30, 4, lg(g, 0, 8 * TS + 6, 0, 8 * TS + 36, "#2f3350", "#1c1f33"), OUT), 5, 2); rr(g, 15 * TS + 8, 8 * TS + 9, 32, 24, 2, "#0f2a3a"); rr(g, 15 * TS + 20, 8 * TS + 36, 8, 4, 1.5, "#1c1e2c");
   // 하단 벽 회사 사인
-  g.save(); g.shadowColor = "rgba(143,214,232,.9)"; g.shadowBlur = 14; g.font = "800 22px Nunito, 'IBM Plex Sans KR', sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = "#bfeaf5"; g.fillText("DANA OFFICE", W / 2 + 10, 12 * TS + 25); g.restore(); rr(g, W / 2 - 86, 12 * TS + 14, 12, 22, 3, "#ffc060"); rr(g, W / 2 - 83, 12 * TS + 18, 6, 14, 2, "#3b34a8");
+  g.save(); g.shadowColor = "rgba(255,138,43,.85)"; g.shadowBlur = 14; g.font = "800 22px Nunito, 'IBM Plex Sans KR', sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = "#ffd7b3"; g.fillText("DANA OFFICE", W / 2 + 10, 12 * TS + 25); g.restore(); rr(g, W / 2 - 86, 12 * TS + 14, 12, 22, 3, "#ff6a00"); rr(g, W / 2 - 83, 12 * TS + 18, 6, 14, 2, "#fff3e6");
 }
 
 /* ── 정적 배경 (시간대 바뀔 때 1회) ─────────────────── */
@@ -201,8 +201,8 @@ export function buildBackground(bg: HTMLCanvasElement, hour: number) {
   bin(g, 1, 4); bin(g, 14, 4); bin(g, 14, 10); sideTable(g, 1, 10); plant(g, 20, 7, 1); plant(g, 5, 7, 2);
 }
 /* ── 동적 (매 프레임, 월드 좌표) ─────────────────────── */
-export function drawDynamic(g: G, c: Ctx, simMin: number) {
-  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) { const ch = at(x, y); if (ch === "D") desk(g, x, y, c); else if (ch === "K") coffee(g, x, y, c); else if (ch === "S") server(g, x, y, c); else if (ch === "E") door(g, x, y, c.doorOpen); }
+export function drawDynamic(g: G, c: Ctx, simMin: number, skipDesks?: Set<string>) {
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) { const ch = at(x, y); if (ch === "D") { if (!skipDesks?.has(`${x},${y}`)) drawDesk(g, x, y, c); } else if (ch === "K") coffee(g, x, y, c); else if (ch === "S") server(g, x, y, c); else if (ch === "E") door(g, x, y, c.doorOpen); }
   reception(g, 10, 6);
   for (let b = 0; b < 7; b++) { const hh = Math.max(2, 10 + Math.sin(c.t * 0.9 + b * 1.3) * 6); rr(g, 15 * TS + 10 + b * 4.2, 8 * TS + 31 - hh, 3, hh, 1, b % 2 ? "#4fc0bc" : "#8fd6e8"); }
   const cx = 6 * TS + 24, cy = 22, ang = ((simMin / 60) % 12) / 12 * Math.PI * 2, mang = (simMin % 60) / 60 * Math.PI * 2;
