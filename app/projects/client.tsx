@@ -25,6 +25,7 @@ export function ProjectsClient({ projects, types, agents }: { projects: P[]; typ
               {p.status === "active" ? <><button className="btn sm" onClick={() => patch(p.id, { status: "paused" })}>일시정지</button><button className="btn sm danger" onClick={() => { if (confirm("종료하면 편성된 AI가 퇴근합니다. 종료할까요?")) patch(p.id, { status: "done" }); }}>종료</button></> : <button className="btn sm" onClick={() => patch(p.id, { status: "active" })}>재개</button>}
               <button className="btn sm" onClick={() => patch(p.id, { ai_allowed: !p.ai_allowed })}>{p.ai_allowed ? "AI 사용 금지로" : "AI 사용 허용으로"}</button>
               <TeamEditor p={p} agents={agents} onSave={(t) => patch(p.id, { team: t })} />
+              {p.type !== "직접 지시" && <button className="btn sm ghost danger" onClick={async () => { if (!confirm(`프로젝트 「${p.name}」을(를) 삭제할까요? 작업·산출물이 함께 지워지고 아카이브 기록은 「직접 지시」로 옮겨집니다.`)) return; const res = await fetch(`/api/projects/${p.id}`, { method: "DELETE" }); if (!res.ok) alert((await res.json()).error || "삭제 실패"); r.refresh(); }}>삭제</button>}
             </div>
           </div>
         ))}

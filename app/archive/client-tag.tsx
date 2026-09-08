@@ -16,3 +16,9 @@ export function ClientTag({ id, client, options }: { id: number; client: string;
     </span>
   );
 }
+
+export function DeleteDirective({ id, title }: { id: number; title: string }) {
+  const router = useRouter(); const [busy, setBusy] = useState(false);
+  const del = async () => { if (!confirm(`아카이브 #${id} 「${title.slice(0, 30)}」을(를) 삭제할까요? PM 종합 문서도 함께 지워집니다.`)) return; setBusy(true); await fetch(`/api/archive/${id}`, { method: "DELETE" }); setBusy(false); router.refresh(); };
+  return <button type="button" className="btn sm ghost danger" disabled={busy} onClick={del} aria-label="아카이브 삭제">삭제</button>;
+}

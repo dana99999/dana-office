@@ -1,7 +1,7 @@
 export type Role = "ceo" | "staff" | "viewer";
 export type Pair = [string, string];
 export interface Look {
-  hair: "short" | "long" | "bun" | "cap";
+  hair: "short" | "long" | "bun" | "cap" | "part";
   hair_c: Pair;
   cap?: Pair;
   skin: Pair;
@@ -12,6 +12,8 @@ export interface Look {
   bottom: Pair;
   shoe: Pair;
   glasses?: boolean;
+  glasses_c?: string;
+  earrings?: boolean;
 }
 export type PresenceState = "away" | "arriving" | "work" | "idle" | "leaving";
 export type TaskStatus = "queued" | "doing" | "review" | "approved" | "rejected" | "blocked";

@@ -164,3 +164,8 @@ export function archiveExternal(w: WorldPort, u: User, input: { title: string; b
   w.say("system", 0, "무결", `${input.source}에서 아카이브 추가: 「${title}」 (아카이브 #${Number(r.lastInsertRowid)})`);
   return { directiveId: Number(r.lastInsertRowid), artifactId: Number(a.lastInsertRowid) };
 }
+
+export function deleteDirective(id: number) {
+  const d = db(); const row = d.prepare("SELECT * FROM directives WHERE id = ?").get(id) as DirectiveRow | undefined; if (!row) return;
+  d.transaction(() => { if (row.summary_task_id) d.prepare("DELETE FROM tasks WHERE id = ?").run(row.summary_task_id); d.prepare("DELETE FROM directives WHERE id = ?").run(id); })();
+}

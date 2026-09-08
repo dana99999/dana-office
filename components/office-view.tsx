@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { drawCharacter, type Pose } from "@/lib/hd/chars";
-import { buildBackground, drawDynamic, drawLight, deskStatesFor, nightAlpha, drawDesk, type Ctx } from "@/lib/hd/world";
-import { TS, W, H, ZONE_LABELS, ENTRANCE, blocked, COLS, ROWS, at } from "@/lib/world/map";
+import { buildBackground, drawDynamic, drawLight, deskStatesFor, nightAlpha, drawDesk, drawChair, type Ctx } from "@/lib/hd/world";
+import { TS, W, H, ZONE_LABELS, ENTRANCE, blocked, COLS, ROWS, deskOf } from "@/lib/world/map";
 import type { ActorSnap, WorldSnapshot } from "@/lib/world/types";
 import { SpriteView } from "./sprite-view";
 import { I, svgStr } from "./icons";
@@ -89,22 +89,22 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
       const ctx: Ctx = { t, hour, night: nightAlpha() > 0.1, desk, apiDown: false, doorOpen };
       // 자리에 앉은 액터의 데스크는 캐릭터 뒤에 다시 그려 하반신을 가린다 (착석 표현)
       const seatedDesks = new Set<string>();
-      for (const a of snap.actors) { const an = anims.get(`${a.kind}:${a.id}`); if (!an) continue; const mv = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5; if (!mv && a.x === a.seat[0] && a.y === a.seat[1] && at(a.seat[0], a.seat[1] + 1) === "D") seatedDesks.add(`${a.seat[0]},${a.seat[1] + 1}`); }
+      for (const a of snap.actors) { const an = anims.get(`${a.kind}:${a.id}`); if (!an) continue; const mv = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5; const dk = deskOf(a.seat); if (!mv && a.x === a.seat[0] && a.y === a.seat[1] && dk && dk.facing === "down") seatedDesks.add(`${dk.desk[0]},${dk.desk[1]}`); }
       drawDynamic(g, ctx, simMin, seatedDesks);
       const sorted = [...snap.actors].sort((a, b) => (anims.get(`${a.kind}:${a.id}`)?.py || 0) - (anims.get(`${b.kind}:${b.id}`)?.py || 0));
       const nowMs = Date.now();
       for (const a of sorted) {
         const an = anims.get(`${a.kind}:${a.id}`)!; const mv = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5;
         const atSeat = a.x === a.seat[0] && a.y === a.seat[1]; const talking = (bubblesRef.current.get(`${a.kind}:${a.id}`)?.until || 0) > nowMs;
-        const seated = !mv && atSeat && seatedDesks.has(`${a.seat[0]},${a.seat[1] + 1}`);
+        const dk = deskOf(a.seat); const seated = !mv && atSeat && !!dk; const faceDir = seated ? dk!.facing : (mv ? an.dir : a.dir);
         let pose: Pose = "idle"; let phase = (t * 0.5) % 1;
         if (mv) { pose = "walk"; phase = an.anim % 1; }
         else if (talking) { pose = Math.floor(t * 6) % 3 === 0 ? "idle" : "talk"; }
         else if (a.kind === "agent" && a.state === "idle") { pose = Math.floor(t * 0.25) % 2 === 0 ? "coffee" : "sleep"; phase = (t * 0.5) % 1; }
         else if (atSeat && (a.kind === "human" || (a.state === "work" && a.queue > 0))) { pose = "type"; phase = (t * 1.2) % 1; }
         else if (an.blink < 0) pose = "blink";
-        drawCharacter(g, a.look, an.px + TS / 2, an.py + TS - 3, { dir: mv ? an.dir : a.dir, pose, phase, size: TS, seated });
-        if (seated) drawDesk(g, a.seat[0], a.seat[1] + 1, ctx);
+        drawCharacter(g, a.look, an.px + TS / 2, an.py + TS - 3, { dir: faceDir, pose, phase, size: TS, seated });
+        if (seated && dk) { if (dk.facing === "down") drawDesk(g, dk.desk[0], dk.desk[1], ctx, "down"); else drawChair(g, a.seat[0], a.seat[1], "up", "front"); }
         if (a.kind === "agent" && a.state === "idle" && !mv && !talking) { g.save(); g.font = "800 11px Nunito, sans-serif"; g.fillStyle = "rgba(255,255,255,.85)"; for (let i = 0; i < 2; i++) { const p = ((t * 0.7 + i * 0.5) % 1); g.globalAlpha = 1 - p; g.fillText("z", an.px + TS - 8 + i * 6 + p * 6, an.py - 14 - p * 14 - i * 4); } g.restore(); }
         if (a.mode === "busy") { g.save(); g.translate(an.px + TS / 2, an.py - 20); g.rotate(t * 3); g.strokeStyle = "#ff9a3c"; g.lineWidth = 2.2; g.lineCap = "round"; g.beginPath(); g.arc(0, 0, 5, 0, Math.PI * 1.4); g.stroke(); g.restore(); }
       }
@@ -113,8 +113,10 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
       const layer = viewRef.current?.querySelector<HTMLDivElement>(".actors"); if (layer) {
         const parts: string[] = [];
         for (const l of ZONE_LABELS) { const lx = (l[1] * TS - camX) * scale; if (lx > -60 && lx < vw + 60) parts.push(`<div class="zlabel" style="left:${lx}px;top:${l[2] * TS * scale}px">${l[0]}</div>`); }
-        for (const a of snap.actors) { const an = anims.get(`${a.kind}:${a.id}`)!; const lx = (an.px + TS / 2 - camX) * scale, top = (an.py - 23) * scale; if (lx < -80 || lx > vw + 80) continue; const you = a.kind === "human" && a.id === me.id; const mv = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5; const st = mv ? "" : a.mode === "busy" ? svgStr.gear : a.kind === "agent" && a.state === "idle" ? svgStr.moon : svgStr.pencil;
-          parts.push(`<div class="tag ${you ? "you" : a.kind === "human" ? "human" : ""}" style="left:${lx}px;top:${top}px"><i class="dot ${a.kind === "agent" ? (a.state === "idle" ? "idle" : "work") : "human"}"></i>${esc(a.name)}<em>${st}</em></div>`);
+        for (const a of snap.actors) { const an = anims.get(`${a.kind}:${a.id}`)!; const lx = (an.px + TS / 2 - camX) * scale; if (lx < -80 || lx > vw + 80) continue;
+          const dkT = deskOf(a.seat); const mvT = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5; const under = !mvT && a.x === a.seat[0] && a.y === a.seat[1] && dkT?.facing === "up"; // 위를 보고 앉으면 책상을 가리지 않게 태그를 아래로
+          const top = (under ? an.py + TS + 4 : an.py - 23) * scale; const you = a.kind === "human" && a.id === me.id; const mv = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5; const st = mv ? "" : a.mode === "busy" ? svgStr.gear : a.kind === "agent" && a.state === "idle" ? svgStr.moon : svgStr.pencil;
+          parts.push(`<div class="tag ${you ? "you" : a.kind === "human" ? "human" : ""} ${under ? "under" : ""}" style="left:${lx}px;top:${top}px"><i class="dot ${a.kind === "agent" ? (a.state === "idle" ? "idle" : "work") : "human"}"></i>${esc(a.name)}<em>${st}</em></div>`);
         }
         layer.innerHTML = parts.join("");
       }
@@ -170,6 +172,17 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
     rec.onend = () => { setListening(false); recRef.current = null; const t = finalText.trim(); if (t) { setText(""); bubblesRef.current.set(`human:${me.id}`, { text: t, until: Date.now() + bubbleMs(t) }); fetch("/api/office/say", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ body: t }) }); } };
     recRef.current = rec; setPanel("chat"); setListening(true); try { rec.start(); } catch { setListening(false); }
   };
+  /* @멘션 자동완성 — 입력 끝의 "@이름" 조각에 맞는 직원 목록 */
+  const [mentionIdx, setMentionIdx] = useState(0);
+  const mention = useMemo(() => { const m = text.match(/(^|\s)@([^\s@]*)$/); if (!m) return null; const q = m[2]; const all = [{ id: 0, name: "전체", role: "모든 담당자에게 전체 지시" }, ...roster.map((r) => ({ id: r.id, name: r.name, role: r.role }))]; const list = all.filter((a) => !q || a.name.startsWith(q)); return list.length ? { q, list } : null; }, [text, roster]);
+  const pickMention = (name: string) => { setText(text.replace(/@([^\s@]*)$/, `@${name} `)); inputRef.current?.focus(); };
+  const onInputKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!mention) return;
+    if (e.key === "ArrowDown") { e.preventDefault(); setMentionIdx((i) => (i + 1) % mention.list.length); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setMentionIdx((i) => (i - 1 + mention.list.length) % mention.list.length); }
+    else if (e.key === "Enter" || e.key === "Tab") { e.preventDefault(); pickMention(mention.list[Math.min(mentionIdx, mention.list.length - 1)].name); }
+    else if (e.key === "Escape") { setText(text.replace(/@([^\s@]*)$/, "")); }
+  };
   const say = async () => { const t = text.trim(); if (!t) return; setText(""); bubblesRef.current.set(`human:${me.id}`, { text: t, until: Date.now() + bubbleMs(t) }); await fetch("/api/office/say", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ body: t }) }); };
   const call = async (id: number, action: "call" | "dismiss" | "auto") => { const r = await fetch("/api/office/call", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ agentId: id, action }) }).then((x) => x.json()); if (r.roster) setRoster(r.roster); };
   const assign = async () => { if (!sel || !taskTitle.trim()) return; setBusy(true); await fetch("/api/office/task", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ agentId: sel.id, title: taskTitle.trim(), brief: taskBrief.trim(), projectId: taskProject || undefined }) }); setBusy(false); setTaskTitle(""); setTaskBrief(""); setSel(null); fetchRoster(setRoster); };
@@ -207,7 +220,13 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
         {panel === "chat" ? (
           <section className="pane chatpane">
             <div className="chat" ref={chatRef}>{msgs.map((m, i) => <div className={`m ${m.kind}`} key={m.id ?? i}><span className="who">{m.name}</span><span className="body">{m.body}</span><time>{(m.ts || "").slice(11, 16)}</time></div>)}</div>
-            <form className="chatin" onSubmit={(e) => { e.preventDefault(); say(); }}>{speechOk && <button type="button" className={`btn mic ${listening ? "on" : ""}`} onClick={toggleVoice} aria-label={listening ? "듣는 중 — 눌러서 중지" : "음성으로 말하기"} aria-pressed={listening}><I.mic size={18} /></button>}<input ref={inputRef} value={text} onChange={(e) => setText(e.target.value)} placeholder={listening ? "듣고 있어요… 말이 끝나면 자동 발송" : "Enter로 입력 · 마이크로 말하기 · @소라 호출"} aria-label="채팅 입력" /><button className="btn primary send" aria-label="보내기"><I.send size={18} /></button></form>
+            <div className="chatwrap">{mention && (
+              <div className="mentions" role="listbox" aria-label="직원 목록">{mention.list.map((a, i) => { const look = a.id ? looks.get(a.id) : null; const row = roster.find((r) => r.id === a.id); return (
+                <button type="button" key={a.id} role="option" aria-selected={i === mentionIdx} className={i === mentionIdx ? "on" : ""} onMouseEnter={() => setMentionIdx(i)} onMouseDown={(e) => { e.preventDefault(); pickMention(a.name); }}>
+                  {look ? <SpriteView look={look} size={22} ring={row ? ringOf(row) : undefined} /> : <span className="allmark"><I.users size={14} /></span>}
+                  <b>@{a.name}</b><span>{a.role}</span>{row && <em className={`dot ${row.present ? (row.state === "idle" ? "idle" : "work") : "away"}`} />}
+                </button>); })}</div>)}
+            <form className="chatin" onSubmit={(e) => { e.preventDefault(); say(); }}>{speechOk && <button type="button" className={`btn mic ${listening ? "on" : ""}`} onClick={toggleVoice} aria-label={listening ? "듣는 중 — 눌러서 중지" : "음성으로 말하기"} aria-pressed={listening}><I.mic size={18} /></button>}<input ref={inputRef} value={text} onChange={(e) => { setText(e.target.value); setMentionIdx(0); }} placeholder={listening ? "듣고 있어요… 말이 끝나면 자동 발송" : "Enter로 입력 · 마이크로 말하기 · @소라 호출"} aria-label="채팅 입력" onKeyDown={onInputKey} autoComplete="off" /><button className="btn primary send" aria-label="보내기"><I.send size={18} /></button></form></div>
           </section>
         ) : (
           <section className="pane teampane">

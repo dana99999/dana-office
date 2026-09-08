@@ -33,7 +33,7 @@ export function drawCharacter(g: G, L: Look, cx: number, feetY: number, o: CharO
   g.save(); g.translate(cx, feetY); if (flip) g.scale(-1, 1); g.scale(s, s);
   // 그림자 (앉으면 의자에 가려짐)
   if (!seated) ell(g, 0, 0.5, 11.5, 3.4, "rgba(10,10,24,.28)");
-  g.translate(0, -46 - bob + (seated ? 15 : 0));
+  g.translate(0, -46 - bob + (seated ? (o.dir === "up" ? -14 : 8) : 0));
 
   // 뒷머리(롱) — 몸 뒤
   if (L.hair === "long") { if (side) rr(g, -11.5, 10, 13, 24, [6, 3, 6, 6], hairGrad, OUT); else rr(g, -14.5, 10, 29, 25, [8, 8, 9, 9], hairGrad, OUT); }
@@ -73,10 +73,10 @@ export function drawCharacter(g: G, L: Look, cx: number, feetY: number, o: CharO
   }
   // 팔
   const sleeve = L.outfit === "vest" ? shirt : top, sleeveSh = L.outfit === "vest" ? mix(shirt, "#000000", 0.14) : topSh;
-  const armSw = o.pose === "type" ? 0 : swing * 22;
+  const armSw = (o.pose === "type" || seated) ? 0 : swing * 22;
   const arm = (ax: number, sign: number, ang: number, front: boolean) => {
     g.save(); g.translate(ax, by + 1.5); g.rotate((ang * Math.PI) / 180 * sign);
-    if ((o.pose === "type" || o.pose === "coffee") && !back) g.rotate(sign * -0.7);
+    if ((o.pose === "type" || o.pose === "coffee" || seated) && !back) g.rotate(sign * -0.7);
     rr(g, -2.6, 0, 5.2, 10.5, 2.6, lg(g, 0, 0, 0, 10, front ? lighten(sleeve, 8) : sleeveSh, sleeveSh), OUT); circ(g, 0, 10.8, 2.7, lg(g, 0, 8, 0, 13, skin, skinSh), OUT, .9); g.restore();
   };
   if (side) arm(2.5, 1, -armSw, true); else { arm(-11.5, 1, armSw, false); arm(11.5, 1, -armSw, true); }
@@ -90,6 +90,7 @@ export function drawCharacter(g: G, L: Look, cx: number, feetY: number, o: CharO
   g.fillStyle = lg(g, -8, 2, 8, 26, lighten(skin, 10), skinSh); g.fill(); g.strokeStyle = OUT; g.lineWidth = 1; g.stroke();
   // 귀
   if (!back) { circ(g, side ? -11.4 : -12.6, 15.5, 2.2, lg(g, 0, 14, 0, 18, skin, skinSh), OUT, .9); if (!side) circ(g, 12.6, 15.5, 2.2, lg(g, 0, 14, 0, 18, skin, skinSh), OUT, .9); }
+  if (L.earrings) { const exs = back ? [-12.6, 12.6] : side ? [-11.4] : [-12.6, 12.6]; g.strokeStyle = "#d7d9e0"; g.lineWidth = 1.1; for (const ex of exs) { g.beginPath(); g.arc(ex, 18.6, 1.7, 0, Math.PI * 2); g.stroke(); } g.strokeStyle = "rgba(255,255,255,.85)"; g.lineWidth = .6; for (const ex of exs) { g.beginPath(); g.arc(ex, 18.6, 1.7, Math.PI * 1.1, Math.PI * 1.6); g.stroke(); } }
 
   // 얼굴
   if (!back) {
@@ -107,7 +108,7 @@ export function drawCharacter(g: G, L: Look, cx: number, feetY: number, o: CharO
     if (o.pose === "talk") { ell(g, mx, 21.4, 1.7, 1.25, "#6c3a45"); ell(g, mx, 22.1, 1.1, 0.5, "#e58b8b"); }
     else { g.strokeStyle = "#7b4a50"; g.lineWidth = 1.15; g.lineCap = "round"; g.beginPath(); g.moveTo(mx - 1.9, 20.9); g.quadraticCurveTo(mx, 22.6, mx + 1.9, 20.9); g.stroke(); }
     // 안경
-    if (L.glasses) { g.strokeStyle = "rgba(43,36,56,.92)"; g.lineWidth = 1.15; for (const ex of eyeXs) { g.beginPath(); g.roundRect(ex - 3.9, ey - 3, 7.8, 5.6, 2.2); g.stroke(); } g.beginPath(); if (!side) { g.moveTo(-1.2, ey - 0.6); g.lineTo(1.2, ey - 0.6); } else { g.moveTo(2.6, ey - 1.6); g.lineTo(-7, ey - 3.2); } g.stroke(); g.fillStyle = "rgba(255,255,255,.14)"; for (const ex of eyeXs) { g.beginPath(); g.roundRect(ex - 3.9, ey - 3, 7.8, 5.6, 2.2); g.fill(); } }
+    if (L.glasses) { g.strokeStyle = L.glasses_c || "rgba(43,36,56,.92)"; g.lineWidth = L.glasses_c ? 1.35 : 1.15; for (const ex of eyeXs) { g.beginPath(); g.roundRect(ex - 3.9, ey - 3, 7.8, 5.6, 2.2); g.stroke(); } g.beginPath(); if (!side) { g.moveTo(-1.2, ey - 0.6); g.lineTo(1.2, ey - 0.6); } else { g.moveTo(2.6, ey - 1.6); g.lineTo(-7, ey - 3.2); } g.stroke(); g.fillStyle = "rgba(255,255,255,.14)"; for (const ex of eyeXs) { g.beginPath(); g.roundRect(ex - 3.9, ey - 3, 7.8, 5.6, 2.2); g.fill(); } }
   }
 
   // 머리카락(앞) / 캡
@@ -123,6 +124,11 @@ export function drawCharacter(g: G, L: Look, cx: number, feetY: number, o: CharO
       // 옆: 뒤통수 덮고 앞머리가 이마 쪽으로 쓸려 내려옴
       g.beginPath(); g.arc(HX, HY, HR + 0.6, Math.PI * 0.62, Math.PI * 1.92); g.quadraticCurveTo(HX + 10, HY - 4, HX + 6, HY - 2); g.quadraticCurveTo(HX + 2, HY - 6.5, HX - 4, HY - 4.5); g.lineTo(HX - 9, HY + 3); g.closePath(); g.fillStyle = hairGrad; g.fill(); g.strokeStyle = OUT; g.lineWidth = 1; g.stroke();
       if (L.hair !== "short") rr(g, HX - 13.6, HY - 4, 5, 12, 2.5, hairGrad, OUT);
+    } else if (L.hair === "part") {
+      // 정면 5:5 가르마: 중앙에서 양쪽으로 갈라져 내려오는 앞머리
+      g.beginPath(); g.arc(HX, HY, HR + 0.6, Math.PI * 0.86, Math.PI * 2.14); g.quadraticCurveTo(11, HY - 4.5, 7.5, HY - 2.2); g.quadraticCurveTo(3.5, HY - 5.5, 0.6, HY - 9.5); g.lineTo(-0.6, HY - 9.5); g.quadraticCurveTo(-3.5, HY - 5.5, -7.5, HY - 2.2); g.quadraticCurveTo(-11, HY - 4.5, HX - HR - 0.6, HY + 0.4); g.closePath(); g.fillStyle = hairGrad; g.fill(); g.strokeStyle = OUT; g.lineWidth = 1; g.stroke();
+      g.strokeStyle = "rgba(0,0,0,.18)"; g.lineWidth = 1; g.beginPath(); g.moveTo(0, HY - HR + 0.5); g.lineTo(0, HY - 9.5); g.stroke();
+      for (const sx of [-1, 1]) rr(g, sx * 11.6 - 1.8, HY - 4, 3.6, 7, 1.8, hairGrad, OUT);
     } else {
       // 정면: 둥근 헬멧 + 두 갈래 앞머리 + 옆머리
       g.beginPath(); g.arc(HX, HY, HR + 0.6, Math.PI * 0.86, Math.PI * 2.14); g.quadraticCurveTo(10.5, HY - 5, 6, HY - 3.2); g.quadraticCurveTo(3, HY - 7.2, -0.5, HY - 3.6); g.quadraticCurveTo(-4.5, HY - 7.6, -8, HY - 3.4); g.quadraticCurveTo(-11, HY - 4, HX - HR - 0.6, HY + 0.4); g.closePath(); g.fillStyle = hairGrad; g.fill(); g.strokeStyle = OUT; g.lineWidth = 1; g.stroke();
@@ -140,5 +146,5 @@ export function drawCharacter(g: G, L: Look, cx: number, feetY: number, o: CharO
 export const HAIR_COLORS: [string, string][] = [["#2a2226", "#443840"], ["#171519", "#2e2b33"], ["#5b3b2b", "#7a533f"], ["#9a6b4a", "#b8865f"], ["#d9a85a", "#e9c07a"], ["#8f93a8", "#a9adbf"], ["#8a6bb3", "#a98ccb"], ["#c86b57", "#e0887a"], ["#c9b7e8", "#dccff2"], ["#7fb8b0", "#9fd0c8"]];
 export const TOP_COLORS: [string, string][] = [["#3a3f66", "#2a2e4c"], ["#8b3f5c", "#6a2e46"], ["#3f8f80", "#2e6b60"], ["#d47a48", "#a85a30"], ["#6a5cc4", "#4c4295"], ["#d9a85a", "#a8803e"], ["#8a8fa8", "#67708a"], ["#c85c8a", "#9a4468"], ["#f2eee4", "#d5cfbf"], ["#23232b", "#3c3c48"], ["#a8c8a0", "#7fa478"], ["#f0b7b7", "#d48f8f"]];
 export const BOTTOM_COLORS: [string, string][] = [["#2c2e42", "#20222f"], ["#3a3f5c", "#2c3047"], ["#6a5646", "#4c3e32"], ["#a3a7ba", "#868a9e"], ["#5b6f9e", "#425276"], ["#e8e4da", "#c8c3b5"]];
-export const SKINS: { label: string; v: [string, string] }[] = [{ label: "연", v: ["#f7dcc2", "#e2b895"] }, { label: "중", v: ["#efc7a3", "#d19b72"] }, { label: "진", v: ["#d9a077", "#b57c55"] }, { label: "딥", v: ["#a86f4c", "#7e5134"] }];
-export function randomLook(): Look { const pk = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)]; return { hair: pk(["short", "long", "bun", "cap"] as Look["hair"][]), hair_c: pk(HAIR_COLORS), cap: pk([["#3f3a8f", "#2c2866"], ["#23232b", "#3c3c48"], ["#c86b57", "#9a4a3a"]] as [string, string][]), skin: pk(SKINS).v, outfit: pk(["tee", "hoodie", "blazer", "vest"] as Look["outfit"][]), top: pk(TOP_COLORS), shirt: "#f5f4f0", accent: pk(["#f5f4f0", "#c0392b", "#e8a33d", "#2b2e42", "#7fb8b0"]), bottom: pk(BOTTOM_COLORS), shoe: pk([["#1e1e26", "#3e3e4c"], ["#eaeaee", "#bdbdc8"], ["#4a3020", "#6a4a34"]] as [string, string][]), glasses: Math.random() < 0.25 }; }
+export const SKINS: { label: string; v: [string, string] }[] = [{ label: "밝", v: ["#fbeadb", "#eacdb6"] }, { label: "연", v: ["#f7dcc2", "#e2b895"] }, { label: "중", v: ["#efc7a3", "#d19b72"] }, { label: "진", v: ["#d9a077", "#b57c55"] }, { label: "딥", v: ["#a86f4c", "#7e5134"] }];
+export function randomLook(): Look { const pk = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)]; return { hair: pk(["short", "long", "bun", "cap", "part"] as Look["hair"][]), hair_c: pk(HAIR_COLORS), cap: pk([["#3f3a8f", "#2c2866"], ["#23232b", "#3c3c48"], ["#c86b57", "#9a4a3a"]] as [string, string][]), skin: pk(SKINS).v, outfit: pk(["tee", "hoodie", "blazer", "vest"] as Look["outfit"][]), top: pk(TOP_COLORS), shirt: "#f5f4f0", accent: pk(["#f5f4f0", "#c0392b", "#e8a33d", "#2b2e42", "#7fb8b0"]), bottom: pk(BOTTOM_COLORS), shoe: pk([["#1e1e26", "#3e3e4c"], ["#eaeaee", "#bdbdc8"], ["#4a3020", "#6a4a34"]] as [string, string][]), glasses: Math.random() < 0.25 }; }

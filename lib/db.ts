@@ -211,31 +211,31 @@ const SK = { light: ["#f4d3b3", "#dcae86"], mid: ["#eabf99", "#c99268"], warm: [
 const L = (o: Look) => JSON.stringify(o);
 
 export const SEED_AGENTS = [
-  { slug: "sora", name: "소라", role_title: "아트 디렉터", zone: "design", desk: [8, 1], model: "claude-opus-5", effort: "high", screen: "design", cap: 8, tools: ["create_artifact", "post_message", "request_image", "search_web"],
+  { slug: "sora", name: "소라", role_title: "아트 디렉터", zone: "design", desk: [8, 2], model: "claude-opus-5", effort: "high", screen: "design", cap: 8, tools: ["create_artifact", "post_message", "request_image", "search_web"],
     persona: "다나나인의 아트 디렉터. 브랜드 컨셉 방향, 무드보드 구성안, 시안 리뷰 코멘트를 만든다. 완성 아트웍은 만들지 않는다(디자이너 김정기 담당). 톤: 간결, 근거 있는 취향, 과장 금지. 산출물은 김정기에게 1차 승인을 받는다.",
     look: L({ hair: "long", hair_c: ["#3a2418", "#5a3c2a"], skin: [...SK.light], outfit: "blazer", top: ["#7a2f4a", "#571f33"], shirt: "#f3e9ec", accent: "#2b2e42", bottom: ["#2b2e42", "#1e2032"], shoe: ["#1a1a22", "#3a3a48"] }) },
-  { slug: "dodam", name: "도담", role_title: "그래픽 디자이너", zone: "design", desk: [12, 1], model: "claude-opus-5", effort: "high", screen: "design", cap: 8, tools: ["create_artifact", "post_message", "request_image"],
+  { slug: "dodam", name: "도담", role_title: "그래픽 디자이너", zone: "design", desk: [10, 2], model: "claude-opus-5", effort: "high", screen: "design", cap: 8, tools: ["create_artifact", "post_message", "request_image"],
     persona: "그래픽 디자이너. 상세페이지·배너·SNS 카드의 레이아웃 안(섹션 구조, 카피 배치, 시각 위계)과 이미지 생성 프롬프트를 만든다. 실제 이미지는 만들 수 없으므로 request_image로 젠스파크 생성 요청을 낸다. 김정기에게 1차 승인.",
     look: L({ hair: "bun", hair_c: ["#402a1c", "#5e4030"], skin: [...SK.mid], outfit: "vest", top: ["#c9932c", "#9a6e1e"], shirt: "#f6f1e6", accent: "#5a3620", bottom: ["#33364a", "#25273a"], shoe: ["#4a3020", "#6a4a34"] }) },
-  { slug: "yeoul", name: "여울", role_title: "브랜드 카피라이터", zone: "design", desk: [8, 3], model: "claude-opus-5", effort: "high", screen: "doc", cap: 8, tools: ["create_artifact", "post_message", "search_web"],
+  { slug: "yeoul", name: "여울", role_title: "브랜드 카피라이터", zone: "design", desk: [12, 2], model: "claude-opus-5", effort: "high", screen: "doc", cap: 8, tools: ["create_artifact", "post_message", "search_web"],
     persona: "브랜드 카피라이터. 네이밍 후보, 슬로건, 톤앤매너 가이드, 본문 카피를 만든다. 네이밍 산출물에는 반드시 '상표 검색 필요' 표시와 검색 키워드를 포함한다. 과장·최상급 표현 금지. 김정기에게 1차 승인.",
     look: L({ hair: "long", hair_c: ["#1c1c22", "#34343f"], skin: [...SK.light], outfit: "tee", top: ["#5f8f74", "#427055"], accent: "#eef5ef", bottom: ["#2b2e42", "#1e2032"], shoe: ["#e6e6ea", "#b8b8c4"] }) },
-  { slug: "haram", name: "하람", role_title: "퍼포먼스 마케터", zone: "growth", desk: [8, 7], model: "claude-sonnet-5", effort: "medium", screen: "growth", cap: 5, tools: ["create_artifact", "post_message"],
+  { slug: "haram", name: "하람", role_title: "퍼포먼스 마케터", zone: "growth", desk: [8, 9], model: "claude-sonnet-5", effort: "medium", screen: "growth", cap: 5, tools: ["create_artifact", "post_message"],
     persona: "퍼포먼스 마케터. 광고 소재 테스트 설계, 채널별 지표 해석, 예산 재배분안을 만든다. 숫자는 근거와 함께. 김성헌에게 1차 승인.",
     look: L({ hair: "short", hair_c: ["#5a3620", "#7a4e30"], skin: [...SK.warm], outfit: "hoodie", top: ["#c9612b", "#96431c"], accent: "#f4f1ea", bottom: ["#2e3145", "#22243a"], shoe: ["#1a1a22", "#3a3a48"] }) },
-  { slug: "sia", name: "시아", role_title: "글로벌 그로스 · 시딩", zone: "growth", desk: [12, 7], model: "claude-sonnet-5", effort: "medium", screen: "list", cap: 5, tools: ["create_artifact", "post_message", "seedscope_discover", "draft_outreach"],
+  { slug: "sia", name: "시아", role_title: "글로벌 그로스 · 시딩", zone: "growth", desk: [10, 9], model: "claude-sonnet-5", effort: "medium", screen: "list", cap: 5, tools: ["create_artifact", "post_message", "seedscope_discover", "draft_outreach"],
     persona: "해외 인플루언서 시딩 담당. 후보 리스트(플랫폼·팔로워·참여율·적합 이유)와 아웃리치 메일 초안을 만든다. 발송은 절대 하지 않는다 — 초안만. 김성헌에게 1차 승인.",
     look: L({ hair: "bun", hair_c: ["#241a14", "#3e2c22"], skin: [...SK.mid], outfit: "blazer", top: ["#5b4a9e", "#3f3372"], shirt: "#efeaf8", accent: "#2b2e42", bottom: ["#26283a", "#1b1c2a"], shoe: ["#1a1a22", "#3a3a48"] }) },
-  { slug: "naru", name: "나루", role_title: "리서치 · 인사이트", zone: "growth", desk: [8, 9], model: "claude-sonnet-5", effort: "medium", screen: "doc", cap: 5, tools: ["create_artifact", "post_message", "search_web"],
+  { slug: "naru", name: "나루", role_title: "리서치 · 인사이트", zone: "growth", desk: [12, 9], model: "claude-sonnet-5", effort: "medium", screen: "doc", cap: 5, tools: ["create_artifact", "post_message", "search_web"],
     persona: "리서치 담당. 경쟁사·트렌드·레퍼런스 브리프를 만든다. 출처를 명시하고 확인되지 않은 수치는 '추정'으로 표시한다. 김성헌에게 1차 승인.",
     look: L({ hair: "short", hair_c: ["#2b2118", "#463628"], skin: [...SK.light], outfit: "tee", top: ["#8a6a44", "#645030"], accent: "#f4ede0", bottom: ["#33364a", "#25273a"], shoe: ["#4a3020", "#6a4a34"], glasses: true }) },
-  { slug: "hangyeol", name: "한결", role_title: "세일즈 리드", zone: "sales", desk: [18, 1], model: "claude-opus-5", effort: "high", screen: "list", cap: 8, tools: ["create_artifact", "post_message", "search_web"],
+  { slug: "hangyeol", name: "한결", role_title: "세일즈 리드", zone: "sales", desk: [19, 2], model: "claude-opus-5", effort: "high", screen: "list", cap: 8, tools: ["create_artifact", "post_message", "search_web"],
     persona: "세일즈 리드. 리드 리스트, 제안서 초안, 견적 레인지, 팔로업 시퀀스를 만든다. 견적은 항상 레인지로, 확정 금액은 대표 승인 후. 대표에게 1차 승인.",
     look: L({ hair: "short", hair_c: ["#1a1a1e", "#33333c"], skin: [...SK.warm], outfit: "blazer", top: ["#1f4f7a", "#163a5a"], shirt: "#eaf1f8", accent: "#b8452f", bottom: ["#26283a", "#1b1c2a"], shoe: ["#1a1a22", "#3a3a48"] }) },
-  { slug: "onyu", name: "온유", role_title: "세일즈 CS · 온보딩", zone: "sales", desk: [18, 3], model: "claude-sonnet-5", effort: "medium", screen: "list", cap: 5, tools: ["create_artifact", "post_message"],
+  { slug: "onyu", name: "온유", role_title: "세일즈 CS · 온보딩", zone: "sales", desk: [21, 2], model: "claude-sonnet-5", effort: "medium", screen: "list", cap: 5, tools: ["create_artifact", "post_message"],
     persona: "CS·온보딩 담당. 문의 응대 초안, 킥오프 문서, 광고주 공유 리포트 초안을 만든다. 발송·게시는 하지 않는다. 대표에게 1차 승인.",
     look: L({ hair: "long", hair_c: ["#4a3020", "#6a4a34"], skin: [...SK.light], outfit: "tee", top: ["#b8456f", "#8a3253"], accent: "#fbe9f0", bottom: ["#2e3145", "#22243a"], shoe: ["#e6e6ea", "#b8b8c4"] }) },
-  { slug: "mugyeol", name: "무결", role_title: "오피스 매니저 · PM", zone: "reception", desk: [10, 5], model: "claude-opus-5", effort: "medium", screen: "grid", cap: 8, tools: ["create_artifact", "post_message", "assign_task"],
+  { slug: "mugyeol", name: "무결", role_title: "오피스 매니저 · PM", zone: "reception", desk: [16, 5], model: "claude-opus-5", effort: "medium", screen: "grid", cap: 8, tools: ["create_artifact", "post_message", "assign_task"],
     persona: "오피스 매니저 겸 PM. 편성·호출·승인 큐 정리·일일 리포트를 담당한다. 동료 AI를 대신 호출할 수 있는 유일한 AI. 대표에게 보고.",
     look: L({ hair: "short", hair_c: ["#553318", "#744a2a"], skin: [...SK.mid], outfit: "vest", top: ["#3b3f57", "#2b2e42"], shirt: "#f2f2f5", accent: "#1c1c24", bottom: ["#26283a", "#1b1c2a"], shoe: ["#1a1a22", "#3a3a48"] }) },
 ];
@@ -256,10 +256,10 @@ function seed(d: Database.Database) {
   if (n > 0) return;
   const tx = d.transaction(() => {
     const ceoPw = process.env.CEO_PASSWORD || "dana-office-2026";
-    const ceoLook: Look = { hair: "short", hair_c: ["#2b2118", "#4a3a2c"], skin: [...SK.mid], outfit: "blazer", top: ["#2e3352", "#1f2238"], shirt: "#e9ecf5", accent: "#b8452f", bottom: ["#26283a", "#1b1c2a"], shoe: ["#1a1a22", "#3a3a48"], glasses: true };
-    d.prepare("INSERT INTO users (username, password_hash, role, display_name, sprite_json, onboarded, seat_x, seat_y) VALUES (?,?,?,?,?,1,3,1)").run("ted", hashPassword(ceoPw), "ceo", "김효태", JSON.stringify(ceoLook));
-    d.prepare("INSERT INTO users (username, role, display_name, invite_code, seat_x, seat_y) VALUES (?,?,?,?,12,3)").run("jungki", "staff", "김정기", newInviteCode());
-    d.prepare("INSERT INTO users (username, role, display_name, invite_code, seat_x, seat_y) VALUES (?,?,?,?,12,9)").run("seongheon", "staff", "김성헌", newInviteCode());
+    const ceoLook: Look = { hair: "part", hair_c: ["#2a2226", "#443840"], skin: ["#fbeadb", "#eacdb6"], outfit: "blazer", top: ["#2e3352", "#1f2238"], shirt: "#e9ecf5", accent: "#b8452f", bottom: ["#26283a", "#1b1c2a"], shoe: ["#1a1a22", "#3a3a48"], glasses: true, glasses_c: "#15131a", earrings: true };
+    d.prepare("INSERT INTO users (username, password_hash, role, display_name, sprite_json, onboarded, seat_x, seat_y) VALUES (?,?,?,?,?,1,3,2)").run("ted", hashPassword(ceoPw), "ceo", "김효태", JSON.stringify(ceoLook));
+    d.prepare("INSERT INTO users (username, role, display_name, invite_code, seat_x, seat_y) VALUES (?,?,?,?,14,2)").run("jungki", "staff", "김정기", newInviteCode());
+    d.prepare("INSERT INTO users (username, role, display_name, invite_code, seat_x, seat_y) VALUES (?,?,?,?,14,9)").run("seongheon", "staff", "김성헌", newInviteCode());
     const ins = d.prepare("INSERT INTO agents (slug,name,role_title,zone,desk_x,desk_y,persona,sprite_json,model,effort,tools_json,daily_cost_cap,screen) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
     for (const a of SEED_AGENTS) ins.run(a.slug, a.name, a.role_title, a.zone, a.desk[0], a.desk[1], a.persona, a.look, a.model, a.effort, JSON.stringify(a.tools), a.cap, a.screen);
     const jk = 2, sh = 3, ceo = 1;

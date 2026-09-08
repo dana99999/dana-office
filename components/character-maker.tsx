@@ -22,13 +22,14 @@ export function CharacterMaker({ initial, name, onChange, footer }: { initial: L
         <div className="row"><button type="button" className="btn sm" onClick={() => setDi((di + 3) % 4)}>◀ 회전</button><button type="button" className="btn sm" onClick={() => setDi((di + 1) % 4)}>회전 ▶</button><button type="button" className="btn sm" onClick={() => setWalk(!walk)}>{walk ? "멈춤" : "걷기"}</button></div>
       </div>
       <div className="opts">
-        <Seg label="헤어" opts={[["숏", "short"], ["롱", "long"], ["번", "bun"], ["캡", "cap"]] as [string, Look["hair"]][]} val={look.hair} set={(v) => setLook({ ...look, hair: v })} />
+        <Seg label="헤어" opts={[["숏", "short"], ["가르마", "part"], ["롱", "long"], ["번", "bun"], ["캡", "cap"]] as [string, Look["hair"]][]} val={look.hair} set={(v) => setLook({ ...look, hair: v })} />
         <Sw label="헤어 색" cols={HAIR_COLORS} val={look.hair_c} set={(v) => setLook({ ...look, hair_c: v })} />
         <Seg label="피부" opts={SKINS.map((s) => [s.label, s.v] as [string, [string, string]])} val={look.skin} set={(v) => setLook({ ...look, skin: v })} />
         <Seg label="의상" opts={[["티", "tee"], ["후디", "hoodie"], ["블레이저", "blazer"], ["베스트", "vest"]] as [string, Look["outfit"]][]} val={look.outfit} set={(v) => setLook({ ...look, outfit: v })} />
         <Sw label="상의 색" cols={TOP_COLORS} val={look.top} set={(v) => setLook({ ...look, top: v })} />
         <Sw label="하의 색" cols={BOTTOM_COLORS} val={look.bottom} set={(v) => setLook({ ...look, bottom: v })} />
         <Seg label="안경" opts={[["없음", false], ["있음", true]]} val={!!look.glasses} set={(v) => setLook({ ...look, glasses: v })} />
+        <Seg label="귀걸이" opts={[["없음", false], ["은색 링", true]]} val={!!look.earrings} set={(v) => setLook({ ...look, earrings: v })} />
         <Seg label="신발" opts={[["검정", ["#1a1a22", "#3a3a48"]], ["흰색", ["#e6e6ea", "#b8b8c4"]], ["브라운", ["#4a3020", "#6a4a34"]]] as [string, [string, string]][]} val={look.shoe} set={(v) => setLook({ ...look, shoe: v })} />
         <div className="row" style={{ gridColumn: "1 / -1", justifyContent: "space-between", borderTop: "1px solid var(--line)", paddingTop: 12 }}>
           <button type="button" className="btn" onClick={() => setLook(randomLook())}>랜덤</button>
