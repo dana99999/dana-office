@@ -18,6 +18,7 @@ export const I = {
   gear: ({ size = 18, ...p }: P) => <svg {...base(size, p)}><circle cx="12" cy="12" r="3" /><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6" /></svg>,
   moon: ({ size = 18, ...p }: P) => <svg {...base(size, p)}><path d="M14.5 4.5a7.5 7.5 0 1 0 5 12.6A8 8 0 0 1 14.5 4.5Z" /></svg>,
   pencil: ({ size = 18, ...p }: P) => <svg {...base(size, p)}><path d="m4.5 19.5 4-1 9.6-9.6a2 2 0 0 0 0-2.8l-.2-.2a2 2 0 0 0-2.8 0L5.5 15.5l-1 4Z" /><path d="m13.5 7.5 3 3" /></svg>,
+  mic: ({ size = 18, ...p }: P) => <svg {...base(size, p)}><rect x="9" y="3.5" width="6" height="11" rx="3" /><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5M9 20.5h6" /></svg>,
   send: ({ size = 18, ...p }: P) => <svg {...base(size, p)}><path d="M4.5 12 20 4.5l-3.6 15L11.5 14l-7-2Z" /><path d="M11.5 14 20 4.5" /></svg>,
   chevron: ({ size = 18, ...p }: P) => <svg {...base(size, p)}><path d="m9 6 6 6-6 6" /></svg>,
   x: ({ size = 18, ...p }: P) => <svg {...base(size, p)}><path d="m6.5 6.5 11 11M17.5 6.5l-11 11" /></svg>,

@@ -33,7 +33,7 @@ export function drawCharacter(g: G, L: Look, cx: number, feetY: number, o: CharO
   g.save(); g.translate(cx, feetY); if (flip) g.scale(-1, 1); g.scale(s, s);
   // 그림자 (앉으면 의자에 가려짐)
   if (!seated) ell(g, 0, 0.5, 11.5, 3.4, "rgba(10,10,24,.28)");
-  g.translate(0, -46 - bob + (seated ? 9 : 0));
+  g.translate(0, -46 - bob + (seated ? 15 : 0));
 
   // 뒷머리(롱) — 몸 뒤
   if (L.hair === "long") { if (side) rr(g, -11.5, 10, 13, 24, [6, 3, 6, 6], hairGrad, OUT); else rr(g, -14.5, 10, 29, 25, [8, 8, 9, 9], hairGrad, OUT); }

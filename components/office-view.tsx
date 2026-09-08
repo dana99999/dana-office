@@ -9,6 +9,7 @@ import { I, svgStr } from "./icons";
 import type { Look } from "@/lib/types";
 
 type Me = { id: number; name: string; role: string };
+interface SpeechRec { lang: string; interimResults: boolean; continuous: boolean; maxAlternatives: number; onresult: ((e: { resultIndex: number; results: ArrayLike<ArrayLike<{ transcript: string }> & { isFinal: boolean }> }) => void) | null; onerror: ((e: { error: string }) => void) | null; onend: (() => void) | null; start: () => void; stop: () => void; abort: () => void; }
 type Msg = { id?: number; ts: string; kind: string; id2?: number; name: string; body: string; channel?: string };
 type RosterRow = { id: number; name: string; role: string; state: string; present: boolean; queue: number; manual: string; desired: boolean; busy: boolean };
 interface Anim { px: number; py: number; dir: ActorSnap["dir"]; anim: number; blink: number }
@@ -85,7 +86,7 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
       g.fillStyle = "#0b0c14"; g.fillRect(camX, 0, vwWorld, H); g.drawImage(bgRef.current!, 0, 0, W, H);
       const { desk, lamps, mons, zonesLit } = deskStatesFor(snap.actors);
       const doorOpen = snap.actors.some((a) => Math.abs(a.x - ENTRANCE[0]) + Math.abs(a.y - ENTRANCE[1]) <= 1);
-      const ctx: Ctx = { t, hour, night: nightAlpha(hour) > 0.1, desk, apiDown: false, doorOpen };
+      const ctx: Ctx = { t, hour, night: nightAlpha() > 0.1, desk, apiDown: false, doorOpen };
       // 자리에 앉은 액터의 데스크는 캐릭터 뒤에 다시 그려 하반신을 가린다 (착석 표현)
       const seatedDesks = new Set<string>();
       for (const a of snap.actors) { const an = anims.get(`${a.kind}:${a.id}`); if (!an) continue; const mv = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5; if (!mv && a.x === a.seat[0] && a.y === a.seat[1] && at(a.seat[0], a.seat[1] + 1) === "D") seatedDesks.add(`${a.seat[0]},${a.seat[1] + 1}`); }
@@ -156,6 +157,19 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
     if (hit) { const row = roster.find((x) => x.id === hit.id); if (row) { setSel(row); return; } }
     if (!blocked(tx, ty)) postMove({ to: [tx, ty] });
   };
+  /* 음성 입력 — Web Speech API(크롬·사파리). 말이 끝나면 인식 문장을 그대로 발송 */
+  const [listening, setListening] = useState(false); const recRef = useRef<{ stop: () => void; abort: () => void } | null>(null);
+  const speechOk = typeof window !== "undefined" && !!((window as unknown as { SpeechRecognition?: unknown }).SpeechRecognition || (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition);
+  const toggleVoice = () => {
+    if (listening) { recRef.current?.stop(); return; }
+    const W = window as unknown as { SpeechRecognition?: new () => SpeechRec; webkitSpeechRecognition?: new () => SpeechRec }; const Ctor = W.SpeechRecognition || W.webkitSpeechRecognition; if (!Ctor) { setAlertMsg("이 브라우저는 음성 인식을 지원하지 않습니다 (크롬·사파리 권장)"); setTimeout(() => setAlertMsg(null), 5000); return; }
+    const rec = new Ctor(); rec.lang = "ko-KR"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+    let finalText = "";
+    rec.onresult = (e) => { let interim = ""; for (let i = e.resultIndex; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) finalText += r[0].transcript; else interim += r[0].transcript; } setText((finalText + interim).trim()); };
+    rec.onerror = (e) => { setListening(false); if (e.error !== "aborted" && e.error !== "no-speech") { setAlertMsg(e.error === "not-allowed" ? "마이크 권한이 필요합니다. 주소창 왼쪽 아이콘에서 허용해 주세요." : `음성 인식 오류: ${e.error}`); setTimeout(() => setAlertMsg(null), 6000); } };
+    rec.onend = () => { setListening(false); recRef.current = null; const t = finalText.trim(); if (t) { setText(""); bubblesRef.current.set(`human:${me.id}`, { text: t, until: Date.now() + bubbleMs(t) }); fetch("/api/office/say", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ body: t }) }); } };
+    recRef.current = rec; setPanel("chat"); setListening(true); try { rec.start(); } catch { setListening(false); }
+  };
   const say = async () => { const t = text.trim(); if (!t) return; setText(""); bubblesRef.current.set(`human:${me.id}`, { text: t, until: Date.now() + bubbleMs(t) }); await fetch("/api/office/say", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ body: t }) }); };
   const call = async (id: number, action: "call" | "dismiss" | "auto") => { const r = await fetch("/api/office/call", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ agentId: id, action }) }).then((x) => x.json()); if (r.roster) setRoster(r.roster); };
   const assign = async () => { if (!sel || !taskTitle.trim()) return; setBusy(true); await fetch("/api/office/task", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ agentId: sel.id, title: taskTitle.trim(), brief: taskBrief.trim(), projectId: taskProject || undefined }) }); setBusy(false); setTaskTitle(""); setTaskBrief(""); setSel(null); fetchRoster(setRoster); };
@@ -179,7 +193,7 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
             <div className="hp-h"><b>조작</b><button className="hp-x" onClick={() => setHelp(false)} aria-label="닫기"><I.x size={16} /></button></div>
             <p className="hint">바닥을 탭하면 그곳으로 걸어가고, AI를 탭하면 업무를 지시합니다. 화면이 좁으면 카메라가 나를 따라오고 좌우 드래그로 둘러볼 수 있습니다.</p>
             <div className="dpad"><span /><button onClick={() => postMove({ dx: 0, dy: -1 })} aria-label="위"><I.arrow dir="up" size={20} /></button><span /><button onClick={() => postMove({ dx: -1, dy: 0 })} aria-label="왼쪽"><I.arrow dir="left" size={20} /></button><button onClick={() => postMove({ dx: 0, dy: 1 })} aria-label="아래"><I.arrow dir="down" size={20} /></button><button onClick={() => postMove({ dx: 1, dy: 0 })} aria-label="오른쪽"><I.arrow dir="right" size={20} /></button></div>
-            <p className="hint">키보드 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 이동 · <kbd>Enter</kbd> 대화창 열기 → 입력 후 <kbd>Enter</kbd> 발송 · <kbd>Esc</kbd> 닫기</p>
+            <p className="hint">키보드 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 이동 · <kbd>Enter</kbd> 대화창 열기 → 입력 후 <kbd>Enter</kbd> 발송 · <kbd>Esc</kbd> 닫기 · 입력창 왼쪽 마이크를 누르고 말하면 끝나는 즉시 발송됩니다.</p>
             <p className="hint"><b>채팅 요령</b> · <code>@소라</code> 처럼 부르면 그 담당자가 출근해 답합니다. 담당자를 부르지 않고 업무를 말하면(예: 「신제품 런칭 캠페인 준비해줘」) PM 무결이 접수해 관련 담당자들이 역할을 나눠 시작하고, 끝나면 종합 정리를 아카이브에 남깁니다.</p>
             <p className="hint">대기·부재 AI는 LLM을 호출하지 않습니다. 업무를 배정한 순간부터만 과금됩니다.</p>
           </div>
@@ -193,7 +207,7 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
         {panel === "chat" ? (
           <section className="pane chatpane">
             <div className="chat" ref={chatRef}>{msgs.map((m, i) => <div className={`m ${m.kind}`} key={m.id ?? i}><span className="who">{m.name}</span><span className="body">{m.body}</span><time>{(m.ts || "").slice(11, 16)}</time></div>)}</div>
-            <form className="chatin" onSubmit={(e) => { e.preventDefault(); say(); }}><input ref={inputRef} value={text} onChange={(e) => setText(e.target.value)} placeholder="Enter로 입력 시작 · @소라 호출 · 업무를 말하면 전체 지시" aria-label="채팅 입력" /><button className="btn primary send" aria-label="보내기"><I.send size={18} /></button></form>
+            <form className="chatin" onSubmit={(e) => { e.preventDefault(); say(); }}>{speechOk && <button type="button" className={`btn mic ${listening ? "on" : ""}`} onClick={toggleVoice} aria-label={listening ? "듣는 중 — 눌러서 중지" : "음성으로 말하기"} aria-pressed={listening}><I.mic size={18} /></button>}<input ref={inputRef} value={text} onChange={(e) => setText(e.target.value)} placeholder={listening ? "듣고 있어요… 말이 끝나면 자동 발송" : "Enter로 입력 · 마이크로 말하기 · @소라 호출"} aria-label="채팅 입력" /><button className="btn primary send" aria-label="보내기"><I.send size={18} /></button></form>
           </section>
         ) : (
           <section className="pane teampane">

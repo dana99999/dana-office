@@ -33,12 +33,12 @@ export const WANDER = {
   meet: [[16, 8], [16, 9], [20, 8], [20, 9], [17, 7], [19, 7], [17, 10], [19, 10]] as Tile[],
   corridor: [[4, 5], [7, 6], [14, 5], [17, 6], [2, 6], [19, 5]] as Tile[],
 };
-export const ZONE_LABELS: [string, number, number][] = [["대표실", 2.6, 4.5], ["디자인", 10.5, 4.5], ["세일즈", 16.6, 4.5], ["정문 · 리셉션", 3.4, 5.5], ["갤러리 · 라운지", 3.5, 6.55], ["그로스", 13.4, 6.55], ["회의실", 18, 6.55], ["서버룸", 20.2, 11.9]];
+export const ZONE_LABELS: [string, number, number][] = [["대표실", 2.6, 4.5], ["디자인", 10.5, 4.5], ["세일즈", 16.6, 4.5], ["갤러리 · 라운지", 3.5, 6.55], ["그로스", 13.4, 6.55], ["회의실", 18, 6.55], ["서버룸", 20.2, 11.9]];
 /** 사람용 예비 좌석 (책상 위 타일) */
 export const FREE_SEATS: Tile[] = [[4, 3], [16, 9], [20, 5], [2, 4]];
 
 export function at(x: number, y: number): string { if (x < 0 || y < 0 || x >= COLS || y >= ROWS) return "#"; return MAP[y][x]; }
-export function blocked(x: number, y: number): boolean { return "#DBTCKPSORW".indexOf(at(x, y)) >= 0; }
+export function blocked(x: number, y: number): boolean { return "#DBTCKPSOW".indexOf(at(x, y)) >= 0; } // R(구 리셉션 사인 자리)은 통행 가능
 export function inZone(x: number, y: number): Zone | null { for (const z of ZONES) if (x >= z.x1 && x <= z.x2 && y >= z.y1 && y <= z.y2) return z; return null; }
 export function inLounge(x: number, y: number) { return x >= LOUNGE.x1 && x <= LOUNGE.x2 && y >= LOUNGE.y1 && y <= LOUNGE.y2; }
 
