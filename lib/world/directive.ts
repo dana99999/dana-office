@@ -6,7 +6,7 @@
 import { db } from "../db";
 import type { Agent, Artifact, Project, Task, User } from "../types";
 
-export interface DirectiveRow { id: number; source: string; body: string; requester_id: number | null; requester_name: string; project_id: number; member_task_ids: string; summary_task_id: number | null; summary_artifact_id: number | null; status: "open" | "summarizing" | "archived"; created_at: string; archived_at: string | null; }
+export interface DirectiveRow { id: number; source: string; client: string; body: string; requester_id: number | null; requester_name: string; project_id: number; member_task_ids: string; summary_task_id: number | null; summary_artifact_id: number | null; status: "open" | "summarizing" | "archived"; created_at: string; archived_at: string | null; }
 export interface WorldPort { say(kind: "agent" | "human" | "system", id: number, name: string, body: string): void; summon(agentId: number): void; notifyTasksChanged(): void; }
 
 export const PM_SLUG = "mugyeol";
@@ -45,6 +45,20 @@ const ROLE: Record<string, { claim: (d: string) => string; suffix: string; brief
   onyu: { claim: () => "광고주 커뮤니케이션 초안과 킥오프 문서는 제가 정리하겠습니다.", suffix: "광고주 커뮤니케이션", brief: (d) => `전체 지시 「${d}」 관련 광고주 안내 메일 초안 또는 킥오프 문서. 발송·게시 금지, 초안만.` },
 };
 
+/** 광고주 태그 추정: 프로젝트 광고주 → 본문 속 알려진 광고주명 → #태그 */
+export function knownClients(): string[] {
+  const d = db();
+  const a = (d.prepare("SELECT DISTINCT client FROM projects WHERE client <> '' AND client <> '내부' ORDER BY client").all() as { client: string }[]).map((r) => r.client);
+  const b = (d.prepare("SELECT DISTINCT client FROM directives WHERE client <> '' ORDER BY client").all() as { client: string }[]).map((r) => r.client);
+  return [...new Set([...a, ...b])];
+}
+export function guessClient(body: string, project?: Project | null, explicit?: string): string {
+  if (explicit && explicit.trim()) return explicit.trim().slice(0, 40);
+  if (project && project.type !== "직접 지시" && project.client && project.client !== "내부") return project.client;
+  const tag = body.match(/#([^\s#]{2,20})/); if (tag) return tag[1];
+  for (const c of knownClients()) if (c && body.includes(c)) return c;
+  return "";
+}
 export function pickTeam(body: string, agents: Agent[]): Agent[] {
   const slugs: string[] = [];
   for (const [re, slug] of RULES) if (re.test(body) && !slugs.includes(slug)) slugs.push(slug);
@@ -67,7 +81,7 @@ function resolveProject(d: ReturnType<typeof db>, body: string, agentIds: number
 }
 
 /** 전체 지시 시작: PM 접수 → 담당자 역할 선언(순차) → 작업 생성 */
-export function startDirective(w: WorldPort, u: User, body: string, opts: { source?: string; context?: string } = {}): DirectiveRow | null {
+export function startDirective(w: WorldPort, u: User, body: string, opts: { source?: string; context?: string; client?: string } = {}): DirectiveRow | null {
   const d = db();
   const agents = d.prepare("SELECT * FROM agents WHERE active = 1").all() as Agent[];
   const pm = agents.find((a) => a.slug === PM_SLUG); if (!pm) return null;
@@ -78,7 +92,7 @@ export function startDirective(w: WorldPort, u: User, body: string, opts: { sour
   const taskIds: number[] = [];
   const ctx = opts.context ? `\n\n[지시자가 함께 넘긴 맥락]\n${opts.context}` : "";
   for (const a of team) { const r = ROLE[a.slug]; const t = ins.run(project.id, `${short} — ${r?.suffix || a.role_title}`.slice(0, 120), ((r ? r.brief(clean) : `전체 지시 「${clean}」 중 ${a.role_title} 담당 몫.`) + ctx).slice(0, 4000), u.id, a.id); taskIds.push(Number(t.lastInsertRowid)); }
-  const row = d.prepare("INSERT INTO directives (body, requester_id, requester_name, project_id, member_task_ids, source) VALUES (?,?,?,?,?,?)").run(clean, u.id, u.display_name, project.id, JSON.stringify(taskIds), opts.source || "office");
+  const row = d.prepare("INSERT INTO directives (body, requester_id, requester_name, project_id, member_task_ids, source, client) VALUES (?,?,?,?,?,?,?)").run(clean, u.id, u.display_name, project.id, JSON.stringify(taskIds), opts.source || "office", guessClient(`${clean}\n${opts.context || ""}`, project, opts.client));
   const dir = d.prepare("SELECT * FROM directives WHERE id = ?").get(Number(row.lastInsertRowid)) as DirectiveRow;
   // PM 접수 → 담당자 순차 역할 선언 → 출근·작업 시작
   const names = team.map((a) => `${a.name}(${a.role_title})`).join(", ");
@@ -124,9 +138,11 @@ export function onTaskFinished(w: WorldPort, taskId: number, artifactId?: number
 }
 
 export interface DirectiveView extends DirectiveRow { project_name: string; members: { task_id: number; agent_name: string; role_title: string; title: string; status: string; artifact_id: number | null }[]; summary_title: string | null; }
-export function listDirectives(): DirectiveView[] {
+export function setDirectiveClient(id: number, client: string) { db().prepare("UPDATE directives SET client = ? WHERE id = ?").run(client.trim().slice(0, 40), id); }
+export function listDirectives(client?: string): DirectiveView[] {
   const d = db();
-  const rows = d.prepare("SELECT dr.*, p.name AS project_name FROM directives dr JOIN projects p ON p.id = dr.project_id ORDER BY dr.id DESC").all() as (DirectiveRow & { project_name: string })[];
+  const where = client === undefined ? "" : client === "" ? " WHERE dr.client = ''" : " WHERE dr.client = ?";
+  const rows = (client ? d.prepare(`SELECT dr.*, p.name AS project_name FROM directives dr JOIN projects p ON p.id = dr.project_id${where} ORDER BY dr.id DESC`).all(client) : d.prepare(`SELECT dr.*, p.name AS project_name FROM directives dr JOIN projects p ON p.id = dr.project_id${where} ORDER BY dr.id DESC`).all()) as (DirectiveRow & { project_name: string })[];
   return rows.map((r) => {
     const ids = JSON.parse(r.member_task_ids) as number[];
     const members = ids.map((id) => d.prepare("SELECT t.id AS task_id, a.name AS agent_name, a.role_title, t.title, t.status, (SELECT x.id FROM artifacts x WHERE x.task_id = t.id ORDER BY x.id DESC LIMIT 1) AS artifact_id FROM tasks t LEFT JOIN agents a ON a.id = t.assignee_agent_id WHERE t.id = ?").get(id) as DirectiveView["members"][number] | undefined).filter((m): m is DirectiveView["members"][number] => !!m);
@@ -136,7 +152,7 @@ export function listDirectives(): DirectiveView[] {
 }
 
 /** 외부(클로드 코드 등)에서 넘어온 내용을 곧바로 아카이브 문서로 보관 — LLM 호출 없음, 비용 0 */
-export function archiveExternal(w: WorldPort, u: User, input: { title: string; body: string; source: string }): { directiveId: number; artifactId: number } {
+export function archiveExternal(w: WorldPort, u: User, input: { title: string; body: string; source: string; client?: string }): { directiveId: number; artifactId: number } {
   const d = db();
   const pm = d.prepare("SELECT * FROM agents WHERE slug = ?").get(PM_SLUG) as Agent | undefined; if (!pm) throw new Error("PM 에이전트 없음");
   const project = resolveProject(d, input.title, [pm.id]);
@@ -144,7 +160,7 @@ export function archiveExternal(w: WorldPort, u: User, input: { title: string; b
   const t = d.prepare("INSERT INTO tasks (project_id, title, brief, requester_id, assignee_agent_id, status, priority) VALUES (?,?,?,?,?,'approved',3)").run(project.id, `[아카이브] ${title}`.slice(0, 120), `${input.source}에서 넘어온 기록`, u.id, pm.id);
   const body = `# ${title}\n\n**출처** ${input.source} · **기록자** ${u.display_name} · **일시** ${new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}\n\n${input.body.trim()}`;
   const a = d.prepare("INSERT INTO artifacts (task_id, agent_id, kind, title, body_md, status, approved_by) VALUES (?,?,?,?,?,'approved',?)").run(Number(t.lastInsertRowid), pm.id, "report", title.slice(0, 80), body.slice(0, 200000), u.id);
-  const r = d.prepare("INSERT INTO directives (body, requester_id, requester_name, project_id, member_task_ids, summary_task_id, summary_artifact_id, status, archived_at, source) VALUES (?,?,?,?,'[]',?,?,'archived',datetime('now'),?)").run(title, u.id, u.display_name, project.id, Number(t.lastInsertRowid), Number(a.lastInsertRowid), input.source);
+  const r = d.prepare("INSERT INTO directives (body, requester_id, requester_name, project_id, member_task_ids, summary_task_id, summary_artifact_id, status, archived_at, source, client) VALUES (?,?,?,?,'[]',?,?,'archived',datetime('now'),?,?)").run(title, u.id, u.display_name, project.id, Number(t.lastInsertRowid), Number(a.lastInsertRowid), input.source, guessClient(`${title}\n${input.body}`, project, input.client));
   w.say("system", 0, "무결", `${input.source}에서 아카이브 추가: 「${title}」 (아카이브 #${Number(r.lastInsertRowid)})`);
   return { directiveId: Number(r.lastInsertRowid), artifactId: Number(a.lastInsertRowid) };
 }
