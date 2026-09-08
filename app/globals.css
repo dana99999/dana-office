@@ -70,9 +70,10 @@ tbody tr:last-child td{border-bottom:0} td.num{font-family:var(--mono);font-vari
 .zero td{color:var(--ink-3)} .zero td.num{color:var(--teal);font-weight:700}
 .lhead{font-family:var(--display);font-size:10.5px;letter-spacing:.14em;color:var(--ink-3);text-transform:uppercase;margin-bottom:8px;font-weight:800}
 .md h1{font-size:1.15rem;margin:0 0 8px} .md h2{font-size:1rem;margin:14px 0 6px} .md h3{font-size:.95rem;margin:12px 0 4px} .md ul,.md ol{padding-left:20px;margin:0 0 8px} .md li{margin-bottom:2px} .md table{margin:6px 0 10px;font-size:12.5px} .md blockquote{margin:8px 0;padding:8px 14px;border-left:3px solid var(--accent);background:var(--accent-soft);color:var(--ink-2);border-radius:0 10px 10px 0} .md p{margin:0 0 8px} .md img{max-width:100%;border-radius:12px;border:1px solid var(--line)}
-.kanban{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:12px;overflow-x:auto} @media (max-width:860px){.kanban{grid-template-columns:1fr}}
+.kanban{display:grid;grid-template-columns:repeat(3,minmax(240px,1fr));gap:12px}
 .col{background:var(--surface-2);border-radius:var(--r);padding:12px;min-height:160px;transition:background .15s,box-shadow .15s} .col.over{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
-.tcard[draggable="true"]{cursor:grab} .tcard.dragging{opacity:.45} .kanban{grid-template-columns:repeat(3,minmax(240px,1fr))}
+.tcard[draggable="true"]{cursor:grab} .tcard.dragging{opacity:.45}
+.tmove{font:inherit;font-size:12px;font-weight:600;padding:5px 9px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);min-height:30px}
 .col h4{font-family:var(--display);font-size:11px;letter-spacing:.08em;color:var(--ink-3);margin-bottom:10px;display:flex;justify-content:space-between;text-transform:uppercase;font-weight:800}
 .tcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:10px;font-size:13px;box-shadow:var(--shadow)} .tcard b{font-weight:700;display:block;margin-bottom:3px} .tcard .m{font-size:11.5px;color:var(--ink-3);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
@@ -174,3 +175,20 @@ tbody tr:last-child td{border-bottom:0} td.num{font-family:var(--mono);font-vari
 .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 .gal .it{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);transition:transform .15s} .gal .it:hover{transform:translateY(-2px)} .gal .it img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover} .gal .it .ph{aspect-ratio:4/3;background:linear-gradient(135deg,var(--surface-2),var(--surface-3));display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-family:var(--display);font-weight:800;font-size:12px;letter-spacing:.1em} .gal .it .b{padding:12px 14px;font-size:13px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ── 모바일 공통 ── */
+@media (max-width:860px){
+  .main{overflow-x:hidden}
+  .grid>*,.card,.tile,.col,.tcard{min-width:0} .card,.tcard,.chat .body{overflow-wrap:anywhere}
+  .topbar{margin-bottom:12px;gap:6px 12px} .topbar h1{font-size:1.25rem} .topbar .sub{font-size:12px}
+  .btn{white-space:normal;text-align:center} .btn.sm{min-height:32px}
+  .hide-m{display:none!important} .segpill{display:flex}
+  .kanban{grid-template-columns:1fr} .col{min-height:0}
+  .gal{grid-template-columns:repeat(2,1fr);gap:10px} .gal .it .b{padding:8px 10px;font-size:12px} .gal .it .b .muted{font-size:11px}
+  .tiles{grid-template-columns:1fr 1fr;gap:10px} .tile{padding:12px 13px} .tile .v{font-size:1.15rem}
+  .filters .chip.filter{padding:5px 10px;font-size:11.5px}
+  .modal .box{max-height:92vh}
+  table{font-size:12px} th,td{padding:8px 9px}
+  .maker .stagebox{padding:18px}
+  .login-wrap{grid-template-columns:1fr} .login-art{padding:22px 20px;min-height:200px} .login-form{padding:24px 20px}
+}

@@ -11,15 +11,16 @@ const COLS: { key: string; title: string; sub: string; sts: string[]; drop: stri
   { key: "done", title: "완료", sub: "승인 · 반려", sts: ["approved", "rejected"], drop: "approved" },
 ];
 export function TasksClient({ tasks, projects, agents }: { tasks: TaskRow[]; projects: P[]; agents: A[] }) {
-  const r = useRouter(); const [open, setOpen] = useState(false); const [drag, setDrag] = useState<number | null>(null); const [over, setOver] = useState<string | null>(null); const [f, setF] = useState({ projectId: projects[0]?.id || 0, title: "", brief: "", agentId: agents[0]?.id || 0, priority: 2 }); const [busy, setBusy] = useState(false);
+  const r = useRouter(); const [open, setOpen] = useState(false); const [drag, setDrag] = useState<number | null>(null); const [over, setOver] = useState<string | null>(null); const [mcol, setMcol] = useState("review"); const [f, setF] = useState({ projectId: projects[0]?.id || 0, title: "", brief: "", agentId: agents[0]?.id || 0, priority: 2 }); const [busy, setBusy] = useState(false);
   const create = async () => { setBusy(true); await fetch("/api/tasks", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(f) }); setBusy(false); setOpen(false); r.refresh(); };
   const patch = async (id: number, body: Record<string, unknown>) => { await fetch(`/api/tasks/${id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }); r.refresh(); };
   return (
     <div>
       <div className="topbar"><h1>작업 보드</h1><span className="sub">카드를 끌어 옮기면 상태가 바뀝니다. 진행으로 놓으면 다시 큐에 들어가고, 완료로 놓으면 승인됩니다.</span><span className="sp" /><button className="btn primary" onClick={() => setOpen(true)} disabled={!projects.length}>+ 작업</button></div>
+      <div className="segpill" role="tablist" aria-label="열 선택">{COLS.map((c) => <button key={c.key} role="tab" aria-selected={mcol === c.key} className={mcol === c.key ? "on" : ""} onClick={() => setMcol(c.key)}>{c.title} <b style={{ opacity: .6, marginLeft: 4 }}>{tasks.filter((t) => c.sts.includes(t.status)).length}</b></button>)}</div>
       <div className="kanban">
         {COLS.map((c) => { const items = tasks.filter((t) => c.sts.includes(t.status)); return (
-          <div className={`col ${over === c.key ? "over" : ""}`} key={c.key}
+          <div className={`col ${over === c.key ? "over" : ""} ${mcol !== c.key ? "hide-m" : ""}`} key={c.key}
             onDragOver={(e) => { e.preventDefault(); if (over !== c.key) setOver(c.key); }} onDragLeave={() => setOver(null)}
             onDrop={(e) => { e.preventDefault(); setOver(null); const id = Number(e.dataTransfer.getData("text/task") || drag); setDrag(null); const t = tasks.find((x) => x.id === id); if (!t || c.sts.includes(t.status)) return; if (c.drop === "review" && !t.artifact_id) { alert("산출물이 없는 작업은 검토로 옮길 수 없습니다. 진행에서 담당자가 산출물을 만들면 자동으로 올라옵니다."); return; } patch(id, { status: c.drop }); }}>
             <h4><span>{c.title} <small style={{ fontWeight: 500, letterSpacing: 0, textTransform: "none", marginLeft: 6 }}>{c.sub}</small></span><span>{items.length}</span></h4>
@@ -33,6 +34,9 @@ export function TasksClient({ tasks, projects, agents }: { tasks: TaskRow[]; pro
                   {t.status === "approved" && t.artifact_id && <Link className="btn sm" href={`/artifacts/${t.artifact_id}`}>보기</Link>}
                   {(t.status === "blocked" || t.status === "rejected") && <button className="btn sm" onClick={() => patch(t.id, { status: "queued" })}>다시 큐로</button>}
                   {t.status === "queued" && <select className="btn sm" value={t.assignee_agent_id || ""} onChange={(e) => patch(t.id, { agentId: e.target.value ? Number(e.target.value) : null })}><option value="">담당 지정…</option>{agents.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</select>}
+                  <select className="tmove" value="" aria-label="다른 열로 이동" onChange={(e) => { const to = e.target.value; if (!to) return; if (to === "review" && !t.artifact_id) { alert("산출물이 없는 작업은 검토로 옮길 수 없습니다."); return; } patch(t.id, { status: to }); }}>
+                    <option value="">이동…</option>{COLS.filter((c) => !c.sts.includes(t.status)).map((c) => <option key={c.key} value={c.drop}>{c.title}으로</option>)}
+                  </select>
                   {["queued", "blocked", "rejected", "approved"].includes(t.status) && <button className="btn sm danger" onClick={() => { if (confirm("삭제할까요?")) fetch(`/api/tasks/${t.id}`, { method: "DELETE" }).then(() => r.refresh()); }}>삭제</button>}
                 </div>
               </div>))}
