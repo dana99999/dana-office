@@ -18,6 +18,7 @@ export function db(): Database.Database {
   d.pragma("journal_mode = WAL");
   d.pragma("foreign_keys = ON");
   migrate(d);
+  try { d.exec("ALTER TABLE directives ADD COLUMN source TEXT NOT NULL DEFAULT 'office'"); } catch { /* 이미 있음 */ }
   seed(d);
   g.__danaDb = d;
   return d;

@@ -6,7 +6,7 @@
 import { db } from "../db";
 import type { Agent, Artifact, Project, Task, User } from "../types";
 
-export interface DirectiveRow { id: number; body: string; requester_id: number | null; requester_name: string; project_id: number; member_task_ids: string; summary_task_id: number | null; summary_artifact_id: number | null; status: "open" | "summarizing" | "archived"; created_at: string; archived_at: string | null; }
+export interface DirectiveRow { id: number; source: string; body: string; requester_id: number | null; requester_name: string; project_id: number; member_task_ids: string; summary_task_id: number | null; summary_artifact_id: number | null; status: "open" | "summarizing" | "archived"; created_at: string; archived_at: string | null; }
 export interface WorldPort { say(kind: "agent" | "human" | "system", id: number, name: string, body: string): void; summon(agentId: number): void; notifyTasksChanged(): void; }
 
 export const PM_SLUG = "mugyeol";
@@ -67,7 +67,7 @@ function resolveProject(d: ReturnType<typeof db>, body: string, agentIds: number
 }
 
 /** 전체 지시 시작: PM 접수 → 담당자 역할 선언(순차) → 작업 생성 */
-export function startDirective(w: WorldPort, u: User, body: string): DirectiveRow | null {
+export function startDirective(w: WorldPort, u: User, body: string, opts: { source?: string; context?: string } = {}): DirectiveRow | null {
   const d = db();
   const agents = d.prepare("SELECT * FROM agents WHERE active = 1").all() as Agent[];
   const pm = agents.find((a) => a.slug === PM_SLUG); if (!pm) return null;
@@ -76,12 +76,14 @@ export function startDirective(w: WorldPort, u: User, body: string): DirectiveRo
   const clean = stripBroadcast(body); const short = shortTitle(body);
   const ins = d.prepare("INSERT INTO tasks (project_id, title, brief, requester_id, assignee_agent_id, priority) VALUES (?,?,?,?,?,2)");
   const taskIds: number[] = [];
-  for (const a of team) { const r = ROLE[a.slug]; const t = ins.run(project.id, `${short} — ${r?.suffix || a.role_title}`.slice(0, 120), (r ? r.brief(clean) : `전체 지시 「${clean}」 중 ${a.role_title} 담당 몫.`).slice(0, 4000), u.id, a.id); taskIds.push(Number(t.lastInsertRowid)); }
-  const row = d.prepare("INSERT INTO directives (body, requester_id, requester_name, project_id, member_task_ids) VALUES (?,?,?,?,?)").run(clean, u.id, u.display_name, project.id, JSON.stringify(taskIds));
+  const ctx = opts.context ? `\n\n[지시자가 함께 넘긴 맥락]\n${opts.context}` : "";
+  for (const a of team) { const r = ROLE[a.slug]; const t = ins.run(project.id, `${short} — ${r?.suffix || a.role_title}`.slice(0, 120), ((r ? r.brief(clean) : `전체 지시 「${clean}」 중 ${a.role_title} 담당 몫.`) + ctx).slice(0, 4000), u.id, a.id); taskIds.push(Number(t.lastInsertRowid)); }
+  const row = d.prepare("INSERT INTO directives (body, requester_id, requester_name, project_id, member_task_ids, source) VALUES (?,?,?,?,?,?)").run(clean, u.id, u.display_name, project.id, JSON.stringify(taskIds), opts.source || "office");
   const dir = d.prepare("SELECT * FROM directives WHERE id = ?").get(Number(row.lastInsertRowid)) as DirectiveRow;
   // PM 접수 → 담당자 순차 역할 선언 → 출근·작업 시작
   const names = team.map((a) => `${a.name}(${a.role_title})`).join(", ");
   w.summon(pm.id);
+  if (opts.source && opts.source !== "office") w.say("system", 0, "무결", `${opts.source}에서 넘어온 지시: 「${short}」`);
   setTimeout(() => w.say("agent", pm.id, pm.name, `${u.display_name}님 지시 접수했습니다. 「${short}」 — 참여: ${names}. 각자 역할 정리해 주세요. 산출물이 모두 들어오면 제가 종합해서 아카이브합니다.`), 700);
   team.forEach((a, i) => setTimeout(() => { w.summon(a.id); w.say("agent", a.id, a.name, ROLE[a.slug]?.claim(clean) || `${a.role_title} 몫은 제가 맡겠습니다.`); }, 1800 + i * 1300));
   setTimeout(() => w.notifyTasksChanged(), 1800 + team.length * 1300);
@@ -131,4 +133,18 @@ export function listDirectives(): DirectiveView[] {
     const st = r.summary_artifact_id ? (d.prepare("SELECT title FROM artifacts WHERE id = ?").get(r.summary_artifact_id) as { title: string } | undefined)?.title || null : null;
     return { ...r, members, summary_title: st };
   });
+}
+
+/** 외부(클로드 코드 등)에서 넘어온 내용을 곧바로 아카이브 문서로 보관 — LLM 호출 없음, 비용 0 */
+export function archiveExternal(w: WorldPort, u: User, input: { title: string; body: string; source: string }): { directiveId: number; artifactId: number } {
+  const d = db();
+  const pm = d.prepare("SELECT * FROM agents WHERE slug = ?").get(PM_SLUG) as Agent | undefined; if (!pm) throw new Error("PM 에이전트 없음");
+  const project = resolveProject(d, input.title, [pm.id]);
+  const title = input.title.trim().slice(0, 120);
+  const t = d.prepare("INSERT INTO tasks (project_id, title, brief, requester_id, assignee_agent_id, status, priority) VALUES (?,?,?,?,?,'approved',3)").run(project.id, `[아카이브] ${title}`.slice(0, 120), `${input.source}에서 넘어온 기록`, u.id, pm.id);
+  const body = `# ${title}\n\n**출처** ${input.source} · **기록자** ${u.display_name} · **일시** ${new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}\n\n${input.body.trim()}`;
+  const a = d.prepare("INSERT INTO artifacts (task_id, agent_id, kind, title, body_md, status, approved_by) VALUES (?,?,?,?,?,'approved',?)").run(Number(t.lastInsertRowid), pm.id, "report", title.slice(0, 80), body.slice(0, 200000), u.id);
+  const r = d.prepare("INSERT INTO directives (body, requester_id, requester_name, project_id, member_task_ids, summary_task_id, summary_artifact_id, status, archived_at, source) VALUES (?,?,?,?,'[]',?,?,'archived',datetime('now'),?)").run(title, u.id, u.display_name, project.id, Number(t.lastInsertRowid), Number(a.lastInsertRowid), input.source);
+  w.say("system", 0, "무결", `${input.source}에서 아카이브 추가: 「${title}」 (아카이브 #${Number(r.lastInsertRowid)})`);
+  return { directiveId: Number(r.lastInsertRowid), artifactId: Number(a.lastInsertRowid) };
 }
