@@ -56,7 +56,12 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
   /* 배율: 스테이지 영역의 폭·높이 모두에 맞춤 (한 화면에 꽉 차되 넘치지 않게). 좁으면 카메라 팔로우 */
   useEffect(() => {
     const el = stageRef.current; if (!el) return;
-    const fit = () => { const cw = el.clientWidth || W, ch = el.clientHeight || H; const sc = Math.min(2, Math.max(0.5, Math.min(cw / W, ch / H))); setView({ scale: sc, vw: Math.min(cw, Math.round(W * sc)), vh: Math.round(H * sc) }); };
+    const fit = () => {
+      const cw = el.clientWidth || W, ch = el.clientHeight || H; const mobile = window.matchMedia("(max-width: 860px)").matches;
+      // 데스크톱: 폭·높이 모두 맞춤. 모바일: 높이에 맞추고(글자가 읽히는 최소 배율 유지) 좌우는 카메라가 따라감
+      const sc = mobile ? Math.min(2, Math.max(0.46, ch / H)) : Math.min(2, Math.max(0.5, Math.min(cw / W, ch / H)));
+      setView({ scale: sc, vw: Math.min(cw, Math.round(W * sc)), vh: Math.min(ch, Math.round(H * sc)) });
+    };
     fit(); const ro = new ResizeObserver(fit); ro.observe(el); window.addEventListener("resize", fit); return () => { ro.disconnect(); window.removeEventListener("resize", fit); };
   }, []);
   useEffect(() => { if (!help) return; const off = (e: MouseEvent) => { if (!(e.target as HTMLElement).closest(".helppop, .help")) setHelp(false); }; window.addEventListener("mousedown", off); return () => window.removeEventListener("mousedown", off); }, [help]);
@@ -67,7 +72,7 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
     if (!bgRef.current) bgRef.current = document.createElement("canvas");
     const loop = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000); last = now; const t = (now - t0) / 1000; const { scale, vw } = viewRefState.current; const dpr = window.devicePixelRatio || 1;
-      if (cv.width !== Math.round(vw * dpr) || cv.height !== Math.round(H * scale * dpr)) { cv.width = Math.round(vw * dpr); cv.height = Math.round(H * scale * dpr); }
+      const { vh } = viewRefState.current; if (cv.width !== Math.round(vw * dpr) || cv.height !== Math.round(vh * dpr)) { cv.width = Math.round(vw * dpr); cv.height = Math.round(vh * dpr); }
       const snap = snapRef.current; const d = new Date(); const hour = d.getHours() + d.getMinutes() / 60; const simMin = d.getHours() * 60 + d.getMinutes();
       if (Math.floor(hour) !== bgHour.current) { buildBackground(bgRef.current!, Math.floor(hour)); bgHour.current = Math.floor(hour); }
       const anims = animRef.current; const live = new Set<string>();

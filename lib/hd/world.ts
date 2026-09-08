@@ -60,7 +60,10 @@ export function drawChair(g: G, x: number, y: number, facing: Facing = "down", p
   const back = (by: number) => { shadow(g, () => rr(g, X + 9, by, 30, 22, [9, 9, 5, 5], lg(g, 0, by, 0, by + 22, "#3f3c47", "#2a2830"), OUT), 4, 2); rr(g, X + 12, by + 3, 24, 15, [7, 7, 4, 4], lg(g, 0, by + 3, 0, by + 18, "#4d4a56", "#3a3742")); g.fillStyle = "rgba(255,255,255,.1)"; g.fillRect(X + 16, by + 5, 16, 1.5); rr(g, X + 21, by + 13, 6, 1.5, .75, "#ff6a00"); };
   const seat = (sy: number) => { rr(g, X + 6, sy - 2, 5, 13, 2.5, "#2a2830", OUT); rr(g, X + 37, sy - 2, 5, 13, 2.5, "#2a2830", OUT); rr(g, X + 11, sy, 26, 14, [4, 4, 7, 7], lg(g, 0, sy, 0, sy + 14, "#44414c", "#2e2c34"), OUT); rr(g, X + 14, sy + 2, 20, 7, 3.5, "#4d4a56"); };
   if (facing === "down") { if (part !== "front") { back(Y + 10); seat(Y + 29); rr(g, X + 20, Y + 43, 8, 3, 1.5, "#1c1a22"); } }
-  else { if (part !== "front") { seat(Y + 5); } if (part !== "behind") { back(Y + 22); rr(g, X + 22.5, Y + 44, 3, 3, 1, "#1c1a22"); } }
+  else {
+    // 사람이 위를 보고 앉는 의자: 구도상 팔걸이·좌판은 등받이에 가려진다. 등받이 아래로 쿠션이 살짝 보이고, 캐릭터가 앉으면 등받이가 캐릭터 위로 올라온다
+    if (part !== "behind") { rr(g, X + 12, Y + 38, 24, 8, [2, 2, 6, 6], lg(g, 0, Y + 38, 0, Y + 46, "#44414c", "#2e2c34"), OUT); back(Y + 18); }
+  }
 }
 /** 책상 — facing "down": 사람이 위에서 아래를 봄(모니터 뒷면). "up": 사람이 아래에서 위를 봄(화면 보임) */
 export function drawDesk(g: G, x: number, y: number, c: Ctx, facing: Facing = deskFacing(x, y)) {
