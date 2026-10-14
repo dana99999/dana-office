@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { verifyToken, SESSION_COOKIE } from "@/lib/token";
 
-const PUBLIC = ["/login", "/api/auth", "/view", "/api/files", "/api/health", "/api/ingest"]; // ingest는 자체 Bearer 토큰 검사
-const CEO_ONLY = ["/admin", "/billing", "/api/admin", "/api/billing"];
+const PUBLIC = ["/login", "/api/auth", "/view", "/api/files", "/api/health", "/api/ingest", "/api/ledger/ingest"]; // ingest는 자체 Bearer 토큰 검사
+const CEO_ONLY = ["/admin", "/billing", "/ledger", "/api/admin", "/api/billing", "/api/ledger"];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;

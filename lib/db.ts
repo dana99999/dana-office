@@ -201,6 +201,34 @@ function migrate(d: Database.Database) {
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     archived_at TEXT
   );
+  CREATE TABLE IF NOT EXISTS deals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    client TEXT NOT NULL DEFAULT '',
+    name TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'active',
+    folder TEXT NOT NULL DEFAULT '',
+    memo TEXT NOT NULL DEFAULT '',
+    due_date TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE TABLE IF NOT EXISTS deal_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    deal_id INTEGER NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'done',
+    date TEXT,
+    due_date TEXT,
+    party TEXT NOT NULL DEFAULT '',
+    title TEXT NOT NULL DEFAULT '',
+    amount INTEGER NOT NULL DEFAULT 0,
+    vat INTEGER NOT NULL DEFAULT 0,
+    memo TEXT NOT NULL DEFAULT '',
+    source TEXT NOT NULL DEFAULT 'manual',
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_deal_entries_deal ON deal_entries(deal_id);
   CREATE INDEX IF NOT EXISTS idx_ledger_ts ON usage_ledger(ts);
   CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
   CREATE INDEX IF NOT EXISTS idx_messages_ts ON messages(ts);

@@ -8,6 +8,7 @@ type Ic = keyof typeof I;
 const NAV: { href: string; label: string; ic: Ic; roles: string[] }[] = [
   { href: "/office", label: "오피스", ic: "office", roles: ["ceo", "staff"] },
   { href: "/projects", label: "프로젝트", ic: "folder", roles: ["ceo", "staff"] },
+  { href: "/ledger", label: "정산 · 계약", ic: "ledger", roles: ["ceo"] },
   { href: "/tasks", label: "작업 보드", ic: "board", roles: ["ceo", "staff"] },
   { href: "/approvals", label: "승인 큐", ic: "check", roles: ["ceo", "staff"] },
   { href: "/archive", label: "아카이브", ic: "archive", roles: ["ceo", "staff"] },

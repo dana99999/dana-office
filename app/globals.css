@@ -192,3 +192,25 @@ tbody tr:last-child td{border-bottom:0} td.num{font-family:var(--mono);font-vari
   .maker .stagebox{padding:18px}
   .login-wrap{grid-template-columns:1fr} .login-art{padding:22px 20px;min-height:200px} .login-form{padding:24px 20px}
 }
+
+/* ── 정산 · 계약 ── */
+.money-in{color:var(--teal)} .money-out{color:var(--accent-ink)} .tile .v.money-in .money em,.tile .v.money-out .money em{color:var(--ink-3)}
+td .sub{display:block;font-size:11.5px;color:var(--ink-3);font-weight:500} td .sub.memo{white-space:pre-wrap;color:var(--ink-2);margin-top:2px} td .sub.src{font-size:10.5px;letter-spacing:.02em} td a.sub.dl{color:var(--accent-ink)} td a.sub.dl:hover{text-decoration:underline}
+td.num .sub{font-family:var(--font-sans),system-ui,sans-serif} td.num .sub .chip{margin-top:3px}
+.plan-card{padding:0;overflow:hidden} .plan-card .pc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px 8px} .plan-card .pc-h .lhead b{margin-left:4px;color:var(--ink-2)} .plan-card .pc-h .mono{font-size:15px;font-weight:800}
+.plan-card td{padding:10px 18px} .plan-card tr:first-child td{border-top:1px solid var(--line)}
+.deal{display:block;color:inherit;transition:transform .15s,box-shadow .15s} .deal:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.kv{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 10px;margin-top:12px} .kv span{display:block;font-size:10.5px;color:var(--ink-3);font-weight:700;letter-spacing:.02em} .kv b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13.5px;font-weight:700}
+.next{margin-top:10px;font-size:12px;color:var(--ink-2);background:var(--surface-2);border-radius:10px;padding:6px 10px}
+.ltable tr.plan td{background:color-mix(in srgb,var(--accent-soft) 45%,transparent)} .ltable tr.cancel td{color:var(--ink-3)} .ltable tr.cancel td b,.ltable tr.cancel td.num{text-decoration:line-through}
+@media (max-width:860px){.ltable td:last-child .row{flex-wrap:wrap!important} .plan-card td{padding:9px 12px} .plan-card .pc-h{padding:12px 12px 6px}}
+@media (max-width:520px){.kv{grid-template-columns:1fr 1fr}}
+.tiles.t6{grid-template-columns:repeat(6,1fr)} @media (max-width:1100px){.tiles.t6{grid-template-columns:repeat(3,1fr)}} @media (max-width:860px){.tiles.t6{grid-template-columns:1fr 1fr}}
+.btn.xdel{border-color:transparent;color:var(--ink-3);padding:5px 8px} .btn.xdel:hover{color:var(--danger);background:var(--danger-soft);box-shadow:none}
+@media (max-width:860px){
+  .ltable thead{display:none} .ltable,.ltable tbody{display:block}
+  .ltable tr{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"date kind amt" "body body body" "act act act";gap:6px 10px;padding:11px 12px;border-bottom:1px solid var(--line);align-items:center}
+  .ltable tbody tr:last-child{border-bottom:0} .ltable td{border:0;padding:0;background:none!important}
+  .ltable td:nth-child(1){grid-area:date} .ltable td:nth-child(2){grid-area:kind} .ltable td:nth-child(3){grid-area:body} .ltable td:nth-child(4){grid-area:amt} .ltable td:nth-child(5){grid-area:act}
+  .ltable tr.plan{background:color-mix(in srgb,var(--accent-soft) 45%,transparent)}
+}
