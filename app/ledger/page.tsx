@@ -21,30 +21,41 @@ function PlanCard({ title, rows, tone, td, empty }: { title: string; rows: Row[]
   </div>;
 }
 
+const open = (d: DealView) => d.status !== "settled" && d.status !== "lost";
+
 export default async function Ledger({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   const s = await getSession(); if (!s) redirect("/login"); if (s.role !== "ceo") redirect("/office");
   const { status } = await searchParams; const td = today();
   const all = dealViews(); const t = totalsOf(all);
   const plans: Row[] = all.flatMap((d) => d.entries.filter((e) => e.status === "plan").map((e) => ({ e, d })));
-  const ins = plans.filter((r) => r.e.kind === "in").sort(byDue), outs = plans.filter((r) => r.e.kind === "out").sort(byDue);
+  const ins = plans.filter((r) => r.e.kind === "in" && !r.d.pass_through).sort(byDue), outs = plans.filter((r) => r.e.kind === "out" && !r.d.pass_through).sort(byDue);
+  const pts = all.filter((d) => d.pass_through && (d.sum.receivable || d.sum.payable || open(d)));
   const invs = plans.filter((r) => r.e.kind === "inv_out" || r.e.kind === "inv_in").sort(byDue);
   const counts = new Map<string, number>(); for (const d of all) counts.set(d.status, (counts.get(d.status) || 0) + 1);
-  const open = (d: DealView) => d.status !== "settled" && d.status !== "lost";
   const deals = status === "all" ? all : status ? all.filter((d) => d.status === status) : all.filter(open);
   const lateIn = ins.filter((r) => isLate(r.e, td));
   return (<div style={{ maxWidth: 1100 }}>
     <div className="topbar"><h1>정산 · 계약</h1><span className="sub">프로젝트별 계약 · 입금 · 지급 · 세금계산서. 대화에서 말하면 클로드가 여기에 기록합니다.</span><span className="sp" /><NewDeal /></div>
     <div className="tiles" style={{ marginBottom: 14 }}>
-      <div className="tile"><div className="l">받을 돈</div><div className="v money-in"><span className="money">{man(t.receivable)}<em>{won(t.receivable)} · {t.inCount}건</em></span></div></div>
-      <div className="tile"><div className="l">줄 돈</div><div className="v money-out"><span className="money">{man(t.payable)}<em>{won(t.payable)} · {t.outCount}건</em></span></div></div>
+      <div className="tile"><div className="l">받을 돈</div><div className="v money-in"><span className="money">{man(t.receivable)}<em>{won(t.receivable)} · {t.inCount}건{t.ptIn ? ` · 경유 ${man(t.ptIn)} 별도` : ""}</em></span></div></div>
+      <div className="tile"><div className="l">줄 돈</div><div className="v money-out"><span className="money">{man(t.payable)}<em>{won(t.payable)} · {t.outCount}건{t.ptOut ? ` · 경유 ${man(t.ptOut)} 별도` : ""}</em></span></div></div>
       <div className="tile"><div className="l">차액</div><div className="v"><span className="money">{man(t.net)}<em>{won(t.net)}</em></span></div></div>
-      <div className="tile"><div className="l">부가세 빼고 남는 돈</div><div className="v"><span className="money">≈ {man(t.netExVat)}<em>받을 돈 속 부가세 {won(t.receivableVat)} 제외</em></span></div></div>
+      <div className="tile"><div className="l">부가세 빼고 남는 돈</div><div className="v"><span className="money">≈ {man(t.netExVat)}<em>받을 돈 속 부가세 {won(t.receivableVat)} 제외{t.ptFee ? ` · 경유 수수료 ${man(t.ptFee)} 포함` : ""}</em></span></div></div>
     </div>
     {lateIn.length > 0 && <div className="alertbar">기한 지난 받을 돈 {lateIn.length}건 · {won(lateIn.reduce((x, r) => x + r.e.amount, 0))} — {lateIn.map((r) => r.e.party || r.d.client).join(", ")}</div>}
     <div className="grid g2" style={{ marginBottom: 14, alignItems: "start" }}>
       <PlanCard title="받을 돈" rows={ins} tone="money-in" td={td} empty="받을 돈이 없습니다." />
       <PlanCard title="줄 돈" rows={outs} tone="money-out" td={td} empty="줄 돈이 없습니다." />
     </div>
+    {pts.length > 0 && <div className="card plan-card" style={{ marginBottom: 14 }}>
+      <div className="pc-h"><div className="lhead" style={{ margin: 0 }}>경유 자금 — 받아서 그대로 넘기는 돈 <b>{pts.length}</b></div><span className="muted">받을 돈 · 줄 돈 합계와 별도, 남는 돈에는 우리 몫만 반영</span></div>
+      <table><thead><tr><th>프로젝트</th><th className="num">받을 돈</th><th className="num">넘길 돈</th><th className="num">우리 몫</th></tr></thead><tbody>{pts.map((d) => <tr key={d.id}>
+        <td><Link href={`/ledger/${d.id}`}><b>{d.name}</b></Link><span className="sub">{d.client}</span></td>
+        <td className="num money-in">{d.sum.receivable ? won(d.sum.receivable) : "—"}</td>
+        <td className="num money-out">{d.sum.payable ? won(d.sum.payable) : "—"}</td>
+        <td className="num"><b>{won(d.sum.margin)}</b><span className="sub">부가세 제외</span></td>
+      </tr>)}</tbody></table>
+    </div>}
     {invs.length > 0 && <div className="card plan-card" style={{ marginBottom: 18 }}>
       <div className="pc-h"><div className="lhead" style={{ margin: 0 }}>세금계산서 할 일 <b>{invs.length}</b></div></div>
       <table><tbody>{invs.map(({ e, d }) => <tr key={e.id}>
@@ -63,7 +74,7 @@ export default async function Ledger({ searchParams }: { searchParams: Promise<{
       <Link href={`/ledger/${d.id}`} className="card deal" key={d.id}>
         <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start", flexWrap: "nowrap" }}>
           <div style={{ minWidth: 0 }}><b style={{ fontSize: 15 }}>{d.name}</b><div className="muted">{d.client || "광고주 미지정"}{d.due_date ? ` · 마감 ${md(d.due_date)}` : ""}</div></div>
-          <span className="row" style={{ gap: 6, flex: "none" }}>{d.sum.overdue > 0 && <span className="chip bad">기한 지남 {d.sum.overdue}</span>}<span className={`chip ${DEAL_STATUS[d.status][1]}`}>{DEAL_STATUS[d.status][0]}</span></span>
+          <span className="row" style={{ gap: 6, flex: "none" }}>{d.sum.overdue > 0 && <span className="chip bad">기한 지남 {d.sum.overdue}</span>}{!!d.pass_through && <span className="chip idle">경유</span>}<span className={`chip ${DEAL_STATUS[d.status][1]}`}>{DEAL_STATUS[d.status][0]}</span></span>
         </div>
         <div className="kv">
           <div><span>{d.sum.contract || !d.sum.quote ? "계약" : "견적"}</span><b>{d.sum.contract || d.sum.quote ? man(d.sum.contract || d.sum.quote) : "—"}</b></div>

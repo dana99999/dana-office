@@ -19,14 +19,14 @@ export function sortEntries(es: Entry[]): Entry[] {
 }
 
 export function summarize(es: Entry[], td = today()): DealSum {
-  const s: DealSum = { contract: 0, quote: 0, received: 0, receivable: 0, receivableVat: 0, paid: 0, payable: 0, invOut: 0, invOutPlan: 0, invInPlan: 0, overdue: 0, next: null };
+  const s: DealSum = { contract: 0, quote: 0, received: 0, receivable: 0, receivableVat: 0, paid: 0, payable: 0, margin: 0, openMargin: 0, invOut: 0, invOutPlan: 0, invInPlan: 0, overdue: 0, next: null };
   for (const e of es) {
     if (e.status === "cancel") continue;
     const plan = e.status === "plan";
     if (e.kind === "contract" && !plan) s.contract += e.amount;
     else if (e.kind === "quote") s.quote = e.amount;
-    else if (e.kind === "in") { if (plan) { s.receivable += e.amount; s.receivableVat += e.vat; } else s.received += e.amount; }
-    else if (e.kind === "out") { if (plan) s.payable += e.amount; else s.paid += e.amount; }
+    else if (e.kind === "in") { if (plan) { s.receivable += e.amount; s.receivableVat += e.vat; s.openMargin += e.amount - e.vat; } else s.received += e.amount; s.margin += e.amount - e.vat; }
+    else if (e.kind === "out") { if (plan) { s.payable += e.amount; s.openMargin -= e.amount - e.vat; } else s.paid += e.amount; s.margin -= e.amount - e.vat; }
     else if (e.kind === "inv_out") { if (plan) s.invOutPlan += e.amount; else s.invOut += e.amount; }
     else if (e.kind === "inv_in" && plan) s.invInPlan += e.amount;
     if (plan && e.kind !== "note" && e.kind !== "quote") {
@@ -45,12 +45,20 @@ export function dealViews(): DealView[] {
 }
 export function dealView(id: number): DealView | undefined { const d = getDeal(id); if (!d) return; const es = entriesOf(id); return { ...d, entries: es, sum: summarize(es) }; }
 
-/** 회사 전체 — 받을 돈·줄 돈·받을 돈에 든 부가세(나중에 세금으로 나감) → 남는 돈 */
+/**
+ * 회사 전체 — 받을 돈·줄 돈·받을 돈에 든 부가세(나중에 세금으로 나감) → 남는 돈.
+ * 경유 자금(pass_through)은 받을 돈·줄 돈에서 빼고 따로 집계, 남는 돈에는 수수료(부가세 제외 차액)만 더한다.
+ */
 export function totalsOf(vs: DealView[]) {
-  const t = { receivable: 0, receivableVat: 0, payable: 0, inCount: 0, outCount: 0, invTodo: 0, overdue: 0 };
-  for (const v of vs) { t.receivable += v.sum.receivable; t.receivableVat += v.sum.receivableVat; t.payable += v.sum.payable; t.overdue += v.sum.overdue;
-    for (const e of v.entries) if (e.status === "plan") { if (e.kind === "in") t.inCount++; else if (e.kind === "out") t.outCount++; else if (e.kind === "inv_out" || e.kind === "inv_in") t.invTodo++; } }
-  return { ...t, net: t.receivable - t.payable, netExVat: t.receivable - t.payable - t.receivableVat };
+  const t = { receivable: 0, receivableVat: 0, payable: 0, inCount: 0, outCount: 0, invTodo: 0, overdue: 0, ptIn: 0, ptOut: 0, ptFee: 0 };
+  for (const v of vs) {
+    t.overdue += v.sum.overdue;
+    for (const e of v.entries) if (e.status === "plan" && (e.kind === "inv_out" || e.kind === "inv_in")) t.invTodo++;
+    if (v.pass_through) { t.ptIn += v.sum.receivable; t.ptOut += v.sum.payable; t.ptFee += v.sum.openMargin; continue; }
+    t.receivable += v.sum.receivable; t.receivableVat += v.sum.receivableVat; t.payable += v.sum.payable;
+    for (const e of v.entries) if (e.status === "plan") { if (e.kind === "in") t.inCount++; else if (e.kind === "out") t.outCount++; }
+  }
+  return { ...t, net: t.receivable - t.payable + t.ptIn - t.ptOut, netExVat: t.receivable - t.payable - t.receivableVat + t.ptFee };
 }
 
 // ── 변경 ──
@@ -78,16 +86,17 @@ function upsertDeal(b: B): { id: number; created: boolean } {
   const d = db(); const id = intOf(b.id, "id");
   const client = str(b.client, 60); const name = str(b.name, 120); const status = oneOf(b.status, DEAL_STATUSES, "status");
   const folder = str(b.folder, 400); const memo = str(b.memo, 4000); const due = dateOf(b.due_date, "due_date");
+  const pt = b.pass_through === undefined || b.pass_through === null ? undefined : b.pass_through === true || b.pass_through === 1 || b.pass_through === "1" || b.pass_through === "true" ? 1 : 0;
   const cur: Deal | undefined = id ? getDeal(id) : name ? (d.prepare("SELECT * FROM deals WHERE client = ? AND name = ?").get(client || "", name) as Deal | undefined) : undefined;
   if (id && !cur) throw new LedgerError(`프로젝트 #${id} 없음`);
   if (!cur) {
     if (!name) throw new LedgerError("새 프로젝트에는 name(프로젝트명)이 필요합니다");
-    const r = d.prepare("INSERT INTO deals (client, name, status, folder, memo, due_date) VALUES (?,?,?,?,?,?)").run(client || "", name, status || "active", folder || "", memo || "", due ?? null);
+    const r = d.prepare("INSERT INTO deals (client, name, status, folder, memo, due_date, pass_through) VALUES (?,?,?,?,?,?,?)").run(client || "", name, status || "active", folder || "", memo || "", due ?? null, pt ?? 0);
     return { id: Number(r.lastInsertRowid), created: true };
   }
   const sets: string[] = []; const vals: unknown[] = [];
   const put = (col: string, v: unknown) => { if (v !== undefined) { sets.push(`${col} = ?`); vals.push(v); } };
-  if (id) { put("client", client); put("name", name); } put("status", status); put("folder", folder); put("memo", memo); put("due_date", due);
+  if (id) { put("client", client); put("name", name); } put("status", status); put("folder", folder); put("memo", memo); put("due_date", due); put("pass_through", pt);
   if (sets.length) d.prepare(`UPDATE deals SET ${sets.join(", ")}, updated_at = datetime('now') WHERE id = ?`).run(...vals, cur.id);
   return { id: cur.id, created: false };
 }

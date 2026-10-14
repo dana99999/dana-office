@@ -16,7 +16,7 @@ export default async function DealPage({ params }: { params: Promise<{ id: strin
   return (<div style={{ maxWidth: 1040 }}>
     <Link href="/ledger" className="muted">← 정산 · 계약</Link>
     <div className="topbar" style={{ marginTop: 6 }}>
-      <h1>{v.name}</h1><span className="sub">{v.client || "광고주 미지정"}{v.due_date ? ` · 마감 ${md(v.due_date)}` : ""}</span><span className={`chip ${DEAL_STATUS[v.status][1]}`}>{DEAL_STATUS[v.status][0]}</span>
+      <h1>{v.name}</h1><span className="sub">{v.client || "광고주 미지정"}{v.due_date ? ` · 마감 ${md(v.due_date)}` : ""}</span><span className={`chip ${DEAL_STATUS[v.status][1]}`}>{DEAL_STATUS[v.status][0]}</span>{!!v.pass_through && <span className="chip idle">경유 — 받아서 넘기는 돈</span>}
       <span className="sp" /><DealControls deal={v} /><EntryButton dealId={v.id} deals={deals} label="+ 기록 추가" primary />
     </div>
     <div className="tiles t6" style={{ marginBottom: 14 }}>
@@ -25,7 +25,7 @@ export default async function DealPage({ params }: { params: Promise<{ id: strin
       {tile("받을 돈", m.receivable, "money-in")}
       {tile("준 돈", m.paid, "money-out")}
       {tile("줄 돈", m.payable, "money-out")}
-      {tile("남는 돈 (예상)", left, "", left ? `${won(left)} · 부가세 포함` : " ")}
+      {v.pass_through ? tile("우리 몫", m.margin, "", m.margin ? `${won(m.margin)} · 부가세 제외` : " ") : tile("남는 돈 (예상)", left, "", left ? `${won(left)} · 부가세 포함` : " ")}
     </div>
     {(m.invOutPlan > 0 || m.invInPlan > 0) && <div className="alertbar">세금계산서 할 일 — {[m.invOutPlan ? `발행 ${won(m.invOutPlan)}` : "", m.invInPlan ? `받기 ${won(m.invInPlan)}` : ""].filter(Boolean).join(" · ")}</div>}
     {(v.memo || v.folder) && <div className="card" style={{ marginBottom: 14 }}>

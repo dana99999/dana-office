@@ -3,9 +3,10 @@ export type DealStatus = "quote" | "active" | "delivered" | "settled" | "hold" |
 export type EntryKind = "in" | "out" | "inv_out" | "inv_in" | "contract" | "quote" | "note";
 export type EntryStatus = "plan" | "done" | "cancel";
 
-export type Deal = { id: number; client: string; name: string; status: DealStatus; folder: string; memo: string; due_date: string | null; created_at: string; updated_at: string };
+/** pass_through = 경유 자금(받아서 그대로 넘기고 수수료만 남는 건) — 받을 돈·줄 돈 합계와 따로 본다 */
+export type Deal = { id: number; client: string; name: string; status: DealStatus; folder: string; memo: string; due_date: string | null; pass_through: number; created_at: string; updated_at: string };
 export type Entry = { id: number; deal_id: number; kind: EntryKind; status: EntryStatus; date: string | null; due_date: string | null; party: string; title: string; amount: number; vat: number; memo: string; source: string; created_at: string; updated_at: string };
-export type DealSum = { contract: number; quote: number; received: number; receivable: number; receivableVat: number; paid: number; payable: number; invOut: number; invOutPlan: number; invInPlan: number; overdue: number; next: Entry | null };
+export type DealSum = { contract: number; quote: number; received: number; receivable: number; receivableVat: number; paid: number; payable: number; margin: number; openMargin: number; invOut: number; invOutPlan: number; invInPlan: number; overdue: number; next: Entry | null };
 export type DealView = Deal & { sum: DealSum; entries: Entry[] };
 
 /** [라벨, chip 클래스] */

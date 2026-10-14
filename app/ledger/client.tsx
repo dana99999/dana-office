@@ -5,7 +5,7 @@ import { I } from "@/components/icons";
 import { DEAL_STATUS, ENTRY_STATUS, KIND, KINDS, type DealStatus, type Entry, type EntryKind, type EntryStatus } from "@/lib/ledger-meta";
 
 type DealOpt = { id: number; label: string };
-type DealLite = { id: number; client: string; name: string; status: DealStatus; due_date: string | null; folder: string; memo: string };
+type DealLite = { id: number; client: string; name: string; status: DealStatus; due_date: string | null; folder: string; memo: string; pass_through: number };
 
 async function op(body: Record<string, unknown>) {
   const r = await fetch("/api/ledger", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -21,7 +21,7 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
 }
 
 // ── 프로젝트 ──
-type DF = { client: string; name: string; status: DealStatus; due_date: string; folder: string; memo: string };
+type DF = { client: string; name: string; status: DealStatus; due_date: string; folder: string; memo: string; pass_through: boolean };
 function DealFields({ f, setF }: { f: DF; setF: (f: DF) => void }) {
   return <>
     <div className="grid g2">
@@ -32,12 +32,13 @@ function DealFields({ f, setF }: { f: DF; setF: (f: DF) => void }) {
     </div>
     <div className="field" style={{ marginTop: 10 }}><label>작업 폴더 경로</label><input value={f.folder} onChange={(e) => setF({ ...f, folder: e.target.value })} placeholder="@업체 자료/NN.광고주/" /></div>
     <div className="field" style={{ marginTop: 10 }}><label>메모 — 계약 조건, 특이사항</label><textarea value={f.memo} onChange={(e) => setF({ ...f, memo: e.target.value })} /></div>
+    <label className="row" style={{ marginTop: 10, fontSize: 13 }}><input type="checkbox" checked={f.pass_through} onChange={(e) => setF({ ...f, pass_through: e.target.checked })} /> 경유 자금 — 받아서 그대로 넘기고 수수료만 남는 돈 (받을 돈 · 줄 돈 합계와 따로 봄)</label>
   </>;
 }
 
 export function NewDeal() {
   const r = useRouter(); const [open, setOpen] = useState(false); const [busy, setBusy] = useState(false); const [err, setErr] = useState("");
-  const [f, setF] = useState<DF>({ client: "", name: "", status: "active", due_date: "", folder: "", memo: "" });
+  const [f, setF] = useState<DF>({ client: "", name: "", status: "active", due_date: "", folder: "", memo: "", pass_through: false });
   const save = async () => { setBusy(true); setErr(""); try { const j = await op({ op: "deal", ...f, due_date: f.due_date || null }); r.push(`/ledger/${j.id}`); r.refresh(); } catch (e) { setErr((e as Error).message); setBusy(false); } };
   return <>
     <button className="btn primary" onClick={() => setOpen(true)}>+ 프로젝트</button>
@@ -48,7 +49,7 @@ export function NewDeal() {
 
 export function DealControls({ deal }: { deal: DealLite }) {
   const r = useRouter(); const [open, setOpen] = useState(false); const [err, setErr] = useState("");
-  const [f, setF] = useState<DF>({ client: deal.client, name: deal.name, status: deal.status, due_date: deal.due_date || "", folder: deal.folder, memo: deal.memo });
+  const [f, setF] = useState<DF>({ client: deal.client, name: deal.name, status: deal.status, due_date: deal.due_date || "", folder: deal.folder, memo: deal.memo, pass_through: !!deal.pass_through });
   const run = async (body: Record<string, unknown>) => { setErr(""); try { await op(body); r.refresh(); return true; } catch (e) { setErr((e as Error).message); return false; } };
   return <span className="row" style={{ gap: 6 }}>
     <select className="tmove" aria-label="프로젝트 상태" value={deal.status} onChange={(e) => run({ op: "deal", id: deal.id, status: e.target.value })}>{(Object.keys(DEAL_STATUS) as DealStatus[]).map((k) => <option key={k} value={k}>{DEAL_STATUS[k][0]}</option>)}</select>
