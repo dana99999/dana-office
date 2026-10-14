@@ -214,3 +214,5 @@ td.num .sub{font-family:var(--font-sans),system-ui,sans-serif} td.num .sub .chip
   .ltable td:nth-child(1){grid-area:date} .ltable td:nth-child(2){grid-area:kind} .ltable td:nth-child(3){grid-area:body} .ltable td:nth-child(4){grid-area:amt} .ltable td:nth-child(5){grid-area:act}
   .ltable tr.plan{background:color-mix(in srgb,var(--accent-soft) 45%,transparent)}
 }
+.chip.inv-out{background:color-mix(in srgb,#2a78d6 14%,transparent);color:#2a78d6} .chip.inv-in{background:color-mix(in srgb,#7b52d1 14%,transparent);color:#7b52d1}
+@media (prefers-color-scheme:dark){.chip.inv-out{color:#7fb2ef} .chip.inv-in{color:#b39af0}}
