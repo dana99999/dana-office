@@ -33,8 +33,8 @@ export async function liveRun(agent: Agent, task: Task, project: Project, tools:
     `출력은 반드시 JSON 스키마를 따른다. body_md는 승인자가 바로 읽을 수 있게 제목·표·목록으로 구조화한 한국어 마크다운. image_request는 request_image 툴이 있고 이미지가 꼭 필요할 때만 채우고, 아니면 null.`,
   ].filter(Boolean).join("\n\n");
   const user = `프로젝트: ${project.name} (${project.client}) · 유형 ${project.type}\n프로젝트 브리프: ${project.brief || "(없음)"}\n\n이전 산출물과 승인/반려 이력:\n${recentContext(task)}\n\n이번 작업: ${task.title}\n작업 브리프: ${task.brief || "(없음)"}\n\n위 작업의 산출물을 만들어 JSON으로 답하세요.`;
-  const model = agent.model || "claude-sonnet-5";
-  const isHaiku = /haiku/.test(model);
+  const model = agent.model || "claude-opus-5-5";
+  const isHaiku = /haiku-4/.test(model);
   const useSearch = tools.includes("search_web") && !isHaiku;
   const res = await getClient().messages.create({
     model,

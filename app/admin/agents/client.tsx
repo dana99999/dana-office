@@ -8,9 +8,9 @@ import { SpriteView } from "@/components/sprite-view";
 import { randomLook } from "@/lib/hd/chars";
 const ZONES = [["design", "디자인 스튜디오"], ["growth", "그로스"], ["sales", "세일즈"], ["reception", "리셉션"]];
 const DESKS: [number, number, string][] = [[4, 3, "대표실 프리 데스크"], [16, 9, "회의실 옆 프리 데스크"], [20, 5, "복도 끝"], [2, 4, "대표실 창가"], [8, 1, "디자인 D-1"], [12, 1, "디자인 D-2"], [8, 3, "디자인 D-3"], [12, 3, "디자인 D-4"], [18, 1, "세일즈 S-1"], [18, 3, "세일즈 S-2"], [8, 7, "그로스 G-1"], [12, 7, "그로스 G-2"], [8, 9, "그로스 G-3"], [12, 9, "그로스 G-4"], [10, 5, "리셉션"]];
-const MODELS = [["claude-opus-5", "Claude Opus 5 — 컨셉·제안서·네이밍"], ["claude-sonnet-5", "Claude Sonnet 5 — 카피·리스트·브리프"], ["claude-haiku-4-5", "Claude Haiku 4.5 — 단순 정리"]];
+const MODELS = [["claude-opus-5-5", "Claude Opus 5.5 — 기본 (컨셉·제안서·카피)"], ["claude-fable-5-1", "Claude Fable 5.1 — 최상위 (비용 2.5배)"], ["claude-sonnet-5-5", "Claude Sonnet 5.5 — 절반 비용"], ["claude-haiku-5-5", "Claude Haiku 5.5 — 단순 정리"]];
 type F = { name: string; role_title: string; zone: string; desk: string; persona: string; model: string; effort: string; tools: string[]; daily_cost_cap: number; approver_user_id: number | null; screen: string; look: Look };
-const empty = (): F => ({ name: "", role_title: "", zone: "design", desk: "4,3", persona: "", model: "claude-sonnet-5", effort: "medium", tools: ["create_artifact", "post_message"], daily_cost_cap: 5, approver_user_id: null, screen: "doc", look: randomLook() });
+const empty = (): F => ({ name: "", role_title: "", zone: "design", desk: "4,3", persona: "", model: "claude-opus-5-5", effort: "medium", tools: ["create_artifact", "post_message"], daily_cost_cap: 5, approver_user_id: null, screen: "doc", look: randomLook() });
 export function AgentsAdmin({ agents, users }: { agents: Agent[]; users: { id: number; name: string }[] }) {
   const r = useRouter(); const [edit, setEdit] = useState<{ id: number | null; f: F } | null>(null); const [busy, setBusy] = useState(false); const [err, setErr] = useState("");
   const openNew = () => setEdit({ id: null, f: empty() });

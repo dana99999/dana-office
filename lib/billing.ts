@@ -3,13 +3,17 @@ import type { LedgerRow } from "./types";
 
 /** Anthropic API 정가 (USD / 1M tokens, 2026-06 기준). 캐시 읽기는 입력의 1/10, 캐시 쓰기는 1.25배 */
 export const PRICING: Record<string, { input: number; output: number; cacheRead: number; cacheWrite: number }> = {
+  "claude-fable-5-1": { input: 10, output: 50, cacheRead: 1, cacheWrite: 12.5 },
+  "claude-opus-5-5": { input: 4, output: 20, cacheRead: 0.2, cacheWrite: 5 },
+  "claude-sonnet-5-5": { input: 2, output: 10, cacheRead: 0.2, cacheWrite: 2.5 },
+  "claude-haiku-5-5": { input: 0.1, output: 0.5, cacheRead: 0.01, cacheWrite: 0.125 },
   "claude-opus-5": { input: 5, output: 25, cacheRead: 0.5, cacheWrite: 6.25 },
   "claude-sonnet-5": { input: 2, output: 10, cacheRead: 0.2, cacheWrite: 2.5 },
   "claude-haiku-4-5": { input: 1, output: 5, cacheRead: 0.1, cacheWrite: 1.25 },
 };
 export interface Usage { input_tokens: number; cached_tokens: number; output_tokens: number; cache_write_tokens?: number; }
 export function costOf(model: string, u: Usage): number {
-  const p = PRICING[model] || PRICING["claude-sonnet-5"];
+  const p = PRICING[model] || PRICING["claude-opus-5-5"];
   const c = (u.input_tokens * p.input + u.cached_tokens * p.cacheRead + (u.cache_write_tokens || 0) * p.cacheWrite + u.output_tokens * p.output) / 1_000_000;
   return Math.round(c * 1_000_000) / 1_000_000;
 }
