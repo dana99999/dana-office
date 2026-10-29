@@ -3,14 +3,15 @@ import type { Agent, Look, PresenceState, User } from "../types";
 import { ENTRANCE, findPath, pick, WANDER, type Tile, TS } from "./map";
 import type { ActorSnap, WorldEvent, WorldSnapshot } from "./types";
 import { runQueuedTask } from "../agent/invoke";
-import { isBroadcast, onTaskFinished, startDirective } from "./directive";
+import { isBroadcast, looksLikeTask, onTaskFinished, startDirective } from "./directive";
 
 interface Actor extends ActorSnap {
   path: Tile[]; stepT: number; wait: number; lastSeen: number; busy: boolean; manual: "in" | "out" | "";
 }
 type Sub = (ev: WorldEvent) => void;
 
-const TICK = 250, STEP_MS = 420, RUN_INTERVAL_MS = Number(process.env.RUN_INTERVAL_MS || 12000), HUMAN_TIMEOUT = 20000;
+// STEP_MS는 TICK의 정수배여야 화면 보간(0.42s/칸)과 맞아 칸마다 멈칫하지 않는다
+const TICK = 140, STEP_MS = 420, RUN_INTERVAL_MS = Number(process.env.RUN_INTERVAL_MS || 3000), HUMAN_TIMEOUT = 20000, MAX_PARALLEL = 4;
 
 export class World {
   actors = new Map<string, Actor>();
@@ -67,7 +68,7 @@ export class World {
     if (a.kind !== "agent") return;
     const want = this.desired(a);
     if (!a.present) {
-      if (want) { a.present = true; a.x = ENTRANCE[0]; a.y = ENTRANCE[1]; a.path = findPath([a.x, a.y], a.seat); this.setState(a, "arriving"); this.say("system", 0, "무결", `${a.name} 호출 — 정문 통과`, "office"); }
+      if (want) { a.present = true; a.x = ENTRANCE[0]; a.y = ENTRANCE[1]; a.path = findPath([a.x, a.y], a.seat); this.setState(a, "arriving"); this.say("system", 0, "PM", `${a.name} 호출 — 정문 통과`, "office"); }
       a.wait = 2; return;
     }
     if (!want) { if (a.state !== "leaving") { a.path = findPath([a.x, a.y], ENTRANCE); this.setState(a, "leaving"); } a.wait = 2; return; }
@@ -91,7 +92,7 @@ export class World {
           a.stepT = 0; const n = a.path.shift()!; a.dir = n[0] > a.x ? "right" : n[0] < a.x ? "left" : n[1] > a.y ? "down" : "up"; a.x = n[0]; a.y = n[1]; moved = true;
           if (!a.path.length) {
             if (a.kind === "agent") {
-              if (a.state === "leaving") { a.present = false; this.setState(a, "away"); this.say("system", 0, "무결", `${a.name} 퇴근 — 편성 없음, 비용 0`, "office"); }
+              if (a.state === "leaving") { a.present = false; this.setState(a, "away"); this.say("system", 0, "PM", `${a.name} 퇴근 — 편성 없음, 비용 0`, "office"); }
               else if (a.state === "arriving") { this.setState(a, "work"); a.mode = "work"; a.dir = "down"; a.wait = 1; }
               else if (a.state === "work" || a.state === "idle") a.dir = "down";
               this.persist(a);
@@ -106,23 +107,26 @@ export class World {
     if (moved || this.dirty || now - this.lastBeat > 2000) { this.lastBeat = now; this.dirty = false; this.emit({ type: "snapshot", data: this.snapshot() }); }
   }
 
-  /** 작업 러너 — 근무 상태이고 자리에 있는 에이전트의 큐에서 하나 실행 */
+  /** 작업 러너 — 근무 상태이고 자리에 있는 에이전트마다 큐에서 하나씩, 동시에 최대 MAX_PARALLEL개 */
   private async runOne() {
     const d = db();
+    let running = [...this.actors.values()].filter((a) => a.kind === "agent" && a.busy).length;
     const candidates = [...this.actors.values()].filter((a) => a.kind === "agent" && a.present && a.state === "work" && !a.busy && a.queue > 0 && !a.path.length);
     for (const a of candidates) {
+      if (running >= MAX_PARALLEL) break;
       const t = d.prepare("SELECT id FROM tasks WHERE assignee_agent_id = ? AND status = 'queued' ORDER BY priority, id LIMIT 1").get(a.id) as { id: number } | undefined;
       if (!t) continue;
-      a.busy = true; a.mode = "busy"; this.dirty = true;
-      try {
-        const r = await runQueuedTask(a.id, t.id, { presenceState: a.state });
-        if (r.ok) { this.say("agent", a.id, a.name, r.message || "산출물을 승인 큐에 올렸습니다.", "office"); this.emit({ type: "task", data: { taskId: t.id, status: "review", agentId: a.id, title: r.title || "" } }); try { onTaskFinished(this, t.id, r.artifactId); } catch (e) { console.error("directive follow-up failed", e); } }
-        else if (/한도|크레딧|예산/.test(r.reason || "")) { try { onTaskFinished(this, t.id); } catch { /* ignore */ } this.emit({ type: "alert", data: { level: "warn", body: `${a.name}: ${r.reason}` } }); }
-        else { this.emit({ type: "alert", data: { level: "warn", body: `${a.name}: ${r.reason}` } }); }
-      } catch (e) { this.emit({ type: "alert", data: { level: "critical", body: `${a.name} 실행 오류: ${(e as Error).message}` } }); }
-      a.busy = false; a.mode = "work"; this.refreshQueues(); this.dirty = true;
-      break; // 한 tick에 하나만
+      running++; void this.runFor(a, t.id);
     }
+  }
+  private async runFor(a: Actor, taskId: number) {
+    a.busy = true; a.mode = "busy"; this.dirty = true;
+    try {
+      const r = await runQueuedTask(a.id, taskId, { presenceState: a.state });
+      if (r.ok) { this.say("agent", a.id, a.name, r.message || "산출물을 승인 큐에 올렸습니다.", "office"); this.emit({ type: "task", data: { taskId, status: "review", agentId: a.id, title: r.title || "" } }); try { onTaskFinished(this, taskId, r.artifactId); } catch (e) { console.error("directive follow-up failed", e); } }
+      else this.emit({ type: "alert", data: { level: "warn", body: `${a.name}: ${r.reason}` } });
+    } catch (e) { this.emit({ type: "alert", data: { level: "critical", body: `${a.name} 실행 오류: ${(e as Error).message}` } }); }
+    a.busy = false; a.mode = "work"; this.refreshQueues(); this.dirty = true;
   }
 
   /* ── 외부 API ─────────────────────────────────────── */
@@ -151,20 +155,22 @@ export class World {
   humanSay(u: User, body: string) {
     this.say("human", u.id, u.display_name, body);
     if (isBroadcast(body)) { try { if (startDirective(this, u, body)) return; } catch (e) { console.error("directive start failed", e); } }
-    const m = body.match(/@([^\s@]+)/g) || [];
-    for (const tag of m) {
-      const name = tag.slice(1);
-      const a = [...this.actors.values()].find((x) => x.kind === "agent" && x.name === name);
-      if (!a) continue;
+    const named = (body.match(/@([^\s@]+)/g) || []).map((t) => t.slice(1).replace(/[,.!?~:;)」』]+$/, ""));
+    const hits = named.map((n) => [...this.actors.values()].find((x) => x.kind === "agent" && x.name === n)).filter((a): a is Actor => !!a);
+    // @담당자 + 업무 문장이면 그 담당자에게 바로 배정 (PM만 부르면 PM이 편성)
+    if (hits.length && looksLikeTask(body)) {
+      try { if (startDirective(this, u, body.replace(/@[^\s@]+/g, " ").replace(/\s+/g, " ").trim(), { only: hits.map((a) => a.id) })) return; } catch (e) { console.error("mention task failed", e); }
+    }
+    for (const a of hits) {
       if (!a.present) { a.manual = "in"; this.persist(a); a.wait = 0; setTimeout(() => this.say("agent", a.id, a.name, `${u.display_name}님, 부르셔서 출근합니다. 자리에 앉으면 시작할게요.`), 800); }
       else if (a.queue > 0) setTimeout(() => this.say("agent", a.id, a.name, `지금 배정된 작업을 처리 중입니다. 곧 승인 큐에 올라가요.`), 700);
-      else setTimeout(() => this.say("agent", a.id, a.name, `지금 배정된 일이 없어요. 업무를 주시면 바로 시작할게요. (대기 중 — 비용 0)`), 700);
+      else setTimeout(() => this.say("agent", a.id, a.name, `네, 대기 중이에요. 「@${a.name} ○○ 만들어줘」처럼 말씀하시면 바로 시작할게요.`), 700);
     }
   }
   /** 조용히 출근시키기 (시스템 메시지 없음) — 전체 지시 흐름용 */
   summon(agentId: number) { const a = this.actors.get(this.key("agent", agentId)); if (!a || a.present) return; a.manual = "in"; this.persist(a); a.wait = 0; this.dirty = true; }
-  callAgent(agentId: number, byName: string) { const a = this.actors.get(this.key("agent", agentId)); if (!a) return false; a.manual = "in"; this.persist(a); a.wait = 0; this.say("system", 0, "무결", `${byName}님이 ${a.name}을(를) 호출했습니다.`); return true; }
-  dismissAgent(agentId: number, byName: string) { const a = this.actors.get(this.key("agent", agentId)); if (!a) return false; a.manual = "out"; this.persist(a); a.wait = 0; this.say("system", 0, "무결", `${byName}님이 ${a.name}을(를) 내보냈습니다. 진행 중 작업은 저장됩니다.`); return true; }
+  callAgent(agentId: number, byName: string) { const a = this.actors.get(this.key("agent", agentId)); if (!a) return false; a.manual = "in"; this.persist(a); a.wait = 0; this.say("system", 0, "PM", `${byName}님이 ${a.name}을(를) 호출했습니다.`); return true; }
+  dismissAgent(agentId: number, byName: string) { const a = this.actors.get(this.key("agent", agentId)); if (!a) return false; a.manual = "out"; this.persist(a); a.wait = 0; this.say("system", 0, "PM", `${byName}님이 ${a.name}을(를) 내보냈습니다. 진행 중 작업은 저장됩니다.`); return true; }
   clearManual(agentId: number) { const a = this.actors.get(this.key("agent", agentId)); if (a) { a.manual = ""; this.persist(a); a.wait = 0; } }
   notifyTasksChanged() { this.refreshQueues(); this.dirty = true; for (const a of this.actors.values()) if (a.kind === "agent") a.wait = Math.min(a.wait, 1); }
   stop() { if (this.timer) clearInterval(this.timer); }

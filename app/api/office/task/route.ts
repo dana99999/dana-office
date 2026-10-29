@@ -21,6 +21,6 @@ export async function POST(req: Request) {
   const r = d.prepare("INSERT INTO tasks (project_id, title, brief, requester_id, assignee_agent_id, priority) VALUES (?,?,?,?,?,?)").run(pid, b.title.slice(0, 120), (b.brief || "").slice(0, 4000), s.uid, b.agentId, b.priority || 2);
   const w = getWorld(); w.notifyTasksChanged();
   const a = w.roster().find((x) => x.id === b.agentId);
-  w.say("system", 0, "무결", `${s.name}님이 ${a?.name || "AI"}에게 「${b.title}」 배정`);
+  w.say("system", 0, "PM", `${s.name}님이 ${a?.name || "AI"}에게 「${b.title}」 배정`);
   return NextResponse.json({ ok: true, taskId: Number(r.lastInsertRowid), projectId: pid });
 }

@@ -70,6 +70,10 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
   useEffect(() => {
     const cv = cvRef.current; if (!cv) return; const g = cv.getContext("2d")!; let raf = 0; let last = performance.now(); const t0 = last;
     if (!bgRef.current) bgRef.current = document.createElement("canvas");
+    // 책상·의자 등 동적 소품은 무겁다(그림자·그라데이션) — 상태가 바뀌거나 125ms마다만 다시 그린 레이어를 재사용
+    const dyn = { cv: document.createElement("canvas"), sig: "", s: 0, at: 0 };
+    // 이름표·구역 라벨은 키별 요소를 유지하고 transform만 갱신 (매 프레임 innerHTML 재생성 금지)
+    const tagEls = new Map<string, HTMLDivElement>(); const tagLayer0 = viewRef.current?.querySelector<HTMLDivElement>(".actors"); if (tagLayer0) tagLayer0.innerHTML = "";
     const loop = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000); last = now; const t = (now - t0) / 1000; const { scale, vw } = viewRefState.current; const dpr = window.devicePixelRatio || 1;
       const { vh } = viewRefState.current; if (cv.width !== Math.round(vw * dpr) || cv.height !== Math.round(vh * dpr)) { cv.width = Math.round(vw * dpr); cv.height = Math.round(vh * dpr); }
@@ -79,7 +83,7 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
       for (const a of snap.actors) {
         const k = `${a.kind}:${a.id}`; live.add(k); let an = anims.get(k); const tx = a.x * TS, ty = a.y * TS;
         if (!an) { an = { px: tx, py: ty, dir: a.dir, anim: 0, blink: 2 + Math.random() * 4 }; anims.set(k, an); }
-        const dx = tx - an.px, dy = ty - an.py, sp = STEP_PX_PER_S * dt;
+        const dx = tx - an.px, dy = ty - an.py, sp = STEP_PX_PER_S * dt * (Math.abs(dx) + Math.abs(dy) > TS * 1.1 ? 1.6 : 1); // 네트워크 지연으로 한 칸 이상 밀리면 따라잡기
         if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) { if (Math.abs(dx) > Math.abs(dy)) an.dir = dx > 0 ? "right" : "left"; else an.dir = dy > 0 ? "down" : "up"; an.px += Math.abs(dx) <= sp ? dx : Math.sign(dx) * sp; an.py += Math.abs(dy) <= sp ? dy : Math.sign(dy) * sp; an.anim += dt * 2.4; } else { an.dir = a.dir; }
         an.blink -= dt; if (an.blink < -0.15) an.blink = 2.5 + Math.random() * 4;
       }
@@ -95,7 +99,13 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
       // 자리에 앉은 액터의 데스크는 캐릭터 뒤에 다시 그려 하반신을 가린다 (착석 표현)
       const seatedDesks = new Set<string>();
       for (const a of snap.actors) { const an = anims.get(`${a.kind}:${a.id}`); if (!an) continue; const mv = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5; const dk = deskOf(a.seat); if (!mv && a.x === a.seat[0] && a.y === a.seat[1] && dk && dk.facing === "down") seatedDesks.add(`${dk.desk[0]},${dk.desk[1]}`); }
-      drawDynamic(g, ctx, simMin, seatedDesks);
+      { const s = scale * dpr; const sig = `${JSON.stringify(desk)}|${[...seatedDesks].join(",")}|${doorOpen}|${simMin}`;
+        if (sig !== dyn.sig || s !== dyn.s || now - dyn.at > 125) {
+          const w = Math.round(W * s), h = Math.round(H * s); if (dyn.cv.width !== w || dyn.cv.height !== h) { dyn.cv.width = w; dyn.cv.height = h; }
+          const dg = dyn.cv.getContext("2d")!; dg.setTransform(1, 0, 0, 1, 0, 0); dg.clearRect(0, 0, w, h); dg.setTransform(s, 0, 0, s, 0, 0); dg.imageSmoothingEnabled = true;
+          drawDynamic(dg, ctx, simMin, seatedDesks); dyn.sig = sig; dyn.s = s; dyn.at = now;
+        }
+        g.drawImage(dyn.cv, 0, 0, W, H); }
       const sorted = [...snap.actors].sort((a, b) => (anims.get(`${a.kind}:${a.id}`)?.py || 0) - (anims.get(`${b.kind}:${b.id}`)?.py || 0));
       const nowMs = Date.now();
       for (const a of sorted) {
@@ -116,14 +126,20 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
       drawLight(g, hour, lamps, mons, zonesLit);
       g.setTransform(1, 0, 0, 1, 0, 0);
       const layer = viewRef.current?.querySelector<HTMLDivElement>(".actors"); if (layer) {
-        const parts: string[] = [];
-        for (const l of ZONE_LABELS) { const lx = (l[1] * TS - camX) * scale; if (lx > -60 && lx < vw + 60) parts.push(`<div class="zlabel" style="left:${lx}px;top:${l[2] * TS * scale}px">${l[0]}</div>`); }
+        const alive = new Set<string>();
+        const put = (k: string, cls: string, html: string, x: number, y: number, ay: string) => {
+          let el = tagEls.get(k); if (!el || el.parentNode !== layer) { el = document.createElement("div"); tagEls.set(k, el); layer.appendChild(el); }
+          alive.add(k); if (el.className !== cls) el.className = cls;
+          if (el.dataset.h !== html) { el.dataset.h = html; el.innerHTML = html; }
+          const tf = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) translate(-50%,${ay})`; if (el.dataset.tf !== tf) { el.dataset.tf = tf; el.style.transform = tf; }
+        };
+        for (const l of ZONE_LABELS) { const lx = (l[1] * TS - camX) * scale; if (lx > -60 && lx < vw + 60) put(`z:${l[0]}`, "zlabel", l[0], lx, l[2] * TS * scale, "-50%"); }
         for (const a of snap.actors) { const an = anims.get(`${a.kind}:${a.id}`)!; const lx = (an.px + TS / 2 - camX) * scale; if (lx < -80 || lx > vw + 80) continue;
-          const dkT = deskOf(a.seat); const mvT = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5; const under = !mvT && a.x === a.seat[0] && a.y === a.seat[1] && dkT?.facing === "up"; // 위를 보고 앉으면 책상을 가리지 않게 태그를 아래로
-          const top = (under ? an.py + TS + 4 : an.py - 23) * scale; const you = a.kind === "human" && a.id === me.id; const mv = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5; const st = mv ? "" : a.mode === "busy" ? svgStr.gear : a.kind === "agent" && a.state === "idle" ? svgStr.moon : svgStr.pencil;
-          parts.push(`<div class="tag ${you ? "you" : a.kind === "human" ? "human" : ""} ${under ? "under" : ""}" style="left:${lx}px;top:${top}px"><i class="dot ${a.kind === "agent" ? (a.state === "idle" ? "idle" : "work") : "human"}"></i>${esc(a.name)}<em>${st}</em></div>`);
+          const dkT = deskOf(a.seat); const mv = Math.abs(an.px - a.x * TS) > 0.5 || Math.abs(an.py - a.y * TS) > 0.5; const under = !mv && a.x === a.seat[0] && a.y === a.seat[1] && dkT?.facing === "up"; // 위를 보고 앉으면 책상을 가리지 않게 태그를 아래로
+          const top = (under ? an.py + TS + 4 : an.py - 23) * scale; const you = a.kind === "human" && a.id === me.id; const st = mv ? "" : a.mode === "busy" ? svgStr.gear : a.kind === "agent" && a.state === "idle" ? svgStr.moon : svgStr.pencil;
+          put(`t:${a.kind}:${a.id}`, `tag ${you ? "you" : a.kind === "human" ? "human" : ""} ${under ? "under" : ""}`, `<i class="dot ${a.kind === "agent" ? (a.state === "idle" ? "idle" : "work") : "human"}"></i>${esc(a.name)}<em>${st}</em>`, lx, top, under ? "0" : "-100%");
         }
-        layer.innerHTML = parts.join("");
+        for (const [k, el] of tagEls) if (!alive.has(k)) { el.remove(); tagEls.delete(k); }
       }
       /* 말풍선 — 매 프레임 재생성하면 등장 애니메이션이 리셋되므로 키별 요소를 유지하며 위치만 갱신 */
       const blayer = viewRef.current?.querySelector<HTMLDivElement>(".bubbles"); if (blayer) {
@@ -212,7 +228,7 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
             <p className="hint">바닥을 탭하면 그곳으로 걸어가고, AI를 탭하면 업무를 지시합니다. 화면이 좁으면 카메라가 나를 따라오고 좌우 드래그로 둘러볼 수 있습니다.</p>
             <div className="dpad"><span /><button onClick={() => postMove({ dx: 0, dy: -1 })} aria-label="위"><I.arrow dir="up" size={20} /></button><span /><button onClick={() => postMove({ dx: -1, dy: 0 })} aria-label="왼쪽"><I.arrow dir="left" size={20} /></button><button onClick={() => postMove({ dx: 0, dy: 1 })} aria-label="아래"><I.arrow dir="down" size={20} /></button><button onClick={() => postMove({ dx: 1, dy: 0 })} aria-label="오른쪽"><I.arrow dir="right" size={20} /></button></div>
             <p className="hint">키보드 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 이동 · <kbd>Enter</kbd> 대화창 열기 → 입력 후 <kbd>Enter</kbd> 발송 · <kbd>Esc</kbd> 닫기 · 입력창 왼쪽 마이크를 누르고 말하면 끝나는 즉시 발송됩니다.</p>
-            <p className="hint"><b>채팅 요령</b> · <code>@소라</code> 처럼 부르면 그 담당자가 출근해 답합니다. 담당자를 부르지 않고 업무를 말하면(예: 「신제품 런칭 캠페인 준비해줘」) PM 무결이 접수해 관련 담당자들이 역할을 나눠 시작하고, 끝나면 종합 정리를 아카이브에 남깁니다.</p>
+            <p className="hint"><b>채팅 요령</b> · <code>@디자이너 배너 시안 만들어줘</code> 처럼 부르면 그 담당자에게 바로 배정됩니다. 담당자를 부르지 않고 업무를 말하면(예: 「신제품 런칭 캠페인 준비해줘」) PM이 접수해 관련 담당자들이 역할을 나눠 시작하고, 끝나면 종합 정리를 아카이브에 남깁니다.</p>
             <p className="hint">대기·부재 AI는 LLM을 호출하지 않습니다. 업무를 배정한 순간부터만 과금됩니다.</p>
           </div>
         )}
@@ -231,7 +247,7 @@ export function OfficeView({ me, projects }: { me: Me; projects: { id: number; n
                   {look ? <SpriteView look={look} size={22} ring={row ? ringOf(row) : undefined} /> : <span className="allmark"><I.users size={14} /></span>}
                   <b>@{a.name}</b><span>{a.role}</span>{row && <em className={`dot ${row.present ? (row.state === "idle" ? "idle" : "work") : "away"}`} />}
                 </button>); })}</div>)}
-            <form className="chatin" onSubmit={(e) => { e.preventDefault(); say(); }}>{speechOk && <button type="button" className={`btn mic ${listening ? "on" : ""}`} onClick={toggleVoice} aria-label={listening ? "듣는 중 — 눌러서 중지" : "음성으로 말하기"} aria-pressed={listening}><I.mic size={18} /></button>}<input ref={inputRef} value={text} onChange={(e) => { setText(e.target.value); setMentionIdx(0); }} placeholder={listening ? "듣고 있어요… 말이 끝나면 자동 발송" : "Enter로 입력 · 마이크로 말하기 · @소라 호출"} aria-label="채팅 입력" onKeyDown={onInputKey} autoComplete="off" /><button className="btn primary send" aria-label="보내기"><I.send size={18} /></button></form></div>
+            <form className="chatin" onSubmit={(e) => { e.preventDefault(); say(); }}>{speechOk && <button type="button" className={`btn mic ${listening ? "on" : ""}`} onClick={toggleVoice} aria-label={listening ? "듣는 중 — 눌러서 중지" : "음성으로 말하기"} aria-pressed={listening}><I.mic size={18} /></button>}<input ref={inputRef} value={text} onChange={(e) => { setText(e.target.value); setMentionIdx(0); }} placeholder={listening ? "듣고 있어요… 말이 끝나면 자동 발송" : "@디자이너 배너 만들어줘 · 담당자 없이 말하면 PM이 배정"} aria-label="채팅 입력" onKeyDown={onInputKey} autoComplete="off" /><button className="btn primary send" aria-label="보내기"><I.send size={18} /></button></form></div>
           </section>
         ) : (
           <section className="pane teampane">

@@ -15,14 +15,14 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   if (b.action === "approve") {
     d.prepare("UPDATE artifacts SET status='approved', approved_by=?, reason=NULL WHERE id=?").run(s.uid, aid);
     d.prepare("UPDATE tasks SET status='approved', updated_at=datetime('now') WHERE id=?").run(art.task_id);
-    getWorld().say("system", 0, "무결", `${s.name}님이 ${art.agent_name}의 「${art.task_title}」 승인`);
+    getWorld().say("system", 0, "PM", `${s.name}님이 ${art.agent_name}의 「${art.task_title}」 승인`);
   } else if (b.action === "reject") {
     if (!b.reason || b.reason.trim().length < 2) return NextResponse.json({ error: "반려 사유는 필수입니다" }, { status: 400 });
     d.prepare("UPDATE artifacts SET status='rejected', approved_by=?, reason=? WHERE id=?").run(s.uid, b.reason.trim().slice(0, 1000), aid);
     // 재작업: 반려 사유를 브리프에 덧붙여 큐로 되돌림 (retry=false면 종료)
     if (b.retry !== false) d.prepare("UPDATE tasks SET status='queued', brief = brief || char(10) || '[반려 사유] ' || ?, updated_at=datetime('now') WHERE id=?").run(b.reason.trim(), art.task_id);
     else d.prepare("UPDATE tasks SET status='rejected', updated_at=datetime('now') WHERE id=?").run(art.task_id);
-    getWorld().say("system", 0, "무결", `${s.name}님이 「${art.task_title}」 반려 — ${b.reason.trim().slice(0, 40)}`);
+    getWorld().say("system", 0, "PM", `${s.name}님이 「${art.task_title}」 반려 — ${b.reason.trim().slice(0, 40)}`);
   } else return NextResponse.json({ error: "action" }, { status: 400 });
   getWorld().notifyTasksChanged();
   return NextResponse.json({ ok: true });

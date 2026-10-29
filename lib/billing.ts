@@ -41,9 +41,26 @@ export function spentMonth(mode: "live" | "all" = "live"): number {
 export function spentProject(projectId: number): number {
   return (db().prepare("SELECT COALESCE(SUM(cost_usd),0) AS c FROM usage_ledger WHERE project_id = ? AND mode='live'").get(projectId) as { c: number }).c;
 }
-export function creditsTotal(): number { return (db().prepare("SELECT COALESCE(SUM(amount_usd),0) AS c FROM credits").get() as { c: number }).c; }
+/** 구독 월간 크레딧(Claude Max 등): MONTHLY_CREDIT_USD가 있으면 매월 CREDIT_RESET_DAY일에 새로 채워지고 이월되지 않는다 */
+const MONTHLY_CREDIT = Number(process.env.MONTHLY_CREDIT_USD || 0), RESET_DAY = Number(process.env.CREDIT_RESET_DAY || 1);
+const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+export function creditCycle(): { start: string; next: string } | null {
+  if (!MONTHLY_CREDIT) return null;
+  const now = new Date(); const s = new Date(now.getFullYear(), now.getMonth(), RESET_DAY);
+  if (s > now) s.setMonth(s.getMonth() - 1);
+  const n = new Date(s); n.setMonth(n.getMonth() + 1);
+  return { start: ymd(s), next: ymd(n) };
+}
+export function creditsTotal(): number {
+  const c = creditCycle();
+  if (!c) return (db().prepare("SELECT COALESCE(SUM(amount_usd),0) AS c FROM credits").get() as { c: number }).c;
+  return MONTHLY_CREDIT + (db().prepare("SELECT COALESCE(SUM(amount_usd),0) AS c FROM credits WHERE date(ts,'localtime') >= ?").get(c.start) as { c: number }).c;
+}
 export function creditsRemaining(): number {
-  const spent = (db().prepare("SELECT COALESCE(SUM(cost_usd),0) AS c FROM usage_ledger WHERE mode='live'").get() as { c: number }).c;
+  const c = creditCycle();
+  const spent = c
+    ? (db().prepare("SELECT COALESCE(SUM(cost_usd),0) AS c FROM usage_ledger WHERE mode='live' AND date(ts,'localtime') >= ?").get(c.start) as { c: number }).c
+    : (db().prepare("SELECT COALESCE(SUM(cost_usd),0) AS c FROM usage_ledger WHERE mode='live'").get() as { c: number }).c;
   return creditsTotal() - spent;
 }
 export function globalLimit(): { monthly_usd: number; alert_pct: number } {
@@ -84,5 +101,5 @@ export function billingSummary() {
   const credits = rows<{ id: number; ts: string; amount_usd: number; receipt_ref: string; note: string }>("SELECT * FROM credits ORDER BY id DESC");
   const alerts = rows<{ id: number; ts: string; level: string; body: string }>("SELECT * FROM alerts ORDER BY id DESC LIMIT 8");
   const liveMode = !!process.env.ANTHROPIC_API_KEY && !!(d.prepare("SELECT enabled FROM features WHERE key='live_llm'").get() as { enabled: number } | undefined)?.enabled;
-  return { today: spentToday(undefined, "all"), todayLive: spentToday(), month: spentMonth("all"), monthLive: spentMonth(), creditsTotal: creditsTotal(), creditsRemaining: creditsRemaining(), limit: globalLimit(), daily, byAgent, byZone, byProject, recent, credits, alerts, liveMode, krwPerUsd: KRW_PER_USD, outputsToday: (d.prepare(`SELECT COUNT(*) AS c FROM artifacts WHERE date(created_at,'localtime') = ${today()}`).get() as { c: number }).c };
+  return { today: spentToday(undefined, "all"), todayLive: spentToday(), month: spentMonth("all"), monthLive: spentMonth(), creditsTotal: creditsTotal(), creditsRemaining: creditsRemaining(), creditCycle: creditCycle(), limit: globalLimit(), daily, byAgent, byZone, byProject, recent, credits, alerts, liveMode, krwPerUsd: KRW_PER_USD, outputsToday: (d.prepare(`SELECT COUNT(*) AS c FROM artifacts WHERE date(created_at,'localtime') = ${today()}`).get() as { c: number }).c };
 }

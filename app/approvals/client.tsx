@@ -4,9 +4,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { ArtifactRow } from "@/lib/queries";
 import type { ImageRequest } from "@/lib/types";
+import { mdToHtml } from "@/lib/md";
 type Img = ImageRequest & { agent_name: string; task_title: string };
 export function ApprovalsClient({ items, images, me, genspark }: { items: ArtifactRow[]; images: Img[]; me: { id: number; role: string }; genspark: { url: string; mode: string } }) {
-  const r = useRouter(); const [reason, setReason] = useState<Record<number, string>>({}); const [busy, setBusy] = useState<number | null>(null);
+  const r = useRouter(); const [reason, setReason] = useState<Record<number, string>>({}); const [busy, setBusy] = useState<number | null>(null); const [open, setOpen] = useState<Record<number, boolean>>({});
   const act = async (id: number, action: "approve" | "reject") => { setBusy(id); const res = await fetch(`/api/artifacts/${id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, reason: reason[id] }) }); const j = await res.json().catch(() => ({})); setBusy(null); if (!res.ok) alert(j.error || "실패"); r.refresh(); };
   return (
     <div>
@@ -21,8 +22,10 @@ export function ApprovalsClient({ items, images, me, genspark }: { items: Artifa
         {items.map((a) => (
           <div className="card" key={a.id}>
             <div className="row" style={{ justifyContent: "space-between" }}><div><b>{a.title}</b><div className="muted">{a.agent_name} · {a.project_name} · {a.task_title} · {a.created_at.slice(0, 16)}</div></div><Link className="btn sm" href={`/artifacts/${a.id}`}>전체 보기</Link></div>
-            <pre className="muted" style={{ whiteSpace: "pre-wrap", maxHeight: 140, overflow: "hidden", fontFamily: "inherit", margin: "8px 0", fontSize: 12.5 }}>{a.body_md.slice(0, 600)}{a.body_md.length > 600 ? "…" : ""}</pre>
-            {a.image_request_id && <div className="muted">🖼️ 이미지 요청 {a.image_status === "done" ? "완료" : "대기 (젠스파크)"}</div>}
+            {/* 원문 마크다운 대신 렌더링해 바로 읽히게 — 길면 접어 두고 펼치기 */}
+            <div className={`md preview ${open[a.id] ? "open" : ""}`} dangerouslySetInnerHTML={{ __html: mdToHtml(a.body_md) }} />
+            {a.body_md.length > 500 && <button className="btn sm ghost" style={{ marginBottom: 4 }} onClick={() => setOpen({ ...open, [a.id]: !open[a.id] })}>{open[a.id] ? "접기" : "펼쳐서 읽기"}</button>}
+            {a.image_request_id && <div className="muted">이미지 요청 {a.image_status === "done" ? "완료" : "대기 (젠스파크)"}</div>}
             <div className="row" style={{ marginTop: 8 }}>
               <button className="btn primary" disabled={busy === a.id} onClick={() => act(a.id, "approve")}>승인</button>
               <input placeholder="반려 사유 (필수)" value={reason[a.id] || ""} onChange={(e) => setReason({ ...reason, [a.id]: e.target.value })} style={{ flex: 1, minWidth: 160, padding: "7px 10px", border: "1px solid var(--line-strong)", borderRadius: 3, background: "var(--surface)", color: "var(--ink)" }} />

@@ -15,6 +15,6 @@ export async function POST(req: Request) {
   let team = b.team;
   if (!team) { const t = d.prepare("SELECT default_team_json FROM project_types WHERE name = ?").get(b.type) as { default_team_json: string } | undefined; const slugs: string[] = t ? JSON.parse(t.default_team_json) : []; team = (d.prepare(`SELECT id FROM agents WHERE slug IN (${slugs.map(() => "?").join(",") || "''"})`).all(...slugs) as { id: number }[]).map((x) => x.id); }
   const ins = d.prepare("INSERT OR IGNORE INTO assignments (project_id, agent_id) VALUES (?,?)"); for (const id of team) ins.run(pid, id);
-  const w = getWorld(); w.notifyTasksChanged(); w.say("system", 0, "무결", `「${b.name}」 편성 완료 — ${team.length}명 호출`);
+  const w = getWorld(); w.notifyTasksChanged(); w.say("system", 0, "PM", `「${b.name}」 편성 완료 — ${team.length}명 호출`);
   return NextResponse.json({ ok: true, id: pid });
 }

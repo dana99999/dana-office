@@ -18,7 +18,7 @@ export default async function Archive({ searchParams }: { searchParams: Promise<
       {clients.filter((c) => counts.get(c)).map((c) => <Link key={c} href={`/archive?client=${encodeURIComponent(c)}`} className={`chip filter client ${filter === c ? "on" : ""}`}>{c} <b>{counts.get(c) || 0}</b></Link>)}
       {(counts.get("") || 0) > 0 && <Link href="/archive?client=" className={`chip filter ${filter === "" ? "on" : ""}`}>미지정 <b>{counts.get("")}</b></Link>}
     </div>
-    {items.length === 0 && <div className="card muted">{filter === undefined ? "아직 전체 지시가 없습니다. 오피스 채팅에서 담당자를 부르지 않고 업무를 말하면(예: 「신제품 런칭 캠페인 준비해줘」) 관련 담당자들이 역할을 나눠 시작하고, 끝나면 PM 무결이 여기에 종합 정리를 남깁니다." : "이 광고주로 태그된 기록이 없습니다."}</div>}
+    {items.length === 0 && <div className="card muted">{filter === undefined ? "아직 전체 지시가 없습니다. 오피스 채팅에서 담당자를 부르지 않고 업무를 말하면(예: 「신제품 런칭 캠페인 준비해줘」) 관련 담당자들이 역할을 나눠 시작하고, 끝나면 PM이 여기에 종합 정리를 남깁니다." : "이 광고주로 태그된 기록이 없습니다."}</div>}
     <div className="grid">{items.map((d) => { const st = ST[d.status] || ST.open; return (
       <div className="card" key={d.id}>
         <div className="row" style={{ justifyContent: "space-between", marginBottom: 8, alignItems: "flex-start" }}><div style={{ minWidth: 0 }}><b style={{ fontSize: 15 }}>#{d.id} {d.body}</b><div className="muted">{d.requester_name} · {d.project_name} · {d.created_at.slice(0, 16)}</div></div><span className="row" style={{ gap: 6, flex: "none" }}><ClientTag id={d.id} client={d.client} options={clients} />{d.source !== "office" && <span className="chip move">{d.source}</span>}<span className={`chip ${st[0]}`}>{st[1]}</span><DeleteDirective id={d.id} title={d.body} /></span></div>

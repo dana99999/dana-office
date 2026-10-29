@@ -25,6 +25,6 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
   let direct = d.prepare("SELECT id FROM projects WHERE type='직접 지시' LIMIT 1").get() as { id: number } | undefined;
   if (!direct) direct = { id: Number(d.prepare("INSERT INTO projects (client, name, type, brief, budget_usd) VALUES ('내부','직접 지시','직접 지시','채팅·프로필에서 바로 시킨 단건 업무',30)").run().lastInsertRowid) };
   d.transaction(() => { d.prepare("UPDATE directives SET project_id = ? WHERE project_id = ?").run(direct!.id, pid); d.prepare("DELETE FROM projects WHERE id = ?").run(pid); })();
-  const w = getWorld(); w.notifyTasksChanged(); for (const a of w.roster()) w.clearManual(a.id); w.say("system", 0, "무결", `${s.name}님이 프로젝트 「${p.name}」 삭제`);
+  const w = getWorld(); w.notifyTasksChanged(); for (const a of w.roster()) w.clearManual(a.id); w.say("system", 0, "PM", `${s.name}님이 프로젝트 「${p.name}」 삭제`);
   return NextResponse.json({ ok: true });
 }

@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 /**
  * 외부 수신 — 클로드 코드(PC·텔레그램) 등에서 토큰으로 호출.
  *   mode "archive"  : 내용을 그대로 아카이브 문서로 보관 (비용 0)
- *   mode "dispatch" : 전체 지시로 접수 → PM 무결이 담당자 배정 → 산출물 → 종합 아카이브
+ *   mode "dispatch" : 전체 지시로 접수 → PM이 담당자 배정 → 산출물 → 종합 아카이브
  * 헤더 Authorization: Bearer <INGEST_TOKEN>  (.env.local)
  */
 export async function POST(req: Request) {

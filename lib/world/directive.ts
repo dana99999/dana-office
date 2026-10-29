@@ -1,6 +1,6 @@
 /**
  * 전체 지시(브로드캐스트) — 사람이 특정 담당자를 부르지 않고 업무를 말하면
- * PM(무결)이 접수 → 관련 담당자들이 각자 역할을 선언하고 작업에 들어감 → 모두 끝나면 PM이 종합 정리 → 아카이브.
+ * PM이 접수 → 관련 담당자들이 각자 역할을 선언하고 작업에 들어감 → 모두 끝나면 PM이 종합 정리 → 아카이브.
  * 역할 선언·접수 문장은 저장된 템플릿(LLM 호출 없음). 실제 산출물은 기존 runQueuedTask 경로(mock/live)로만 만들어진다.
  */
 import { db } from "../db";
@@ -18,6 +18,8 @@ export function isBroadcast(body: string): boolean {
   if (/@[^\s@]+/.test(body)) return false;
   return body.trim().length >= 8 && TASK_HINT.test(body); // 명령형 어미가 없으면 잡담으로 본다 (비용 0)
 }
+/** 업무 지시로 읽히는 문장인가 (명령형 어미) */
+export function looksLikeTask(body: string): boolean { return body.trim().length >= 6 && TASK_HINT.test(body); }
 export function stripBroadcast(body: string) { return body.replace(BROADCAST_RE, "").trim(); }
 
 const RULES: [RegExp, string][] = [
@@ -72,7 +74,7 @@ function resolveProject(d: ReturnType<typeof db>, body: string, agentIds: number
   const hit = active.find((p) => p.type !== "직접 지시" && p.name && body.includes(p.name));
   let p = hit || active.find((x) => x.type === "직접 지시");
   if (!p) {
-    const r = d.prepare("INSERT INTO projects (client, name, type, brief, budget_usd) VALUES ('내부','직접 지시','직접 지시','채팅·프로필에서 바로 시킨 단건 업무',30)").run();
+    const r = d.prepare("INSERT INTO projects (client, name, type, brief, budget_usd) VALUES ('내부','직접 지시','직접 지시','채팅·프로필에서 바로 시킨 단건 업무',0)").run();
     p = d.prepare("SELECT * FROM projects WHERE id = ?").get(Number(r.lastInsertRowid)) as Project;
   }
   const ins = d.prepare("INSERT OR IGNORE INTO assignments (project_id, agent_id) VALUES (?,?)");
@@ -81,11 +83,13 @@ function resolveProject(d: ReturnType<typeof db>, body: string, agentIds: number
 }
 
 /** 전체 지시 시작: PM 접수 → 담당자 역할 선언(순차) → 작업 생성 */
-export function startDirective(w: WorldPort, u: User, body: string, opts: { source?: string; context?: string; client?: string } = {}): DirectiveRow | null {
+export function startDirective(w: WorldPort, u: User, body: string, opts: { source?: string; context?: string; client?: string; only?: number[] } = {}): DirectiveRow | null {
   const d = db();
   const agents = d.prepare("SELECT * FROM agents WHERE active = 1").all() as Agent[];
   const pm = agents.find((a) => a.slug === PM_SLUG); if (!pm) return null;
-  const team = pickTeam(body, agents); if (!team.length) return null;
+  // 멘션으로 담당자를 직접 지정했으면 그 담당자만, 아니면 본문 키워드로 편성 (PM만 멘션하면 PM이 편성)
+  const forced = (opts.only || []).map((id) => agents.find((a) => a.id === id && a.slug !== PM_SLUG)).filter((a): a is Agent => !!a);
+  const team = forced.length ? forced : pickTeam(body, agents); if (!team.length) return null;
   const project = resolveProject(d, body, [pm.id, ...team.map((a) => a.id)]);
   const clean = stripBroadcast(body); const short = shortTitle(body);
   const ins = d.prepare("INSERT INTO tasks (project_id, title, brief, requester_id, assignee_agent_id, priority) VALUES (?,?,?,?,?,2)");
@@ -95,16 +99,18 @@ export function startDirective(w: WorldPort, u: User, body: string, opts: { sour
   const row = d.prepare("INSERT INTO directives (body, requester_id, requester_name, project_id, member_task_ids, source, client) VALUES (?,?,?,?,?,?,?)").run(clean, u.id, u.display_name, project.id, JSON.stringify(taskIds), opts.source || "office", guessClient(`${clean}\n${opts.context || ""}`, project, opts.client));
   const dir = d.prepare("SELECT * FROM directives WHERE id = ?").get(Number(row.lastInsertRowid)) as DirectiveRow;
   // PM 접수 → 담당자 순차 역할 선언 → 출근·작업 시작
-  const names = team.map((a) => `${a.name}(${a.role_title})`).join(", ");
+  const names = team.map((a) => a.name).join(", ");
+  const solo = team.length === 1;
   w.summon(pm.id);
-  if (opts.source && opts.source !== "office") w.say("system", 0, "무결", `${opts.source}에서 넘어온 지시: 「${short}」`);
-  setTimeout(() => w.say("agent", pm.id, pm.name, `${u.display_name}님 지시 접수했습니다. 「${short}」 — 참여: ${names}. 각자 역할 정리해 주세요. 산출물이 모두 들어오면 제가 종합해서 아카이브합니다.`), 700);
+  if (opts.source && opts.source !== "office") w.say("system", 0, "PM", `${opts.source}에서 넘어온 지시: 「${short}」`);
+  setTimeout(() => w.say("agent", pm.id, pm.name, `${u.display_name}님 지시 접수했습니다. 「${short}」 — ${solo ? `${names} 단독 진행, 끝나면 바로 승인 큐에 올라갑니다.` : `참여: ${names}. 산출물이 모두 들어오면 제가 종합해서 아카이브합니다.`}`), 700);
   team.forEach((a, i) => setTimeout(() => { w.summon(a.id); w.say("agent", a.id, a.name, ROLE[a.slug]?.claim(clean) || `${a.role_title} 몫은 제가 맡겠습니다.`); }, 1800 + i * 1300));
   setTimeout(() => w.notifyTasksChanged(), 1800 + team.length * 1300);
   return dir;
 }
 
-const TERMINAL = new Set(["review", "approved", "rejected", "blocked"]);
+// blocked(한도·크레딧 보류)는 끝난 게 아니다 — 재개되면 그때 종합한다
+const TERMINAL = new Set(["review", "approved", "rejected"]);
 /** 작업 하나가 끝났을 때 — 소속 지시의 진척 확인 → 종합 작업 생성 또는 아카이브 확정 */
 export function onTaskFinished(w: WorldPort, taskId: number, artifactId?: number) {
   const d = db();
@@ -121,6 +127,13 @@ export function onTaskFinished(w: WorldPort, taskId: number, artifactId?: number
     const tasks = ids.map((id) => d.prepare("SELECT * FROM tasks WHERE id = ?").get(id) as Task | undefined).filter((t): t is Task => !!t);
     if (!tasks.every((t) => TERMINAL.has(t.status))) return;
     const pm = d.prepare("SELECT * FROM agents WHERE slug = ?").get(PM_SLUG) as Agent | undefined; if (!pm) return;
+    // 담당자 한 명이면 종합 단계 없이 그 산출물을 그대로 아카이브 (비용·대기 절약)
+    if (tasks.length === 1) {
+      const art = d.prepare("SELECT id FROM artifacts WHERE task_id = ? ORDER BY id DESC LIMIT 1").get(tasks[0].id) as { id: number } | undefined;
+      d.prepare("UPDATE directives SET status='archived', summary_artifact_id=?, archived_at=datetime('now') WHERE id = ?").run(art?.id ?? null, dir.id);
+      setTimeout(() => w.say("agent", pm.id, pm.name, `「${shortTitle(dir.body)}」 완료 — 승인 큐와 아카이브 #${dir.id}에 올렸습니다.`), 600);
+      return;
+    }
     // 종합 브리프: 지시 원문 + 담당자별 산출물 본문
     const secs = tasks.map((t) => {
       const a = d.prepare("SELECT name, role_title FROM agents WHERE id = ?").get(t.assignee_agent_id) as { name: string; role_title: string } | undefined;
@@ -161,7 +174,7 @@ export function archiveExternal(w: WorldPort, u: User, input: { title: string; b
   const body = `# ${title}\n\n**출처** ${input.source} · **기록자** ${u.display_name} · **일시** ${new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}\n\n${input.body.trim()}`;
   const a = d.prepare("INSERT INTO artifacts (task_id, agent_id, kind, title, body_md, status, approved_by) VALUES (?,?,?,?,?,'approved',?)").run(Number(t.lastInsertRowid), pm.id, "report", title.slice(0, 80), body.slice(0, 200000), u.id);
   const r = d.prepare("INSERT INTO directives (body, requester_id, requester_name, project_id, member_task_ids, summary_task_id, summary_artifact_id, status, archived_at, source, client) VALUES (?,?,?,?,'[]',?,?,'archived',datetime('now'),?,?)").run(title, u.id, u.display_name, project.id, Number(t.lastInsertRowid), Number(a.lastInsertRowid), input.source, guessClient(`${title}\n${input.body}`, project, input.client));
-  w.say("system", 0, "무결", `${input.source}에서 아카이브 추가: 「${title}」 (아카이브 #${Number(r.lastInsertRowid)})`);
+  w.say("system", 0, "PM", `${input.source}에서 아카이브 추가: 「${title}」 (아카이브 #${Number(r.lastInsertRowid)})`);
   return { directiveId: Number(r.lastInsertRowid), artifactId: Number(a.lastInsertRowid) };
 }
 
